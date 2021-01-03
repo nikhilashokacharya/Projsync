@@ -1,0 +1,721 @@
+<template>
+  <div>
+    <div
+    v-on="eventStoppers()"
+      class="outer-page"
+      :style="pageStyleObj"
+      @contextmenu="contextMenuVisible($event, -1)"
+      @click.stop="selectedItem"
+      @mousedown="controlEditMode"
+      @keydown.enter="setContentEditable($event, true)"
+      @keydown.esc="setContentEditable($event, false)"
+      :tabindex="properties.TabIndex"
+      :title="properties.ControlTipText"
+    >
+      <div class="pages" :style="styleTabsObj" :title="properties.ControlTipText">
+        <div class="move" ref="scrolling" :style="styleMoveObj">
+          <div
+            ref="controlTabsRef"
+            class="page"
+            v-for="(value, key) in extraDatas.Tabs"
+            :key="key"
+            :style="getTabStyle"
+          >
+          <FDControlTabs @setValue="setValue" :tempWidth="tempWidth" @isChecked="isChecked" :getMouseCursorData="getMouseCursorData" :setFontStyle="setFontStyle" :data="data" @tempStretch="tempStretch" :pageValue="value" :indexValue="key" :pageData="value" :isRunMode="isRunMode" :isEditMode="isEditMode"  :isItalic="isItalic" :tempStretch="tempStretch" :tempWeight="tempWeight"/>
+          <div
+              class="content"
+              :style="styleContentObj"
+              :title="properties.ControlTipText"
+            ></div>
+          </div>
+        </div>
+        <div></div>
+        <div
+          :style="getScrollButtonStyleObj"
+        >
+          <button class="left-button" :style="scrollButtonStyle" @click="leftmove"></button>
+          <button class="right-button" :style="scrollButtonStyle" @click="rightmove"></button>
+        </div>
+      </div>
+    </div>
+    <div
+      id="right-click-menu"
+      tabindex="0"
+      @blur.stop="closeMenu"
+       ref="tabstripContextMenu"
+      :style="{ top: top, left: left, display: viewMenu ? 'block' : 'none' }"
+    >
+      <ContextMenu
+        :values="contextMenuValue"
+        :controlId="controlId"
+        :selectedTab="updatedValue"
+        :data="data"
+        :userFormId="userFormId"
+        @closeMenu="closeMenu"
+      />
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+import { Component, Emit, Prop, Ref, Watch } from 'vue-property-decorator'
+import FdControlVue from '@/api/abstract/FormDesigner/FdControlVue'
+import { State, Action } from 'vuex-class'
+import ContextMenu from '../FDContextMenu/index.vue'
+import { tabsContextMenu } from '../../../models/tabsContextMenu'
+import { controlProperties } from '@/FormDesigner/controls-properties'
+import FDControlTabs from '@/FormDesigner/components/atoms/FDControlTabs/index.vue'
+import Vue from 'vue'
+
+@Component({
+  name: 'FDTabStrip',
+  components: {
+    ContextMenu,
+    FDControlTabs
+  }
+})
+export default class FDTabStrip extends FdControlVue {
+  @State((state) => state.fd.userformData) userformData!: userformData;
+  @Prop() isEditMode: boolean;
+  @Prop({ required: true, type: String }) public userFormId!: string;
+  @Ref('tabstripContextMenu') tabstripContextMenu: HTMLDivElement
+  @Ref('scrolling') scrolling:HTMLDivElement
+  @Ref('controlTabsRef') controlTabsRef: HTMLDivElement[];
+  $el: HTMLDivElement
+
+  isScroll = true;
+  viewMenu?: boolean = false;
+  top: string = '0px';
+  left: string = '0px';
+  contextMenuValue: Array<IcontextMenu> = tabsContextMenu;
+  tempScrollWidth: number;
+  updatedValue: number = 0;
+  tempWidth: number = 0;
+  tempHeight: number = 0;
+  multiRowCount: number = 1;
+  isScrollVisible: boolean = false;
+  rightClickSelect (value: number) {
+    this.updateDataModel({ propertyName: 'Value', value: value })
+  }
+
+  contextMenuVisible (e: MouseEvent, selected: number) {
+    if (this.isEditMode) {
+      if (selected !== -1) {
+        this.top = `${e.offsetY}px`
+        this.left = `${e.offsetX}px`
+        // this.isChecked(selected.indexValue)
+      } else {
+        this.top = `${e.offsetY + 30}px`
+        this.left = `${e.offsetX}px`
+      }
+      e.preventDefault()
+      e.stopPropagation()
+      const controlLeft: number = this.userformData['ID_USERFORM1'][this.controlId].properties.Left!
+      const controlTop: number = this.userformData['ID_USERFORM1'][this.controlId].properties.Top!
+      for (const val of this.contextMenuValue) {
+        if (val.id === 'ID_DELETEPAGE' || val.id === 'ID_RENAME') {
+          val.disabled = this.extraDatas.Tabs!.length === 0
+        } else if (val.id === 'ID_MOVE') {
+          val.disabled = this.extraDatas.Tabs!.length <= 1
+        }
+      }
+      this.viewMenu = true
+      Vue.nextTick(() => this.tabstripContextMenu.focus())
+    } else {
+      return undefined
+    }
+  }
+
+  /**
+   * @description takes the index Value and sets the Value property
+   * @function setValue
+   *
+   */
+  setValue (value: number) {
+    this.updatedValue = value
+    this.updateDataModel({ propertyName: 'Value', value: value })
+    return true
+  }
+
+  /**
+   * @description takes the ref of the div and determines the scrollLeft and scrollTop
+   * @function leftmove
+   *
+   */
+  leftmove () {
+    const scrollRef = this.scrolling
+    if (this.properties.TabOrientation === 0 || this.properties.TabOrientation === 1) {
+    scrollRef.scrollLeft! -= 50
+    } else {
+    scrollRef.scrollTop! -= 50
+    }
+  }
+
+  /**
+   * @description takes the ref of the div and determines the scrollLeft and scrollTop
+   * @function rightmove
+   *
+   */
+  rightmove () {
+    const scrollRef = this.scrolling
+    let tempScrollTop = scrollRef.scrollTop!
+    if (this.properties.TabOrientation === 0 || this.properties.TabOrientation === 1) {
+    scrollRef.scrollLeft! += 50
+    } else {
+      tempScrollTop += 50
+      scrollRef.scrollTop = tempScrollTop
+    }
+  }
+
+  /**
+   * @description takes the index Value and pageValue and set the Value property
+   * @function isChecked
+   *
+   */
+  isChecked (value: selectedTab) {
+    this.updatedValue = value.indexValue
+    this.updateDataModel({ propertyName: 'Value', value: value.indexValue })
+  }
+
+  /**
+   * @description style object is passed to :style attribute in div tag
+   * dynamically changing the styles of the component based on propControlData
+   * @function pageStyleObj
+   *
+   */
+  protected get pageStyleObj (): Partial<CSSStyleDeclaration> {
+    const controlProp = this.properties
+    let display = ''
+    if (this.isRunMode) {
+      display = controlProp.Visible ? 'inline-block' : 'none'
+    } else {
+      display = 'inline-block'
+    }
+    return {
+      left: `${controlProp.Left}px`,
+      width: `${controlProp.Width}px`,
+      height: `${controlProp.Height}px`,
+      top: `${controlProp.Top}px`,
+      cursor:
+        controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''
+          ? this.getMouseCursorData
+          : 'default',
+      display: display
+    }
+  }
+
+  /**
+   * @description style object is passed to :style attribute in div tag
+   * dynamically changing the styles of the component based on propControlData
+   * @function styleMoveObj
+   *
+   */
+  protected get styleMoveObj (): Partial<CSSStyleDeclaration> {
+    const controlProp = this.properties
+    const a = ['bottom', 'top']
+    let bottomTopStyle = {}
+    if (controlProp.TabOrientation === 1) {
+      bottomTopStyle = { [a[0]]: '0px' }
+    } else if (controlProp.TabOrientation === 0) {
+      bottomTopStyle = { [a[1]]: '0px' }
+    }
+    return {
+      ...bottomTopStyle,
+      display: controlProp.Style === 2 ? 'none' : 'inline-block',
+      alignSelf: controlProp.TabOrientation === 1 ? 'flex-end' : '',
+      marginTop: controlProp.TabOrientation === 1 ? `${controlProp.Height! - 35}px` : '0px',
+      whiteSpace: controlProp.MultiRow === true ? 'break-spaces' : 'nowrap',
+      zIndex: controlProp.MultiRow === true ? '100' : '1',
+      height: controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3 ? this.isScrollVisible ? `${controlProp.Height! - 48}px` : `${controlProp.Height}px` : '',
+      width: controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3 ? 'fit-content' : this.isScrollVisible ? `${controlProp.Width! - 62}px` : `${controlProp.Width!}px`,
+      float: controlProp.TabOrientation === 3 ? 'right' : '',
+      overflow: 'hidden'
+    }
+  }
+
+  /**
+   * @description style object is passed to :style attribute in button tags
+   * dynamically changing the styles of the component based on propControlData
+   * @function getScrollButtonStyleObj
+   *
+   */
+  protected get getScrollButtonStyleObj (): Partial<CSSStyleDeclaration> {
+    const controlProp = this.properties
+    const tabsLength = this.properties.TabFixedWidth! > 0 ? this.extraDatas.Tabs!.length * this.properties.TabFixedWidth! + (10 * this.extraDatas.Tabs!.length) : this.properties.Font!.FontSize! < 36 ? this.properties.Font!.FontSize! * 3.5 * this.extraDatas.Tabs!.length : this.properties.Font!.FontSize! * 2.3 * this.extraDatas.Tabs!.length
+    const tabsHeight = this.properties.TabFixedHeight! > 0 ? this.extraDatas.Tabs!.length * this.properties.TabFixedHeight! + (10 * this.extraDatas.Tabs!.length) : this.properties.Font!.FontSize! * 2.3 * this.extraDatas.Tabs!.length
+    return {
+      position: 'absolute',
+      zIndex: '30001',
+      marginTop:
+        controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3
+          ? `${controlProp.Height! - 20}px` : controlProp.TabOrientation === 1 ? `${controlProp.Height! - 22}px` : '0px',
+      transform:
+        controlProp.TabOrientation === 2
+          ? 'rotate(90deg)'
+          : this.transformScrollButtonStyle,
+      display: this.scrollButtonVerify(),
+      right: controlProp.TabOrientation === 3 ? '0px' : controlProp.TabOrientation === 2 ? `${controlProp.Width! - 40}px` : '0px',
+      top: '0px'
+    }
+  }
+
+  get scrollButtonStyle () {
+    const controlProp = this.properties
+    return {
+      cursor:
+        controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''
+          ? this.getMouseCursorData
+          : 'default'
+    }
+  }
+
+  scrollButtonVerify () {
+    const tabsLength = this.properties.TabFixedWidth! > 0 ? this.extraDatas.Tabs!.length * this.properties.TabFixedWidth! + (10 * this.extraDatas.Tabs!.length) : this.properties.Font!.FontSize! < 36 ? this.properties.Font!.FontSize! * 3.5 * this.extraDatas.Tabs!.length : this.properties.Font!.FontSize! * 2.3 * this.extraDatas.Tabs!.length
+    const tabsHeight = this.properties.TabFixedHeight! > 0 ? this.extraDatas.Tabs!.length * this.properties.TabFixedHeight! + (10 * this.extraDatas.Tabs!.length) : this.properties.Font!.FontSize! * 2.3 * this.extraDatas.Tabs!.length
+    if (this.properties.Style === 2) {
+      this.isScrollVisible = false
+      return 'none'
+    } if (!this.properties.MultiRow) {
+      if (this.properties.TabOrientation === 0 || this.properties.TabOrientation === 1) {
+        if (this.properties.Width! > 44) {
+          if (tabsLength > this.properties.Width!) {
+            this.isScrollVisible = true
+            return 'block'
+          } else {
+            this.isScrollVisible = false
+            return 'none'
+          }
+        } else {
+          this.isScrollVisible = false
+          return 'none'
+        }
+      } else if (this.properties.TabOrientation === 2 || this.properties.TabOrientation === 3) {
+        if (this.properties.Height! > 44) {
+          if (tabsHeight > this.properties.Height!) {
+            this.isScrollVisible = true
+            return 'block'
+          } else {
+            this.isScrollVisible = false
+            return 'none'
+          }
+        } else {
+          this.isScrollVisible = false
+          return 'none'
+        }
+      } else {
+        this.isScrollVisible = false
+        return 'none'
+      }
+    } else {
+      this.isScrollVisible = false
+      return 'none'
+    }
+  }
+
+  /**
+   * @description style object is passed to :style attribute in div tag
+   * dynamically changing the styles of the component based on propControlData
+   * @function styleTabsObj
+   *
+   */
+  protected get styleTabsObj (): Partial<CSSStyleDeclaration> {
+    const controlProp = this.properties
+    return {
+      backgroundColor: controlProp.BackColor,
+      cursor:
+        controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''
+          ? this.getMouseCursorData
+          : 'default',
+      display: controlProp.TabOrientation === 1 ? 'flex' : '',
+      position: 'absolute'
+    }
+  }
+
+  /**
+   * @description style object is passed to :style attribute in div tag
+   * dynamically changing the styles of the component based on propControlData
+   * @function getTabStyle
+   *
+   */
+  protected get getTabStyle (): Partial<CSSStyleDeclaration> {
+    const controlProp = this.properties
+    return {
+      display:
+        controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1
+          ? 'inline-block'
+          : 'block',
+      cursor:
+        controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''
+          ? this.getMouseCursorData
+          : 'default'
+    }
+  }
+
+  /**
+   * @description style object is passed to :style attribute in div tag
+   * dynamically changing the styles of the component based on propControlData
+   * @function styleContentObj
+   *
+   */
+  protected get styleContentObj (): Partial<CSSStyleDeclaration> {
+    const controlProp = this.properties
+    return {
+      position: 'absolute',
+      zIndex: '10000',
+      display:
+        controlProp.Style === 1 || controlProp.Style === 2
+          ? 'none'
+          : controlProp.Width! < 30 || controlProp.Height! < 30
+            ? 'none'
+            : 'block',
+      top: controlProp.TabOrientation === 0 ? controlProp.MultiRow ? (this.tempHeight + 12) * this.multiRowCount + 'px' : controlProp.TabFixedHeight! > 0 ? (controlProp.TabFixedHeight! + 10) + 'px' : controlProp.TabFixedHeight! === 0 ? (this.tempHeight + 9) + 'px' : '33px' : controlProp.TabOrientation === 1 ? controlProp.MultiRow ? '-' + (this.tempHeight + 12) * (this.multiRowCount - 1) + 'px' : controlProp.TabFixedHeight! > 0 ? '0px' : '0px' : '0px',
+      height: controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1
+        ? controlProp.TabFixedHeight! > 0 ? (controlProp.Height! - controlProp.TabFixedHeight! - 5) + 'px' : controlProp.TabFixedHeight! === 0 ? (controlProp.Height! - controlProp.Font!.FontSize! - 13) + 'px'
+          : controlProp.TabOrientation === 1
+            ? `${controlProp.Height! - 21}px`
+            : `${controlProp.Height! - 35}px`
+        : `${controlProp.Height! - 2}px`,
+      width:
+        controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1
+          ? `${controlProp.Width! - 3}px`
+          : controlProp.TabFixedWidth! > 0 ? (controlProp.Width! - controlProp.TabFixedWidth! - 15) + 'px' : controlProp.TabFixedWidth! === 0 ? controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3 ? `${controlProp.Width! - this.tempWidth - 12}px` : (controlProp.Width! - controlProp.Font!.FontSize! - 20) + 'px' : `${controlProp.Width! - 34}px`,
+      left: controlProp.TabOrientation === 2 ? controlProp.TabFixedWidth! > 0 ? (controlProp.TabFixedWidth! + 12) + 'px' : controlProp.TabFixedWidth! === 0 ? controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3 ? `${this.tempWidth + 12}px` : (controlProp.Font!.FontSize! + 20) + 'px' : '40px' : controlProp.TabOrientation === 3 ? controlProp.TabFixedWidth! > 0 ? '0px' : '0px' : '0px',
+      cursor:
+        controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''
+          ? this.getMouseCursorData
+          : 'default',
+      padding: '0px'
+    }
+  }
+
+  scrollCheck () {
+    const tabsLength = this.extraDatas.Tabs!.length * this.properties.TabFixedWidth! + (10 * this.extraDatas.Tabs!.length)
+    if (
+      tabsLength > this.properties.Width!
+    ) {
+      this.isScroll = true
+    } else {
+      this.isScroll = false
+    }
+  }
+
+  /**
+   * @description watches changes in propControlData to set autoset when true
+   * @function isScrollUsed
+   * @param oldVal previous propControlData data
+   * @param newVal  new/changed propControlData data
+   */
+  @Watch('properties.Width')
+  isScrollUsed (newVal: controlData, oldVal: controlData) {
+    this.tempScrollWidth = this.scrolling.offsetWidth!
+    if (this.properties.MultiRow) {
+      const initialLength = this.extraDatas.Tabs!.length!
+      const len = (this.tempWidth + 12) * initialLength
+      if ((len - this.properties.Width!) >= 0) {
+        const a = Math.floor(len / this.properties.Width!) + 1
+        this.multiRowCount = a
+        if (this.properties.Width! <= ((this.tempWidth + 12) * 2)) {
+          this.multiRowCount = a + 2
+        } else if (newVal > oldVal) {
+          this.multiRowCount = this.controls.length!
+          const a = Math.ceil(len / this.properties.Width!)
+          this.multiRowCount = a
+        }
+      } else {
+        this.multiRowCount = 1
+      }
+    } else {
+      this.scrollCheck()
+    }
+  }
+  mounted () {
+    this.$el.focus()
+    this.tempScrollWidth = this.scrolling.offsetWidth!
+    this.scrollCheck()
+    this.calculateWidthHeight()
+  }
+  /**
+   * @description watches changes in FontSize of Font
+   * @function checkFontValue
+   * @param oldVal previous properties data
+   * @param newVal  new/changed properties data
+   */
+  @Watch('properties.Font.FontSize', { deep: true })
+  checkFontValue (newVal: number, oldVal: number) {
+    this.calculateWidthHeight()
+  }
+
+  /**
+   * @description watches changes in selectedPageData to set the caption
+   * @function captionValue
+   * @param oldVal previous selectedPageData data
+   * @param newVal  new/changed selectedPageData data
+   */
+  @Watch('selectedPageData.properties.Caption')
+  captionValue (newVal: string, oldVal: string) {
+    this.calculateWidthHeight()
+  }
+
+  calculateWidthHeight () {
+    const that = this
+    if (this.controlTabsRef) {
+      const divElement = this.controlTabsRef
+      let tempWidth = 0
+      let tempHeight = 0
+      Vue.nextTick(function () {
+        for (let i = 0; i < divElement.length; i++) {
+          const ele = divElement[i].children[0].children[1].children[0] as HTMLInputElement
+          if (ele.offsetWidth > tempWidth) {
+            tempWidth = ele.offsetWidth
+          }
+          if (ele.offsetHeight > tempHeight) {
+            tempHeight = ele.offsetHeight
+          }
+        }
+        that.tempWidth = tempWidth
+        that.tempHeight = tempHeight
+      })
+    }
+  }
+  @Emit('updateModel')
+  updateDataModel (updateData: IupdateDataModel) {
+    return updateData
+  }
+
+  closeMenu () {
+    this.viewMenu = false
+  }
+  eventStoppers () {
+    const eventStop = (event: Event) => event.stopPropagation()
+    return this.isEditMode === false ? null : {
+      keydown: eventStop
+    }
+  }
+}
+</script>
+
+<style scoped>
+.outer-page {
+  background-color: rgb(238, 238, 238);
+  overflow-y: hidden;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  width: 0px;
+  height: 0px;
+  left: 0px;
+  top: 0px;
+}
+.pages {
+  margin: 0;
+  width: calc(100%);
+  height: calc(100%);
+  white-space: nowrap;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+.left-button {
+  position: relative;
+  outline: none;
+  background-image: url("../../../../assets/left-arrow-img.png");
+  background-size: 30%;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: 2px solid white;
+  border-right-color: gray;
+  border-bottom-color: gray;
+  top: 3px;
+  right: 15px;
+  width: 22px;
+  height: 18px;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  z-index: 5;
+}
+.right-button {
+  position: relative;
+  outline: none;
+  background-image: url("../../../../assets/right-arrow-img.png");
+  background-size: 30%;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: 2px solid white;
+  border-right-color: gray;
+  border-bottom-color: gray;
+  top: 3px;
+  right: 15px;
+  width: 22px;
+  height: 18px;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  z-index: 5;
+}
+.move {
+  width: 100%;
+  display: grid;
+}
+
+.page {
+  vertical-align: top;
+  z-index: 1;
+  overflow: hidden;
+}
+.scroll-page {
+  z-index: 2;
+}
+.page label {
+  border: 0.1px solid white;
+  background-color: rgb(238, 238, 238);
+  padding: 5px 5px 5px 5px;
+  margin: 0;
+  cursor: pointer;
+  position: relative;
+  top: 0px;
+}
+.page [type="radio"] {
+  display: none;
+}
+::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 1em;
+  background-color: rgb(238, 238, 238);
+}
+::-webkit-scrollbar.move {
+  display: none;
+  width: 0;
+  height: 1em;
+  background-color: rgb(238, 238, 238);
+}
+
+::-webkit-scrollbar-button {
+  background: rgb(238, 238, 238);
+  height: 20px;
+  border: 1px solid lightgray;
+  border-right-color: gray;
+  border-bottom-color: gray;
+}
+
+/* Up */
+::-webkit-scrollbar-button:single-button:horizontal:decrement {
+  background-image: url("../../../../assets/triangle-up-img.png");
+  transform: rotate(90deg);
+  background-size: 10px;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Down */
+::-webkit-scrollbar-button:single-button:horizontal:increment {
+  background-image: url("../../../../assets/triangle-down-img.png");
+  background-size: 10px;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+::-webkit-scrollbar-track-piece {
+  width: 0px;
+}
+
+.page .content {
+  position: absolute;
+  white-space: normal;
+  top: 23px;
+  left: 0px;
+  background: rgb(238, 238, 238);
+  height: 100px;
+  right: 0;
+  bottom: 0;
+  padding: 20px;
+  padding-right: 10px;
+  width: calc(100% - 35px);
+  height: calc(100% - 65px);
+  border: 0.1px solid white;
+  box-shadow: 2px 1px gray;
+}
+.forButton {
+  margin: 3px;
+  border-radius: 3px;
+  z-index: 2;
+  border: 2px outset;
+}
+.page [type="radio"]:checked ~ label.forButton {
+  margin: 3px;
+  border-right: 2px solid gray;
+  border-bottom: none;
+  border-radius: 3px;
+  z-index: 2;
+  background-color: gray;
+  border: 2px inset;
+}
+.forTab {
+  border-bottom: none;
+  border-radius: 3px;
+}
+.page [type="radio"]:checked ~ label.forTab {
+  border-right: 2px solid gray;
+  border-bottom: none;
+  border-radius: 3px;
+  z-index: 2;
+}
+.forLeft {
+  border-bottom: none;
+  border-radius: 3px;
+}
+.page [type="radio"]:checked ~ label.forLeft {
+  border-bottom: 2px solid gray;
+  border-radius: 3px;
+  z-index: 2;
+}
+
+.fmTabStyleButton {
+  border: 1px inset !important;
+}
+.fmTabStyleButton [type="radio"]:checked {
+  border: 1px outset !important;
+  background-color: gray !important;
+}
+.page [type="radio"]:checked ~ label ~ .content {
+  z-index: 1;
+}
+.content {
+  overflow: auto;
+}
+#right-click-menu {
+  background: #fafafa;
+  border: 1px solid #bdbdbd;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2),
+    0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  display: block;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  width: 100px;
+  z-index: 999999;
+}
+
+#right-click-menu li {
+  border-bottom: 1px solid #e0e0e0;
+  margin: 0;
+  padding: 5px 5px;
+}
+
+#right-click-menu li:last-child {
+  border-bottom: none;
+}
+
+#right-click-menu li:hover {
+  background: #1e88e5;
+  color: #fafafa;
+}
+
+.spanClass {
+  text-decoration: underline;
+  text-underline-position: under;
+}
+:focus{
+  outline: none;
+}
+</style>
