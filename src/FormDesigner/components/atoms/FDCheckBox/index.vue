@@ -303,6 +303,7 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
       height: '100%',
       display: !this.isEditMode ? 'table-cell' : 'flex',
       alignItems: this.alignItem ? 'baseline' : 'center',
+      justifyContent: this.isEditMode ? controlProp.Alignment === 0 ? 'flex-end' : '' : '',
       backgroundImage: `url(${controlProp.Picture})`,
       backgroundRepeat: this.getRepeat,
       backgroundPosition: this.getPosition,
