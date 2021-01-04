@@ -125,8 +125,6 @@ export default class UserForm extends FdContainerVue {
    */
   protected get innerWindowStyle (): Partial<CSSStyleDeclaration> {
     return {
-      boxShadow:
-        this.properties.SpecialEffect! > 0 ? this.getSpecialEffectData : 'none',
       margin: '5px',
       left: `${this.properties.Left}px`,
       width: `${this.properties.Width}px`,
@@ -144,6 +142,10 @@ export default class UserForm extends FdContainerVue {
     const scale = (this.properties.Zoom! * 10) / 100
     return {
       ...this.getSampleDotPattern,
+      borderLeft: this.properties.SpecialEffect === 2 ? '2px solid gray' : this.properties.SpecialEffect === 3 ? '1.5px solid gray' : this.properties.SpecialEffect === 4 ? '0.5px solid gray' : '',
+      borderRight: this.properties.SpecialEffect === 1 ? '2px solid gray' : this.properties.SpecialEffect === 4 ? '1.5px solid gray' : this.properties.SpecialEffect === 3 ? '0.5px solid gray' : '',
+      borderTop: this.properties.SpecialEffect === 2 ? '2px solid gray' : this.properties.SpecialEffect === 3 ? '1.5px solid gray' : this.properties.SpecialEffect === 4 ? '0.5px solid gray' : '',
+      borderBottom: this.properties.SpecialEffect === 1 ? '2px solid gray' : this.properties.SpecialEffect === 4 ? '1.5px solid gray' : this.properties.SpecialEffect === 3 ? '0.5px solid gray' : '',
       cursor:
         this.properties.MousePointer !== 0 || this.properties.MouseIcon !== ''
           ? `${this.getMouseCursorData} !important`
