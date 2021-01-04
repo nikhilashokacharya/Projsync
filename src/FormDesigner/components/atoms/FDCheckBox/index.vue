@@ -7,7 +7,7 @@
     @keydown.enter.prevent="setContentEditable($event, true)"
     :tabindex="properties.TabIndex"
   >
-    <label class="control">
+    <label class="control" :style="controlStyleObj">
       <input
         @change="handleChange($event, checkboxInput)"
         ref="checkboxInput"
@@ -69,6 +69,13 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
   $el: HTMLDivElement
   alignItem: boolean = false
 
+  get controlStyleObj () {
+    const controlProp = this.properties
+    return {
+      position: 'sticky',
+      top: `${controlProp.Height! / 2 - 10}px`
+    }
+  }
   get spanStyleObj () {
     const controlProp = this.properties
     if (isNaN(this.properties.TextAlign!)) {

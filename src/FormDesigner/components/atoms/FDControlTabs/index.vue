@@ -201,7 +201,8 @@ export default class FDControlTabs extends Vue {
         controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''
           ? this.getMouseCursorData
           : 'default',
-      zIndex: controlProp.MultiRow ? '30000' : ''
+      zIndex: controlProp.MultiRow ? '30000' : '',
+      backgroundColor: this.indexValue === this.data.properties.Value! ? controlProp.Style === 1 ? 'gray' : '' : ''
     }
   }
 }
@@ -219,7 +220,7 @@ export default class FDControlTabs extends Vue {
   border-bottom: none;
   border-radius: 3px;
   z-index: 2;
-  background-color: gray;
+  background: gray;
   border: 2px inset;
 }
 .active-item-button {
@@ -254,6 +255,7 @@ export default class FDControlTabs extends Vue {
   z-index: 2;
 }
 .page label {
+  background-color: rgb(238,238,238) ;
   display: inline-block;
   padding: 5px 5px 5px 5px;
   margin: 0;

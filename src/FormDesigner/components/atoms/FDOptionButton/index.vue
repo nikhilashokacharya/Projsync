@@ -7,7 +7,7 @@
     :tabindex="properties.TabIndex"
     @keydown.enter.prevent="setContentEditable($event, true)"
   >
-    <label class="control"
+    <label class="control" :style="controlStyleObj"
       ><input
         @change="handleChange($event, optionBtnRef)"
         @click="SetValue()"
@@ -69,6 +69,14 @@ export default class FDOptionButton extends Mixins(FdControlVue) {
   @Ref('optionBtnSpanRef') optionBtnSpanRef!: FDEditableText
   $el: HTMLDivElement
   alignItem: boolean = false
+
+  get controlStyleObj () {
+    const controlProp = this.properties
+    return {
+      position: 'sticky',
+      top: `${controlProp.Height! / 2 - 10}px`
+    }
+  }
 
   get spanStyleObj () {
     const controlProp = this.properties
