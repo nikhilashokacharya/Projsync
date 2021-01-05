@@ -7,7 +7,7 @@
     @keydown.enter.prevent="setContentEditable($event, true)"
     :tabindex="properties.TabIndex"
   >
-    <label class="control" :style="controlStyleObj">
+    <label class="control" :style="controlStyleObj" v-if="properties.Alignment === 1">
       <input
         @change="handleChange($event, checkboxInput)"
         ref="checkboxInput"
@@ -22,10 +22,9 @@
         ref="spanRef"
       ></span
     ></label>
-    <div :style="pictureDivStyle">
+    <div :style="pictureDivStyle" v-if="properties.Alignment === 1">
       <div ref="divAutoSize" :style="divcssStyleProperty">
         <span
-        :style="spanStyleObj"
           v-if="!syncIsEditMode || isRunMode"
           @click="isRunMode && makeChecked($event)"
         >
@@ -47,6 +46,45 @@
         </FDEditableText>
       </div>
     </div>
+    <div :style="pictureDivStyle" v-if="properties.Alignment === 0">
+      <div ref="divAutoSize" :style="divcssStyleProperty">
+        <span
+          v-if="!syncIsEditMode || isRunMode"
+          @click="isRunMode && makeChecked($event)"
+        >
+          <span>{{ computedCaption.afterbeginCaption }}</span>
+          <span class="spanStyle">{{
+            computedCaption.acceleratorCaption
+          }}</span>
+          <span>{{ computedCaption.beforeendCaption }}</span>
+        </span>
+        <FDEditableText
+          v-else
+          ref="checkBoxSpanRef"
+          :editable="isRunMode === false && syncIsEditMode"
+          :caption="properties.Caption"
+          :style="editCssObj"
+          @updateCaption="updateCaption"
+          @releaseEditMode="releaseEditMode"
+        >
+        </FDEditableText>
+      </div>
+    </div>
+    <label class="control" :style="controlStyleObj" v-if="properties.Alignment === 0">
+      <input
+        @change="handleChange($event, checkboxInput)"
+        ref="checkboxInput"
+        :name="properties.Name"
+        :tabindex="properties.TabIndex"
+        :disabled="getDisableValue"
+        type="checkbox"
+        class="control-input visually-hidden" />
+      <span
+        class="control-indicator"
+        :style="controlIndicatorStyleObj"
+        ref="spanRef"
+      ></span
+    ></label>
   </div>
 </template>
 
@@ -74,17 +112,6 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
     return {
       position: 'sticky',
       top: `${controlProp.Height! / 2 - 10}px`
-    }
-  }
-  get spanStyleObj () {
-    const controlProp = this.properties
-    if (isNaN(this.properties.TextAlign!)) {
-      this.updateDataModel({ propertyName: 'TextAlign', value: 0 })
-    }
-    return {
-      position: 'absolute',
-      left: controlProp.TextAlign === 0 ? '0px' : '',
-      right: controlProp.Alignment === 0 && controlProp.TextAlign === 2 ? '0px' : ''
     }
   }
   /**
@@ -258,9 +285,8 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
       fontStretch: font.FontStyle !== '' ? this.tempStretch : '',
 
       display: display,
-      direction: controlProp.Alignment ? 'ltr' : 'rtl',
       overflow: 'hidden',
-      gridTemplateColumns: '12px auto ',
+      gridTemplateColumns: controlProp.Alignment === 1 ? '12px auto' : 'auto 12px',
       gridTemplateRows: '100%',
       gap: '2px',
       alignItems: font.FontSize! > 17 ? 'center' : '',
@@ -310,7 +336,6 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
       height: '100%',
       display: !this.isEditMode ? 'table-cell' : 'flex',
       alignItems: this.alignItem ? 'baseline' : 'center',
-      justifyContent: this.isEditMode ? controlProp.Alignment === 0 ? 'flex-end' : '' : '',
       backgroundImage: `url(${controlProp.Picture})`,
       backgroundRepeat: this.getRepeat,
       backgroundPosition: this.getPosition,
