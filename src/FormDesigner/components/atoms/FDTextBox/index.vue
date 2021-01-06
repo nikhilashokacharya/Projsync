@@ -162,9 +162,9 @@ export default class FDTextBox extends Mixins(FdControlVue) {
       borderTop: controlProp.SpecialEffect === 2 ? '2px solid gray' : controlProp.SpecialEffect === 3 ? '1.5px solid gray' : controlProp.SpecialEffect === 4 ? '0.5px solid gray' : '',
       borderBottom: controlProp.SpecialEffect === 1 ? '2px solid gray' : controlProp.SpecialEffect === 4 ? '1.5px solid gray' : controlProp.SpecialEffect === 3 ? '0.5px solid gray' : '',
       whiteSpace:
-        controlProp.WordWrap && controlProp.MultiLine ? 'normal' : 'nowrap',
+        controlProp.WordWrap && controlProp.MultiLine ? this.isEditMode && !controlProp.MultiLine ? 'nowrap' : '' : 'nowrap',
       wordBreak:
-        controlProp.WordWrap && controlProp.MultiLine ? 'break-word' : 'normal',
+        controlProp.WordWrap && controlProp.MultiLine ? this.isEditMode && !controlProp.MultiLine ? 'normal' : 'break-word' : 'normal',
       color:
         controlProp.Enabled === true ? controlProp.ForeColor : this.getEnabled,
       cursor:

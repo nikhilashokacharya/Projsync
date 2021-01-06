@@ -288,8 +288,12 @@ h1 {
   border-bottom-color: rgb(238, 238, 238);
   border-left-color: rgb(238, 238, 238);
   border-right-color: rgb(238, 238, 238);
-  outline: none;
+  /* outline: none; */
   white-space: pre;
+}
+
+.taborder-buttons :focus {
+  outline: 1px solid black;
 }
 
 .ui-btn {

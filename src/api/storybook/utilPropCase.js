@@ -139,7 +139,7 @@ export default function getStoryFunction (propName, ControlId) {
       result = (value) => { select('ListStyle', listStyle, value, GROUPID_4) }
       break
     case 'ListWidth':
-      result = (value) => { number('ListWidth', value, textDefaultValue, GROUPID_8) }
+      result = (value) => { text('ListWidth', value, GROUPID_8) }
       break
     case 'Locked':
       result = (value) => { boolean('Locked', value, GROUPID_2) }

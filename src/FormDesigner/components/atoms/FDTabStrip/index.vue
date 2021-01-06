@@ -327,7 +327,9 @@ export default class FDTabStrip extends FdControlVue {
           ? this.getMouseCursorData
           : 'default',
       display: controlProp.TabOrientation === 1 ? 'flex' : '',
-      position: 'absolute'
+      position: 'absolute',
+      width: `${controlProp.Width!}px`,
+      height: `${controlProp.Height!}px`
     }
   }
 
@@ -507,8 +509,6 @@ export default class FDTabStrip extends FdControlVue {
 }
 .pages {
   margin: 0;
-  width: calc(100%);
-  height: calc(100%);
   white-space: nowrap;
   overflow-x: hidden;
   overflow-y: hidden;

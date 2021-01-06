@@ -585,7 +585,7 @@ export default class FdControlVue extends Vue {
             this.updateDataModel({ propertyName: 'Value', value: propData.extraDatas!.ControlSourceValue })
           }
         }
-      }
+      };
     } else if (propData.properties.ControlSource) {
       const controlSourceValue = propData.extraDatas!.ControlSourceValue!.toLowerCase()
       const isBoolean:boolean | string = (controlSourceValue === 'true') ? true : (controlSourceValue === 'false') ? false : ''
@@ -620,7 +620,7 @@ export default class FdControlVue extends Vue {
   */
  @Watch('properties.Text', { deep: true })
   valueUpdateProp (newVal:string, oldVal:string) {
-    if (this.data.type!.includes('TextBox')) {
+    if (this.data.type!.includes('TextBox') || this.data.type === 'ComboBox') {
       const propData: controlProperties = this.properties
       this.updateDataModel({ propertyName: 'Value', value: newVal })
     }
@@ -803,7 +803,7 @@ topIndexCheck (newVal:number, oldVal:number) {
  *
  */
 handleMultiSelect (e: MouseEvent) {
-  if (e.target instanceof HTMLTableCellElement || e.target instanceof HTMLTableRowElement) {
+  if (e.target instanceof HTMLTableCellElement || e.target instanceof HTMLTableRowElement || e.target instanceof HTMLDivElement) {
     this.tempListBoxComboBoxEvent = e
     const targetElement = e.target
     const tempData = targetElement.parentElement!.children[0] as HTMLTableElement
@@ -925,6 +925,10 @@ handleMultiSelect (e: MouseEvent) {
     }
     this.setOptionBGColorAndChecked(e)
   }
+  const a = e.currentTarget! as HTMLDivElement
+  this.selectionData[0] = a.innerText
+  this.updateDataModel({ propertyName: 'Value', value: a.innerText[0] })
+  this.updateDataModel({ propertyName: 'Text', value: a.innerText[0] })
 }
 /**
  * @description updates the dataModel listBox object properties when keydown
@@ -1122,12 +1126,9 @@ handleExtendArrowKeySelect (e: KeyboardEvent) {
 */
 handleDrag (e: MouseEvent) {
   if (this.properties.MultiSelect === 2) {
-    // this.setOptionBGColorAndChecked(e)
     if (e.which === 1) {
-      // if (e.type === 'mouseenter') {
       this.setOptionBGColorAndChecked(e)
     }
-    // }
    window.getSelection()!.removeAllRanges()
   }
 }
@@ -1184,6 +1185,15 @@ setBGColorForPreviousSibling (e: KeyboardEvent) {
 * @param event
 */
 clearOptionBGColorAndChecked (e: any) {
+  if (this.data.type === 'ComboBox') {
+    for (let i = 0; i < e.path.length; i++) {
+      if (e.path[i].className === 'tBodyStyle') {
+        for (let j = 0; j < e.path[i].children.length; j++) {
+          e.path[i].children[j].style.backgroundColor = ''
+        }
+      }
+    }
+  }
   const tempPath = e.path
   if (tempPath && tempPath.length > 0) {
     for (let index = 0; index < tempPath.length; index++) {
@@ -1219,6 +1229,9 @@ setOptionBGColorAndChecked (e: KeyboardEvent | MouseEvent) {
    currentTargetElement.style.backgroundColor === 'rgb(59, 122, 231)'
      ? ''
      : 'rgb(59, 122, 231)'
+  if (this.data.type === 'ComboBox') {
+    childNodeChecked.checked = !childNodeChecked.checked
+  }
   if ((e.target instanceof HTMLTableCellElement || e.target instanceof HTMLTableRowElement)) {
     const targetEvent = e.target
     if (this.data.type === 'ComboBox') {

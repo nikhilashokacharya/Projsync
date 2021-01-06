@@ -478,7 +478,8 @@ export default class FDMultiPage extends FdContainerVue {
       display:
         controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1
           ? 'inline-block'
-          : 'block'
+          : 'block',
+      height: controlProp.TabFixedHeight! > 0 ? `${controlProp.TabFixedHeight! + 10}px` : ''
     }
   }
 
@@ -523,14 +524,14 @@ export default class FDMultiPage extends FdContainerVue {
       top:
       controlProp.Style !== 2 ? controlProp.TabOrientation === 0
         ? controlProp.MultiRow ? (this.tempHeight + 12) * this.multiRowCount + 'px' : controlProp.TabFixedHeight! > 0
-          ? controlProp.TabFixedHeight! + 12 + 'px'
+          ? controlProp.TabFixedHeight! + 10 + 'px'
           : controlProp.TabFixedHeight! === 0 ? (this.tempHeight + 9) + 'px'
             : '33px'
         : '0px' : '0px',
       height:
       controlProp.Style !== 2 ? controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1
         ? controlProp.MultiRow ? controlProp.Height! - ((this.tempHeight + 12) * this.multiRowCount) + 'px' : controlProp.TabFixedHeight! > 0
-          ? controlProp.Height! - controlProp.TabFixedHeight! - 5 + 'px'
+          ? controlProp.TabOrientation === 0 ? controlProp.Height! - controlProp.TabFixedHeight! - 10 + 'px' : controlProp.Height! - controlProp.TabFixedHeight! - 5 + 'px'
           : controlProp.TabFixedHeight! === 0 ? controlProp.Font!.FontSize! === 72 ? (controlProp.Height! - controlProp.Font!.FontSize! - 17) + 'px' : (controlProp.Height! - controlProp.Font!.FontSize! - 11) + 'px'
             : controlProp.TabOrientation === 1
               ? `${controlProp.Height! - 21}px`

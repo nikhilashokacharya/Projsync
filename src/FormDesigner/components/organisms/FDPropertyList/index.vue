@@ -107,7 +107,7 @@ export default class PropertiesList extends FDCommonMethod {
         result = this.updateResult(controlData.properties)
       } else if (this.getSelectedControlsDatas!.length > 1) {
         let ctrlKeys = []
-        const uniqueKey = ['Name', 'TabIndex', 'Index', 'MouseIcon', 'Picture', 'Cancel', 'Default', 'Value', 'Style']
+        const uniqueKey = ['Name', 'TabIndex', 'Index', 'MouseIcon', 'Picture', 'Cancel', 'Default', 'Style']
         const combinedObj: ICommonProp = {}
         const commonPropValue: ICommonPropVal = {}
 

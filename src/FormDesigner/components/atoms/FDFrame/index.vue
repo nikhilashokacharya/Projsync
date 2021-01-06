@@ -129,7 +129,7 @@ export default class FDFrame extends FdContainerVue {
     const controlProp = this.data.properties
     return {
       backgroundColor: controlProp.BackColor,
-      width: `${controlProp.Width!}px`,
+      width: `${controlProp.Width! - 1}px`,
       height: `${controlProp.Height}px`,
       boxShadow: controlProp.SpecialEffect ? this.getSpecialEffectData : 'none',
       borderLeft: controlProp.BorderStyle
@@ -171,7 +171,7 @@ export default class FDFrame extends FdContainerVue {
     }
     return {
       position: 'relative',
-      width: `${controlProp.Width!}px`,
+      width: `${controlProp.Width! - 3}px`,
       height: `${controlProp.Height}px`,
       marginLeft: '2px',
       padding: '0px',
@@ -241,7 +241,7 @@ export default class FDFrame extends FdContainerVue {
   get scrollSize (): Partial<CSSStyleDeclaration> {
     const controlProp = this.data.properties!
     return {
-      width: `${controlProp.Width!}px`,
+      width: `${controlProp.Width! - 3}px`,
       height: `${controlProp.Height! - 10}px`,
       overflowX: this.getScrollBarX,
       overflowY: this.getScrollBarY
@@ -318,10 +318,6 @@ export default class FDFrame extends FdContainerVue {
 </script>
 
 <style scoped>
-.outerDivClass {
-  /* overflow: hidden; */
-}
-
 .fieldset {
   box-sizing: border-box;
   margin: 0px;

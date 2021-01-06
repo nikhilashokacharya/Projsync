@@ -251,7 +251,7 @@ export class ControlPropertyData {
           Left: 20,
           ListRows: 4,
           ListStyle: 0,
-          ListWidth: '0 pt',
+          ListWidth: '0pt',
           Locked: false,
           MatchEntry: 1,
           MatchRequired: false,

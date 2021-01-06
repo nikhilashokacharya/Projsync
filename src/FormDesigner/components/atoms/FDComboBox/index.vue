@@ -30,7 +30,7 @@
           wrap="off"
           :tabindex="properties.TabIndex"
           :readonly="getDisableValue || properties.Style === 1"
-          :maxlength="properties.MaxLength !==0 ? properties.MaxLength : ''"
+          :maxlength="properties.MaxLength !== 0 ? properties.MaxLength : ''"
           @blur="handleBlur($event, textareaRef, hideSelectionDiv)"
           @click="handleClick($event, textareaRef, hideSelectionDiv)"
           @input="handleTextInput($event)"
@@ -56,16 +56,103 @@
       </div>
       <div
         class="selected"
-        :class="[properties.DropButtonStyle === 1 ? 'forArrow' : properties.DropButtonStyle === 2 ? 'forEllipsis' : properties.DropButtonStyle === 3 ? 'forReduce' : 'forPlain']"
         @click="enabledCheck($event)"
         :style="selectedStyleObj"
-      ></div>
+      >
+        <div v-if="properties.DropButtonStyle === 1">
+          <svg
+            version="1.0"
+            xmlns="http://www.w3.org/2000/svg"
+            height="10"
+            width="10"
+            viewBox="0 0 810.000000 460.000000"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            <g
+              :fill="properties.Enabled ? '#000000' : open ? '#000000' : 'rgb(190,190,190)'"
+              transform="translate(0.000000,460.000000) scale(0.100000,-0.100000)"
+              stroke="none"
+            >
+              <path
+                d="M74 4585 c-4 -8 0 -23 7 -32 8 -9 897 -1036 1977 -2282 1612 -1862
+          1967 -2266 1987 -2266 20 0 378 408 2005 2280 1089 1254 1979 2287 1977 2295
+          -2 13 -453 15 -3975 18 -3540 2 -3973 0 -3978 -13z"
+              />
+            </g>
+          </svg>
+        </div>
+        <div v-else-if="properties.DropButtonStyle === 2">
+          <svg
+            version="1.0"
+            xmlns="http://www.w3.org/2000/svg"
+            width="12"
+            height="12"
+            viewBox="0 0 1280.000000 1024.000000"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            <g
+              transform="translate(0.000000,1024.000000) scale(0.100000,-0.100000)"
+              :fill="properties.Enabled ? '#000000' : open ? '#000000' : 'rgb(180,180,180)'"
+              stroke="none"
+            >
+              <path
+                d="M3105 4084 c-295 -66 -529 -300 -590 -592 -19 -86 -19 -238 0 -324
+32 -153 97 -270 217 -390 73 -73 101 -94 190 -137 58 -29 134 -58 173 -66 103
+-22 275 -19 368 5 218 55 400 204 497 405 59 123 80 212 80 348 0 347 -231
+651 -565 742 -87 24 -283 29 -370 9z"
+              />
+              <path
+                d="M6236 4083 c-151 -32 -275 -101 -386 -213 -151 -153 -219 -324 -220
+-546 0 -160 45 -304 138 -441 40 -58 130 -150 188 -190 59 -42 175 -94 251
+-113 104 -27 281 -27 386 -1 259 67 466 267 549 531 20 65 23 95 23 225 -1
+137 -3 157 -28 230 -78 223 -238 396 -444 480 -132 53 -316 69 -457 38z"
+              />
+              <path
+                d="M9370 4085 c-364 -81 -610 -385 -610 -752 0 -136 21 -225 80 -348 97
+-201 279 -350 497 -405 93 -24 265 -27 368 -5 39 8 115 37 173 66 89 43 117
+64 190 137 121 121 185 237 219 395 18 89 13 275 -11 362 -71 255 -285 469
+-541 540 -84 23 -282 29 -365 10z"
+              />
+            </g>
+          </svg>
+        </div>
+        <div v-else-if="properties.DropButtonStyle === 3">
+          <svg
+            version="1.0"
+            xmlns="http://www.w3.org/2000/svg"
+            width="12"
+            height="12"
+            viewBox="0 0 1200.000000 1200.000000"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            <g
+              transform="translate(0.000000,1200.000000) scale(0.100000,-0.100000)"
+              :fill="properties.Enabled ? '#000000' : open ? '#000000' : 'rgb(180,180,180)'"
+              stroke="none"
+            >
+              <path
+                d="M0 6000 l0 -460 6000 0 6000 0 0 460 0 460 -6000 0 -6000 0 0 -460z"
+              />
+            </g>
+          </svg>
+        </div>
+      </div>
       <div class="items" :class="{ selectHide: !open }" :style="itemsStyleObj">
-        <div class="listStyle" :title="properties.ControlTipText" :style="listStyleObj" @mousedown="scrollingOnListItems">
-          <table :style="tableStyleObj" class="table-style" @click="tableClick" ref="comboRef" tabindex="1">
-            <thead class="tHeadStyle" v-if="properties.ColumnHeads === true">
-              <!-- <tr> -->
-            <th class="thClass" :style="colHeadsStyle">
+        <div
+          class="listStyle"
+          :title="properties.ControlTipText"
+          :style="listStyleObj"
+          @mousedown="scrollingOnListItems"
+        >
+          <div
+            :style="tableStyleObj"
+            class="table-style"
+            @click="tableClick"
+            ref="comboRef"
+            tabindex="1"
+          >
+            <div class="tHeadStyle" v-if="properties.ColumnHeads === true">
+              <div class="thClass" :style="colHeadsStyle">
                 <template
                   :style="tdStyleObj"
                   v-if="properties.ListStyle === 1"
@@ -74,46 +161,50 @@
                 <template
                   v-for="(a, columnIndex) in extraDatas.ColumnHeadsValues"
                 >
-                  <th
+                  <div
                     v-if="columnIndex < properties.ColumnCount"
                     :key="columnIndex"
                     :style="updateColHeads(columnIndex)"
+                    class="colHeadsClass"
                   >
                     {{ a }}
-                  </th>
+                  </div>
                 </template>
-                <hr class="hrStyle">
-            </th>
-            <!-- </tr> -->
-            </thead>
-            <thead v-else></thead>
-            <tbody
-            class="tBodyStyle"
-              :style="tableBodyObj"
-              @click="open = false"
+                <hr class="hrStyle" />
+              </div>
+            </div>
+            <div v-else></div>
+            <div
+              class="tBodyStyle"
+              @click="properties.Enabled ? (open = false) : (open = true)"
             >
-              <tr
+              <div
                 :tabindex="index"
                 class="tr"
+                :disabled="!properties.Enabled"
                 v-for="(item, index) of tempArray"
                 :key="index"
                 @mouseenter="handleDrag"
                 @keydown="handleExtendArrowKeySelect"
                 @blur="clearMatchEntry"
                 @mousedown="
-                  isRunMode || isEditMode ? handleMultiSelect($event) : ''
+                  isRunMode || isEditMode
+                    ? properties.Enabled
+                      ? handleMultiSelect($event)
+                      : makeOpen()
+                    : ''
                 "
               >
-                <td
+                <div
                   :style="tdStyleObj"
                   class="tdClassIn"
                   v-if="
                     properties.ListStyle === 1 && properties.ColumnCount > 0
                   "
                 >
-                <input name="radio" type="radio" class="inputClass" />
-                </td>
-                <td
+                  <input name="radio" type="radio" class="inputClass" />
+                </div>
+                <div
                   class="column-item"
                   v-for="(i, index) in item"
                   :key="index"
@@ -122,10 +213,10 @@
                   <template v-if="index < properties.ColumnCount">{{
                     i
                   }}</template>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -151,10 +242,11 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   @Ref('textareaRef') textareaRef: HTMLTextAreaElement;
   @Ref('autoSizeTextarea') readonly autoSizeTextarea!: HTMLLabelElement;
   @Ref('hideSelectionDiv') readonly hideSelectionDiv!: HTMLDivElement;
-  @Ref('comboRef') comboRef!: HTMLTableElement
+  @Ref('comboRef') comboRef!: HTMLDivElement;
+
   private options = ['hello'];
   private tabindex = 0;
-  eTargetValue:string = ''
+  eTargetValue: string = '';
   tempArray: Array<Array<string>> = [];
   open: boolean = false;
   multiselect = [];
@@ -163,6 +255,9 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   tempInputValue: string = '';
   tempWidth: string = '0px';
   isScrolling: boolean = false;
+  makeOpen () {
+    this.open = true
+  }
   get getDisableValue () {
     if (this.isRunMode || this.isEditMode) {
       return this.properties.Enabled === false || this.properties.Locked
@@ -201,21 +296,26 @@ export default class FDComboBox extends Mixins(FdControlVue) {
       this.open = true
       const tempEvent = e.target
       this.eTargetValue = e.target.value
-      this.comboRef.children[1].children[0].dispatchEvent(new MouseEvent('mousedown'))
-      this.comboRef.children[1].children[0].dispatchEvent(new KeyboardEvent('keydown', { key: e.target.value }))
-      this.selectionData[0] = this.eTargetValue
+      this.updateDataModel({ propertyName: 'Value', value: this.eTargetValue })
       if (this.properties.MatchEntry !== 0) {
         this.textareaRef.focus()
       }
-      if ((this.properties.MatchEntry === 0)) {
+      if (this.properties.MatchEntry === 0) {
         for (let i = 0; i < this.tempArray.length; i++) {
           if (this.tempArray[i][0][0] === this.textareaRef.value[0]) {
             this.textareaRef.value = this.tempArray[i][0]
-            this.updateDataModel({ propertyName: 'Text', value: this.tempArray[i][0] })
+            this.updateDataModel({
+              propertyName: 'Text',
+              value: this.tempArray[i][0]
+            })
             break
           }
         }
-        this.textareaRef.setSelectionRange(0, this.textareaRef.value.length, 'forward')
+        this.textareaRef.setSelectionRange(
+          0,
+          this.textareaRef.value.length,
+          'forward'
+        )
       }
     } else {
       throw new Error('target is not instance of div element')
@@ -242,13 +342,9 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   protected get selectionSpanObj (): Partial<CSSStyleDeclaration> {
     const controlProp = this.properties
     return {
-      backgroundColor: controlProp.BackStyle ? controlProp.BackColor : 'transparent'
-    }
-  }
-  protected get tableBodyObj (): Partial<CSSStyleDeclaration> {
-    const controlProp = this.properties
-    return {
-      width: `${controlProp.Width}px !important`
+      backgroundColor: controlProp.BackStyle
+        ? controlProp.BackColor
+        : 'transparent'
     }
   }
 
@@ -260,7 +356,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     }
   }
 
-  scrollingOnListItems (e : Event) {
+  scrollingOnListItems (e: Event) {
     this.isScrolling = true
   }
   /**
@@ -285,7 +381,10 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     if (this.properties.ShowDropButtonWhen === 1) {
       this.isVisible = false
     }
-    if (this.properties.EnterFieldBehavior === 1 && event.target instanceof HTMLTextAreaElement) {
+    if (
+      this.properties.EnterFieldBehavior === 1 &&
+      event.target instanceof HTMLTextAreaElement
+    ) {
       const eventTarget = event.target
       let tempField = this.tempInputValue.slice(
         eventTarget.selectionStart - eventTarget.selectionEnd
@@ -293,7 +392,11 @@ export default class FDComboBox extends Mixins(FdControlVue) {
       this.selectionStart = eventTarget.selectionStart
       this.selectionEnd = eventTarget.selectionEnd
     }
-    if (!this.properties.HideSelection && textareaRef && event.target instanceof HTMLTextAreaElement) {
+    if (
+      !this.properties.HideSelection &&
+      textareaRef &&
+      event.target instanceof HTMLTextAreaElement
+    ) {
       const eventTarget = event.target
 
       hideSelectionDiv.style.display = 'block'
@@ -356,15 +459,17 @@ export default class FDComboBox extends Mixins(FdControlVue) {
    * @event click
    */
   divHide (event: MouseEvent, textareaRef: HTMLTextAreaElement) {
-    if (event.target instanceof HTMLSpanElement || event.target instanceof HTMLDivElement) {
-      (event.target).style.display = 'none'
+    if (
+      event.target instanceof HTMLSpanElement ||
+      event.target instanceof HTMLDivElement
+    ) {
+      event.target.style.display = 'none'
       textareaRef.style.display = 'block'
       if (
-        (event.target).tagName === 'SPAN' &&
-      (event.target).parentNode!.nodeName === 'DIV'
+        event.target.tagName === 'SPAN' &&
+        event.target.parentNode!.nodeName === 'DIV'
       ) {
-        ((event.target)
-          .parentNode as HTMLElement).style.display = 'none'
+        (event.target.parentNode as HTMLElement).style.display = 'none'
       }
       textareaRef.focus()
       textareaRef.selectionStart = textareaRef.selectionEnd
@@ -403,12 +508,18 @@ export default class FDComboBox extends Mixins(FdControlVue) {
         tempLabel.style.whiteSpace = textareaRef.style.whiteSpace
         tempLabel.style.wordBreak = textareaRef.style.wordBreak
         tempLabel.style.fontWeight = textareaRef.style.fontWeight
-        tempLabel.style.width = ((this.textareaRef.value.length + 1) * parseInt(textareaRef.style.fontSize)) + 'px'
+        tempLabel.style.width =
+          (this.textareaRef.value.length + 1) *
+            parseInt(textareaRef.style.fontSize) +
+          'px'
         tempLabel.style.height = textareaRef.style.height
         tempLabel.innerText = textareaRef.value
         this.updateDataModel({
           propertyName: 'Width',
-          value: tempLabel.offsetWidth > 20 ? tempLabel.offsetWidth + 21 : tempLabel.offsetWidth + 25
+          value:
+            tempLabel.offsetWidth > 20
+              ? tempLabel.offsetWidth + 21
+              : tempLabel.offsetWidth + 25
         })
         this.updateDataModel({
           propertyName: 'Height',
@@ -426,7 +537,15 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   protected get listStyleObj (): Partial<CSSStyleDeclaration> {
     const controlProp = this.properties
     return {
-      height: !controlProp.ColumnHeads ? (controlProp.ListRows! > 0 && controlProp.ListRows! < this.extraDatas.RowSourceData!.length ? (controlProp.ListRows! * (controlProp.Font!.FontSize! + 3) + 'px') : '') : (controlProp.ListRows! > 0 && controlProp.ListRows! < this.extraDatas.RowSourceData!.length ? ((controlProp.ListRows! + 1) * (controlProp.Font!.FontSize! + 3) + 'px') : ''),
+      height: !controlProp.ColumnHeads
+        ? controlProp.ListRows! > 0 &&
+          controlProp.ListRows! < this.extraDatas.RowSourceData!.length
+          ? controlProp.ListRows! * (controlProp.Font!.FontSize! + 3) + 'px'
+          : ''
+        : controlProp.ListRows! > 0 &&
+          controlProp.ListRows! < this.extraDatas.RowSourceData!.length
+          ? (controlProp.ListRows! + 1) * (controlProp.Font!.FontSize! + 3) + 'px'
+          : '',
       backgroundColor: controlProp.BackColor
     }
   }
@@ -446,9 +565,11 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     return {
       borderCollapse: 'collapse',
       tableLayout: 'fixed',
-      backgroundColor: controlProp.BackStyle ? controlProp.BackColor : 'transparent',
+      backgroundColor: controlProp.BackStyle
+        ? controlProp.BackColor
+        : 'transparent',
       color: controlProp.ForeColor,
-      fontFamily: (font.FontStyle! !== '') ? this.setFontStyle : font.FontName!,
+      fontFamily: font.FontStyle! !== '' ? this.setFontStyle : font.FontName!,
       fontSize: `${font.FontSize}px`,
       fontStyle: font.FontItalic || this.isItalic ? 'italic' : '',
       textDecoration:
@@ -460,14 +581,18 @@ export default class FDComboBox extends Mixins(FdControlVue) {
               ? 'line-through'
               : '',
       textUnderlinePosition: 'under',
-      fontWeight: font.FontBold ? 'bold' : (font.FontStyle !== '') ? this.tempWeight : '',
-      fontStretch: (font.FontStyle !== '') ? this.tempStretch : '',
+      fontWeight: font.FontBold
+        ? 'bold'
+        : font.FontStyle !== ''
+          ? this.tempWeight
+          : '',
+      fontStretch: font.FontStyle !== '' ? this.tempStretch : '',
       width:
-      controlProp.ColumnWidths === ''
-        ? `${controlProp.Width}px`
-        : `${controlProp.Width}px` +
-          parseInt(controlProp.ColumnWidths!) +
-          'px',
+        controlProp.ColumnWidths === ''
+          ? `${controlProp.Width}px`
+          : `${controlProp.Width}px` +
+            parseInt(controlProp.ColumnWidths!) +
+            'px',
       outline: 'none'
     }
   }
@@ -486,10 +611,17 @@ export default class FDComboBox extends Mixins(FdControlVue) {
       }
     return {
       left: `${controlProp.Left}px`,
-      width: controlProp.ShowDropButtonWhen === 0 ? `${controlProp.Width! - 4}px` : controlProp.ShowDropButtonWhen === 1 && this.isVisible === false ? `${controlProp.Width! - 4}px` : controlProp.SelectionMargin ? `${controlProp.Width! - 30}px` : `${controlProp.Width! - 25}px`,
+      width:
+        controlProp.ShowDropButtonWhen === 0
+          ? `${controlProp.Width! - 4}px`
+          : controlProp.ShowDropButtonWhen === 1 && this.isVisible === false
+            ? `${controlProp.Width! - 4}px`
+            : controlProp.SelectionMargin
+              ? `${controlProp.Width! - 30}px`
+              : `${controlProp.Width! - 25}px`,
       height: `${controlProp.Height! - 5}px`,
       top: `${controlProp.Top}px`,
-      fontFamily: (font.FontStyle! !== '') ? this.setFontStyle : font.FontName!,
+      fontFamily: font.FontStyle! !== '' ? this.setFontStyle : font.FontName!,
       fontSize: `${font.FontSize}px`,
       fontStyle: font.FontItalic || this.isItalic ? 'italic' : '',
       textDecoration:
@@ -501,9 +633,15 @@ export default class FDComboBox extends Mixins(FdControlVue) {
               ? 'line-through'
               : '',
       textUnderlinePosition: 'under',
-      fontWeight: font.FontBold ? 'bold' : (font.FontStyle !== '') ? this.tempWeight : '',
-      fontStretch: (font.FontStyle !== '') ? this.tempStretch : '',
-      backgroundColor: controlProp.BackStyle ? controlProp.BackColor : 'transparent',
+      fontWeight: font.FontBold
+        ? 'bold'
+        : font.FontStyle !== ''
+          ? this.tempWeight
+          : '',
+      fontStretch: font.FontStyle !== '' ? this.tempStretch : '',
+      backgroundColor: controlProp.BackStyle
+        ? controlProp.BackColor
+        : 'transparent',
       color: controlProp.ForeColor,
       textAlign:
         controlProp.TextAlign === 0
@@ -544,7 +682,8 @@ export default class FDComboBox extends Mixins(FdControlVue) {
       display = 'inline-block'
     }
     return {
-      display: display
+      display: display,
+      overflow: 'hidden'
     }
   }
   protected get tdStyleObj (): Partial<CSSStyleDeclaration> {
@@ -555,7 +694,9 @@ export default class FDComboBox extends Mixins(FdControlVue) {
           ? 'left'
           : controlProp.TextAlign === 2
             ? 'right'
-            : 'center'
+            : 'center',
+      display: 'inline-block',
+      marginRight: controlProp.ListStyle === 1 ? '5px' : ''
     }
   }
   setWidth () {
@@ -563,7 +704,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     return this.tempWidth
   }
   @Watch('properties.Value', { deep: true })
-  ValueData (newVal: string, oldVal: string) {
+  textAndValueUpdateProp (newVal: string, oldVal: string) {
     if (
       this.properties.BoundColumn! > 0 &&
       this.properties.BoundColumn! < this.extraDatas.RowSourceData!.length
@@ -572,10 +713,12 @@ export default class FDComboBox extends Mixins(FdControlVue) {
       if (tempData![0][this.properties.BoundColumn! - 1] === newVal) {
         this.updateDataModel({ propertyName: 'Value', value: newVal })
       } else {
-        this.updateDataModel({ propertyName: 'Value', value: '' })
+        if (newVal !== '' && this.properties.Value) {
+          this.updateDataModel({ propertyName: 'Text', value: newVal })
+        }
       }
     }
-    if (newVal !== '') {
+    if (newVal !== '' && this.properties.Value) {
       this.selectionData[0] = newVal
       this.updateDataModel({ propertyName: 'Text', value: newVal })
     }
@@ -604,10 +747,22 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     }
   }
 
-  @Watch('properties.ControlSource')
-  controlSourceUpdate () {
-    if (this.properties.ControlSource !== '') {
-      this.selectionData[0] = this.extraDatas.ControlSourceValue!
+  @Watch('properties.ControlSource', { deep: true })
+  updateControlSourceValue (newVal: string, oldVal: string) {
+    const propData: controlData = this.data
+    if (propData.properties.ControlSource !== '') {
+      const controlSourceValue = propData.extraDatas!.ControlSourceValue
+      this.updateDataModel({
+        propertyName: 'Value',
+        value: controlSourceValue
+      })
+      this.updateDataModel({ propertyName: 'Text', value: controlSourceValue })
+    } else {
+      this.updateDataModel({
+        propertyName: 'Value',
+        value: ''
+      })
+      this.updateDataModel({ propertyName: 'Text', value: '' })
     }
   }
   expandWidth () {
@@ -635,7 +790,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
         FontStrikethrough: true
       }
     return {
-      fontFamily: (font.FontStyle! !== '') ? this.setFontStyle : font.FontName!,
+      fontFamily: font.FontStyle! !== '' ? this.setFontStyle : font.FontName!,
       fontSize: `${font.FontSize}px`,
       fontStyle: font.FontItalic || this.isItalic ? 'italic' : '',
       textDecoration:
@@ -646,9 +801,12 @@ export default class FDComboBox extends Mixins(FdControlVue) {
             : font.FontStrikethrough
               ? 'line-through'
               : '',
-      fontWeight: font.FontBold ? 'bold' : (font.FontStyle !== '') ? this.tempWeight : '',
-      fontStretch: (font.FontStyle !== '') ? this.tempStretch : ''
-
+      fontWeight: font.FontBold
+        ? 'bold'
+        : font.FontStyle !== ''
+          ? this.tempWeight
+          : '',
+      fontStretch: font.FontStyle !== '' ? this.tempStretch : ''
     }
   }
 
@@ -663,10 +821,38 @@ export default class FDComboBox extends Mixins(FdControlVue) {
         controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''
           ? this.getMouseCursorData
           : 'default',
-      borderLeft: controlProp.SpecialEffect === 2 ? '2px solid gray' : controlProp.SpecialEffect === 3 ? '1.5px solid gray' : controlProp.SpecialEffect === 4 ? '0.5px solid gray' : '',
-      borderRight: controlProp.SpecialEffect === 1 ? '2px solid gray' : controlProp.SpecialEffect === 4 ? '1.5px solid gray' : controlProp.SpecialEffect === 3 ? '0.5px solid gray' : '',
-      borderTop: controlProp.SpecialEffect === 2 ? '2px solid gray' : controlProp.SpecialEffect === 3 ? '1.5px solid gray' : controlProp.SpecialEffect === 4 ? '0.5px solid gray' : '',
-      borderBottom: controlProp.SpecialEffect === 1 ? '2px solid gray' : controlProp.SpecialEffect === 4 ? '1.5px solid gray' : controlProp.SpecialEffect === 3 ? '0.5px solid gray' : '',
+      borderLeft:
+        controlProp.SpecialEffect === 2
+          ? '2px solid gray'
+          : controlProp.SpecialEffect === 3
+            ? '1.5px solid gray'
+            : controlProp.SpecialEffect === 4
+              ? '0.5px solid gray'
+              : '',
+      borderRight:
+        controlProp.SpecialEffect === 1
+          ? '2px solid gray'
+          : controlProp.SpecialEffect === 4
+            ? '1.5px solid gray'
+            : controlProp.SpecialEffect === 3
+              ? '0.5px solid gray'
+              : '',
+      borderTop:
+        controlProp.SpecialEffect === 2
+          ? '2px solid gray'
+          : controlProp.SpecialEffect === 3
+            ? '1.5px solid gray'
+            : controlProp.SpecialEffect === 4
+              ? '0.5px solid gray'
+              : '',
+      borderBottom:
+        controlProp.SpecialEffect === 1
+          ? '2px solid gray'
+          : controlProp.SpecialEffect === 4
+            ? '1.5px solid gray'
+            : controlProp.SpecialEffect === 3
+              ? '0.5px solid gray'
+              : '',
       display: 'grid',
       gridTemplateColumns: `${controlProp.Width! - 20}px` + ' 21px',
       gridTemplateRows: `${controlProp.Height!}px`,
@@ -677,45 +863,63 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   protected get itemsStyleObj (): Partial<CSSStyleDeclaration> {
     const controlProp = this.properties
     return {
-      width: (parseInt(controlProp.ListWidth!) > 0) ? `${controlProp.ListWidth}px` : `${controlProp.Width!}px`
+      width:
+        parseInt(controlProp.ListWidth!) > 0
+          ? parseInt(controlProp.ListWidth!) + 'px'
+          : this.setdropDownWidth
     }
   }
+
+  get setdropDownWidth () {
+    if (this.properties.Width! < 100) {
+      return '100px'
+    } else {
+      return `${this.properties.Width!}px`
+    }
+  }
+
   protected get selectedStyleObj (): Partial<CSSStyleDeclaration> {
     const controlProp = this.properties
     return {
-      visibility: controlProp.ShowDropButtonWhen === 2 ? 'visible' : this.expandWidth(),
+      visibility:
+        controlProp.ShowDropButtonWhen === 2 ? 'visible' : this.expandWidth(),
       backgroundPosition:
         controlProp.DropButtonStyle === 1 ? 'center' : 'bottom',
-      backgroundSize: controlProp.DropButtonStyle === 1 ? '12px 12px' : controlProp.DropButtonStyle === 2 ? '8px 8px' : controlProp.DropButtonStyle === 3 ? '9px 14px' : '',
+      backgroundSize:
+        controlProp.DropButtonStyle === 1
+          ? '12px 12px'
+          : controlProp.DropButtonStyle === 2
+            ? '8px 8px'
+            : controlProp.DropButtonStyle === 3
+              ? '9px 14px'
+              : '',
       cursor:
         controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''
           ? this.getMouseCursorData
-          : 'default'
+          : 'default',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: controlProp.DropButtonStyle === 1 ? 'center' : 'flex-end'
     }
   }
   enabledCheck (e: MouseEvent) {
     if (this.isRunMode || this.isEditMode) {
-      if (this.properties.Enabled) {
-        if (!this.properties.Locked) {
-          if (this.open) {
-            this.textareaRef.focus()
-            this.open = false
-          } else {
-            this.open = true
-          }
-        }
-      } else {
+      if (this.open) {
+        this.textareaRef.focus()
         this.open = false
+      } else {
+        this.open = true
       }
-    } else {
-      this.open = false
     }
   }
+
   eventStoppers () {
     const eventStop = (event: Event) => event.stopPropagation()
-    return this.isEditMode === false ? null : {
-      keydown: eventStop
-    }
+    return this.isEditMode === false
+      ? null
+      : {
+        keydown: eventStop
+      }
   }
 }
 </script>
@@ -726,7 +930,6 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   text-align: left;
   outline: none;
   box-sizing: border-box;
-  /* line-height: 10px; specify the drop down height */
 }
 .selectionSpan {
   width: 5px;
@@ -736,7 +939,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   grid-template-columns: 5px auto;
 }
 .selected {
-  background-color: lightgray;
+  background-color: rgb(238,238,238);
   border: 1px solid #858586;
   border-left: 0px;
   color: black;
@@ -797,8 +1000,9 @@ export default class FDComboBox extends Mixins(FdControlVue) {
 }
 .tr {
   outline: none;
+  display: flex;
 }
-.tr:hover {
+.tr:hover:not([disabled]) {
   background-color: rgb(59, 122, 231);
 }
 .ul {
@@ -894,16 +1098,17 @@ export default class FDComboBox extends Mixins(FdControlVue) {
 .hrStyle {
   margin: 0px;
 }
-.forArrow {
-  background-image: url('../../../../assets/sort-down.png');
-}
-.forEllipsis {
-  background-image: url('../../../../assets/ellipsis.png');
-}
-.forReduce {
-  background-image: url('../../../../assets/minus.png'),url('../../../../assets/minus.png');
-}
 .forPlain {
   background-image: none;
+}
+.tHeadStyle {
+  position: sticky;
+  top: 0px;
+}
+.column-item {
+  display: flex;
+}
+.colHeadsClass {
+  display: inline-block;
 }
 </style>
