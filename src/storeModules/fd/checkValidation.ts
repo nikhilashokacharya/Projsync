@@ -29,7 +29,7 @@ export function checkPropertyValue (propertyName: keyof controlProperties, value
       result = value >= -1 && value < 2147483647
       break
     case 'TextColumn':
-      result = value >= -1 && value <= 32767
+      result = value >= -1 && value <= 32768
       break
     case 'Max':
     case 'Min':

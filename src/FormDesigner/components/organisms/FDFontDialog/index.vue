@@ -708,7 +708,7 @@ h1 {
 .nestedButtonClass {
   width: 100%;
   font-family: "Candara";
-  font-weight: lighter;
+  font-weight: bold;
   font-size: 13px;
   box-shadow: 1px 1px;
   border-top-color: rgb(238, 238, 238);

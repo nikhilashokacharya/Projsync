@@ -471,10 +471,8 @@ export default class FDTable extends Vue {
           }
         }
       } else if (propertyName === 'Delay') {
-        let isDelayValueInvalid = false
         if (this.isDecimalNumber(propertyValue)) {
           (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
-          EventBus.$emit('showErrorPopup', true, 'invalid', `Invalid property value.`)
         } else if (checkPropertyValue(propertyName, propertyValue)) {
           this.emitUpdateProperty(propertyName, value)
         } else if (value < 0) {
@@ -483,6 +481,15 @@ export default class FDTable extends Vue {
         } else {
           (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
           EventBus.$emit('showErrorPopup', true, 'invalid', `Invalid property value.`)
+        }
+      } else if (propertyName === 'Zoom') {
+        if (this.isDecimalNumber(propertyValue)) {
+          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+        } else if (checkPropertyValue(propertyName, propertyValue)) {
+          this.emitUpdateProperty(propertyName, value)
+        } else {
+          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+          EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value. Enter a value between 10 and 400.`)
         }
       } else {
         this.emitUpdateProperty(propertyName, value)

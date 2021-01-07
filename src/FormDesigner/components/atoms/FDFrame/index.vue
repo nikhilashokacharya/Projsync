@@ -129,7 +129,7 @@ export default class FDFrame extends FdContainerVue {
     const controlProp = this.data.properties
     return {
       backgroundColor: controlProp.BackColor,
-      width: `${controlProp.Width! - 1}px`,
+      width: `${controlProp.Width}px`,
       height: `${controlProp.Height}px`,
       boxShadow: controlProp.SpecialEffect ? this.getSpecialEffectData : 'none',
       borderLeft: controlProp.BorderStyle
@@ -140,7 +140,8 @@ export default class FDFrame extends FdContainerVue {
         : '0.3px solid gray',
       borderBottom: controlProp.BorderStyle
         ? `0.3px solid ${controlProp.BorderColor}`
-        : '0.3px solid gray'
+        : '0.3px solid gray',
+      overflow: 'hidden'
     }
   }
 

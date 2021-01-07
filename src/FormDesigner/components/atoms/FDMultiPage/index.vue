@@ -861,6 +861,7 @@ export default class FDMultiPage extends FdContainerVue {
   left: 0px;
   top: 0px;
   cursor: default;
+  position: sticky;
 }
 .pages {
   /* display: grid; */
