@@ -1920,7 +1920,7 @@ export class PropertyListDefine {
         },
         ListWidth: {
           category: 'ID_CATEGORY_DATA',
-          type: 'String'
+          type: 'number'
         },
         Locked: {
           category: 'ID_CATEGORY_BEHAVIOR',
@@ -2574,11 +2574,18 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_BEHAVIOR',
           type: 'array',
           values: [
-            '0-fmSpecialEffectFlat',
-            '1-fmSpecialEffectRaised',
-            '2-fmSpecialEffectSunken',
-            '3-fmSpecialEffectEtched',
-            '6-fmSpecialEffectBump'
+            '0 - fmTransitionEffectNone',
+            '1 - fmTransitionEffectCoverUp',
+            '2 - fmTransitionEffectCoverRightUp',
+            '3 - fmTransitionEffectCoverRight',
+            '4 - fmTransitionEffectCoverRightDown',
+            '5 - fmTransitionEffectCoverDown',
+            '6 - fmTransitionEffectCoverLeftDown',
+            '7 - fmTransitionEffectCoverLeftUp',
+            '8 - fmTransitionEffectPushUp',
+            '9 - fmTransitionEffectPushRight',
+            '10 - fmTransitionEffectPushDown',
+            '11 - fmTransitionEffectPushLeft'
           ]
         },
         TransitionPeriod: {

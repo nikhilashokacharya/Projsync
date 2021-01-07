@@ -12,7 +12,7 @@
     @keydown.enter.exact="setContentEditable($event, true)"
     @click.stop="!isEditMode ? selectedItem : addControlObj($event)"
     @contextmenu.stop="showContextMenu($event, userFormId, controlId, 'container')"
-    @mousedown.stop="frameMouseDown"
+    @mousedown="frameMouseDown"
     @mouseup="dragSelectorControl($event)"
     @keyup.stop="selectMultipleCtrl($event, false)"
   >

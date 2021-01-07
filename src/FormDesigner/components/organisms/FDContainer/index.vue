@@ -22,7 +22,6 @@
       :class="[!isEditMode ? 'dragSelector' : '']"
       ref="dragSelector"
       :style="dragSelectorStyle"
-      @mousedown.stop.self="handleMouseDown"
     >
       <GroupControl
         :containerId="containerId"
@@ -31,6 +30,9 @@
         class="group"
         :controlRef="$refs"
         :currentSelectedGroup="filterSelected"
+        @openMenu="
+            (e, parentID, controlID, type) => openContextMenu(e, parentID, controlID, type)
+          "
       />
       <div
         v-for="control in propControlData.controls"

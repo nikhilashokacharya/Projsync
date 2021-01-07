@@ -44,7 +44,9 @@ export default class FDCustomDropDown extends Vue {
   }
 
   get propertyValue () {
-    this.selected = this.propertyData.value
+    Vue.nextTick(() => {
+      this.selected = this.propertyData.value
+    })
     return this.propertyData.value
   }
 

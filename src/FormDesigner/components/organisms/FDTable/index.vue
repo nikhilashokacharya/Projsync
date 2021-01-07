@@ -326,7 +326,25 @@ export default class FDTable extends Vue {
       const value = propertyValue.includes('.') ? parseFloat(propertyValue) : parseInt(propertyValue)
       if (propertyName === 'Height' || propertyName === 'Width') {
         if (checkPropertyValue(propertyName, value)) {
-          this.emitUpdateProperty(propertyName, value)
+          if ((this.userformData[this.userFormId][this.getSelectedControlsDatas[0]].type === 'Userform')) {
+            if (propertyName === 'Width') {
+              if (value >= 0 && value < 103) {
+                this.emitUpdateProperty(propertyName, 103);
+                (e.target as HTMLInputElement).value = '103'
+              } else {
+                this.emitUpdateProperty(propertyName, value)
+              }
+            } else if (propertyName === 'Height') {
+              if (value >= 0 && value < 30) {
+                this.emitUpdateProperty(propertyName, 30);
+                (e.target as HTMLInputElement).value = '30'
+              } else {
+                this.emitUpdateProperty(propertyName, value)
+              }
+            }
+          } else {
+            this.emitUpdateProperty(propertyName, value)
+          }
         } else {
           (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
           if (value > 32767) {

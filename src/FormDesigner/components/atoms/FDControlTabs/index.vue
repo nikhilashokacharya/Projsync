@@ -7,6 +7,8 @@
     />
     <label
         @mousedown="!getDisableValue(pageData.Enabled) && isChecked(indexValue,pageValue)"
+        @keydown.delete.exact.stop="deleteMultiPageControl"
+        :tabindex="0"
             :class="[
                 data.properties.Style === 1
                   ? data.properties.TabOrientation === 2
@@ -205,6 +207,10 @@ export default class FDControlTabs extends Vue {
       backgroundColor: this.indexValue === this.data.properties.Value! ? controlProp.Style === 1 ? 'gray' : '' : ''
     }
   }
+  @Emit('deleteMultiPageControl')
+  deleteMultiPageControl (event: KeyboardEvent) {
+    return event
+  }
 }
 </script>
 
@@ -282,5 +288,8 @@ export default class FDControlTabs extends Vue {
 }
 .spanClass {
   text-decoration: underline;
+}
+:focus{
+  outline: none
 }
 </style>

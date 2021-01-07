@@ -85,6 +85,7 @@ export default class TabStripTabOrderModal extends FdDialogDragVue {
     this.closeDialog()
   }
   closeDialog () {
+    EventBus.$emit('focusUserForm')
     this.isTabOrderOpen = false
   }
   created () {
@@ -95,13 +96,13 @@ export default class TabStripTabOrderModal extends FdDialogDragVue {
           .extraDatas!.Tabs!
         if (tabOrderControlData.length > 0) {
           this.tabOrderList = JSON.parse(JSON.stringify(tabOrderControlData))
+          this.currentIndex = 0
         } else {
           console.error('Empty Tab data')
         }
         this.isTabOrderOpen = true
         this.userFormId = userFormId
         this.controlId = controlId
-        this.currentIndex = 0
       }
     )
   }
@@ -288,14 +289,11 @@ h1 {
   border-bottom-color: rgb(238, 238, 238);
   border-left-color: rgb(238, 238, 238);
   border-right-color: rgb(238, 238, 238);
-  /* outline: none; */
   white-space: pre;
 }
-
-.taborder-buttons :focus {
-  outline: 1px solid black;
+.taborder-buttons:focus{
+  outline:1px solid black;
 }
-
 .ui-btn {
   /* margin: 2px; */
   margin: 0;

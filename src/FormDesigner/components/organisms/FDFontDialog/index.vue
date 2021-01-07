@@ -1,6 +1,9 @@
 <template>
-  <div>
-    <div id="" class="overlay" :style="fontStyleObj">
+  <div @keydown.enter="updateFont"
+    @keydown.esc="setFontDialogVisiblilty(false)"
+    tabindex="1"
+    ref="fontDialogRef">
+    <div class="overlay" :style="fontStyleObj">
       <div
         class="font-div popup"
         :style="tabOrderDialogInitialStyle"
@@ -205,6 +208,8 @@ export interface INewFont {
 export default class FDFontDialog extends FdDialogDragVue {
   @Prop() fontPropValue: font;
   @Prop() isOpen: boolean;
+  @Ref('fontDialogRef') fontDialogRef!: HTMLDivElement;
+
   isFontStrikeOut: boolean = false;
   isFontUnderline: boolean = false;
   tabOrderDialogInitialStyle: ITabOrderDialogInitialStyle = {
@@ -383,6 +388,7 @@ export default class FDFontDialog extends FdDialogDragVue {
     this.isFontUnderline = this.tempVal.FontUnderline!
     this.size = this.tempVal.FontSize!
     this.temp = this.newFont[this.font]
+    this.fontDialogRef.focus()
   }
 }
 </script>
@@ -701,8 +707,17 @@ h1 {
 }
 .nestedButtonClass {
   width: 100%;
-  border: 1px solid white;
-  box-shadow: -1px -1px grey;
-  outline: none;
+  font-family: "Candara";
+  font-weight: lighter;
+  font-size: 13px;
+  box-shadow: 1px 1px;
+  border-top-color: rgb(238, 238, 238);
+  border-bottom-color: rgb(238, 238, 238);
+  border-left-color: rgb(238, 238, 238);
+  border-right-color: rgb(238, 238, 238);
+  white-space: pre;
+}
+.nestedButtonClass {
+  outline: 1px solid black;
 }
 </style>

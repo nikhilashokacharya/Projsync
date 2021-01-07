@@ -227,10 +227,10 @@ export default abstract class FdContainerVue extends FdControlVue {
       const sw = parseInt(this.selectedAreaStyle!.width!)
       const sh = parseInt(this.selectedAreaStyle!.height)
 
-      item.properties.Left = sw! === 0 ? e.offsetX : parseInt(this.selectedAreaStyle!.left)
-      item.properties.Top = sw! === 0 ? e.offsetY : parseInt(this.selectedAreaStyle!.top)
-      item.properties.Width = sw! === 0 ? item.properties.Width : sw
-      item.properties.Height = sw! === 0 ? item.properties.Height : sh
+      item.properties.Left = isNaN(sw!) ? e.offsetX : parseInt(this.selectedAreaStyle!.left)
+      item.properties.Top = isNaN(sh!) ? e.offsetY : parseInt(this.selectedAreaStyle!.top)
+      item.properties.Width = isNaN(sw!) ? item.properties.Width : sw
+      item.properties.Height = isNaN(sh!) ? item.properties.Height : sh
       const controls = item.controls
       item.controls = item.type === 'MultiPage' ? [] : item.controls
       const newControlId = type === 'MultiPage' ? pageId : this.controlId
@@ -316,12 +316,12 @@ export default abstract class FdContainerVue extends FdControlVue {
         } else {
           left = parseInt(this.selectedAreaStyle!.left)
           right =
-        parseInt(this.selectedAreaStyle!.left) +
-        parseInt(this.selectedAreaStyle!.width)
+          parseInt(this.selectedAreaStyle!.left) +
+          parseInt(this.selectedAreaStyle!.width)
           top = parseInt(this.selectedAreaStyle!.top)
           bottom =
-        parseInt(this.selectedAreaStyle!.top) +
-        parseInt(this.selectedAreaStyle!.height)
+          parseInt(this.selectedAreaStyle!.top) +
+          parseInt(this.selectedAreaStyle!.height)
         }
         const leftArray: Array<number> = []
         if (left !== right || top !== bottom) {
@@ -331,9 +331,9 @@ export default abstract class FdContainerVue extends FdControlVue {
             const controlProp: controlProperties = this.userformData[this.userFormId][key].properties
             if (
               left <= controlProp!.Left! + controlProp!.Width! &&
-            right >= controlProp!.Left! &&
-            top <= controlProp!.Top! + controlProp!.Height! &&
-            bottom >= controlProp!.Top!
+              right >= controlProp!.Left! &&
+              top <= controlProp!.Top! + controlProp!.Height! &&
+              bottom >= controlProp!.Top!
             ) {
               if (!this.selectedControlArray.includes(key)) { this.selectedControlArray.push(key) }
             }
@@ -344,7 +344,7 @@ export default abstract class FdContainerVue extends FdControlVue {
               .properties.GroupID!
             if (controlGroupId && controlGroupId !== '') {
               !selectedGroup.includes(controlGroupId)! &&
-              selectedGroup.push(controlGroupId)
+                selectedGroup.push(controlGroupId)
             } else {
               selectedGroup.push(val)
             }
@@ -389,11 +389,13 @@ export default abstract class FdContainerVue extends FdControlVue {
    */
   openMenu (e: MouseEvent, parentID: string, controlID: string, type: string) {
     e.preventDefault()
+    const id = (e.target! as HTMLDivElement).id ? (e.target! as HTMLDivElement).id : ''
     const selected = this.selectedControls[this.userFormId].selected
     const userData = this.userformData[this.userFormId]
+    let groupId = ''
     if (!selected.includes(controlID)) {
-      let groupId = userData[controlID].type === 'MultiPage' ? selected[0] : controlID
-      if (this.userformData[this.userFormId][controlID].properties.GroupID !== '') {
+      groupId = userData[controlID].type === 'MultiPage' ? selected[0] : controlID
+      if ('GroupID' in userData[controlID].properties && userData[controlID].properties.GroupID !== '') {
         groupId = this.userformData[this.userFormId][controlID].properties.GroupID!
       }
       if (groupId && !selected.includes(groupId)) {
@@ -405,24 +407,34 @@ export default abstract class FdContainerVue extends FdControlVue {
     }
     const controlType = this.userformData[this.userFormId][controlID].type
     const containerType = this.userformData[this.userFormId][this.containerId].type
-    if (type === 'container') {
+    if (type === 'container' && !groupId.startsWith('group') && selected.length <= 1) {
       this.contextMenuType = true
     } else {
       this.contextMenuType = false
     }
+    const targetElement = (e.target! as HTMLDivElement).style
     const controlLeft: number | undefined = this.userformData[this.userFormId][controlID].properties.Left!
     const controlTop: number | undefined = this.userformData[this.userFormId][controlID].properties.Top!
     this.top = controlType === 'Frame' || controlType === 'MultiPage'
-      ? (type === 'container' ? `${e.offsetY}px` : `${e.offsetY + controlTop! + 30}px`)
+      ? (type === 'container'
+        ? (id.startsWith('group') ? `${parseInt(targetElement.top) + e.offsetY}px` : `${e.offsetY}px`)
+        : `${e.offsetY + controlTop! + 30}px`)
       : (containerType === 'Frame' || containerType === 'MultiPage')
-        ? `${e.offsetY + controlTop!}px` : `${e.offsetY + controlTop! + 30}px`
-    this.left = controlType === 'Frame' || controlType === 'MultiPage'
-      ? (type === 'container' ? `${e.offsetX}px` : `${e.offsetX + controlLeft!}px`)
-      : `${e.offsetX + controlLeft!}px`
+        ? `${e.offsetY + controlTop!}px`
+        : id.startsWith('group')
+          ? `${parseInt(targetElement.top) + e.offsetY}px`
+          : `${e.offsetY + controlTop! + 30}px`
+    this.left =
+    controlType === 'Frame' || controlType === 'MultiPage'
+      ? (type === 'container'
+        ? (id.startsWith('group') ? `${parseInt(targetElement.left) + e.offsetX}px` : `${e.offsetX}px`)
+        : `${e.offsetX + controlLeft!}px`)
+      : id.startsWith('group')
+        ? `${parseInt(targetElement.left) + e.offsetX}px`
+        : `${e.offsetX + controlLeft!}px`
     this.viewMenu = true
-    const controlLength = this.userformData[this.userFormId][selected[0]].controls
-      .length
-    const contextMenuData = this.contextMenuType
+    const controlLength = selected[0].startsWith('group') ? this.userformData[this.userFormId][this.controlId].controls.length : this.userformData[this.userFormId][selected[0]].controls.length
+    const contextMenuData = (type === 'container' && !groupId.startsWith('group') && selected.length <= 1)
       ? this.userformContextMenu
       : this.controlContextMenu
     for (const val of contextMenuData) {
@@ -430,9 +442,8 @@ export default abstract class FdContainerVue extends FdControlVue {
         val.disabled = controlLength === 0
       }
       if (val.id === 'ID_DELETE' && this.contextMenuType) {
-        val.disabled = !(this.selectedControls[this.userFormId].selected.length === 1 &&
-            this.userformData[this.userFormId][controlID].type === 'Frame' &&
-            controlID === this.selectedControls[this.userFormId].selected[0])
+        val.disabled = !(selected.length === 1 &&
+          (userData[controlID].type === 'Frame' || userData[selected[0]].type === 'Page'))
       }
       if (val.id === 'ID_PASTE') {
         val.disabled = Object.keys(this.copiedControl[this.userFormId]).length === 1
@@ -458,6 +469,10 @@ export default abstract class FdContainerVue extends FdControlVue {
           val.disabled =
               this.selectedControls[this.userFormId].selected.length <= 1
         }
+      }
+      if (val.id === 'ID_CONTROLFORWARD' || val.id === 'ID_CONTROLBACKWARD') {
+        const selectedConatiner = this.selectedControls[this.userFormId].container[0]
+        val.disabled = userData[selectedConatiner].controls.length <= 1
       }
       if (val.id === 'ID_ALIGN' || val.id === 'ID_MAKESAMESIZE') {
         for (let index = 0; index < val.values.length; index++) {

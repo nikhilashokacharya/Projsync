@@ -297,6 +297,7 @@ export default class ContextMenu extends FDCommonMethod {
           selected: [item.properties.ID]
         }
       })
+      EventBus.$emit('updateMultiPageValue')
     }
   }
   bringForward () {
@@ -368,6 +369,7 @@ export default class ContextMenu extends FDCommonMethod {
         })
         this.updateIndex(index! - 1)
       }
+      EventBus.$emit('updateMultiPageValue')
     }
   }
   updateTabStripValue (index: number) {
@@ -918,6 +920,7 @@ export default class ContextMenu extends FDCommonMethod {
     const selControl = []
     const userData = this.userformData[this.userFormId]
     const selected = this.selectedControls[this.userFormId].selected
+    const selContainer = this.selectedControls[this.userFormId].container
     const filterControls = []
     const controls = this.userformData[this.userFormId][this.selectedControls[this.userFormId].container[0]].controls
     for (const control of selected) {
@@ -948,24 +951,25 @@ export default class ContextMenu extends FDCommonMethod {
         console.log(curSelect, userData[curSelect].properties.GroupID)
       }
     }
+    console.log(selControl)
     for (let i = 0; i < selControl.length; i++) {
-      this.deleteZIndex(selControl[i])
-      this.deleteTabIndex(selControl[i])
+      const controlId = userData[selControl[i]].type === 'Page' ? selContainer[0] : selControl[i]
+      this.deleteZIndex(controlId)
+      this.deleteTabIndex(controlId)
       this.deleteControl({
         userFormId: this.userFormId,
-        parentId: this.selectedControls[this.userFormId].container[0],
-        targetId: selControl[i]
+        parentId: this.getContainerList(controlId)[0],
+        targetId: controlId
       })
     }
 
     this.selectControl({
       userFormId: this.userFormId,
       select: {
-        container: this.selectedControls[this.userFormId].container,
-        selected: [this.selectedControls[this.userFormId].container[0]]
+        container: userData[selContainer[0]].type === 'MultiPage' ? this.getContainerList(selContainer[0]) : selContainer,
+        selected: userData[selContainer[0]].type === 'MultiPage' ? [this.getContainerList(selContainer[0])[0]] : [selContainer[0]]
       }
     })
-    EventBus.$emit('focusUserForm')
   }
   updateAction (event: KeyboardEvent) {
     let controlActionName = ''

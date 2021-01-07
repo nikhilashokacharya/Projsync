@@ -27,6 +27,7 @@
       :value="propertyValue"
       :type="propertyType"
       @change="updateAppearance"
+      @input="updateCaptionProperty"
     />
   </div>
 </template>
@@ -70,6 +71,13 @@ export default class FDCustomInput extends Vue {
   @Emit('updateAppearance')
   updateAppearance (e: Event) {
     return e
+  }
+  updateCaptionProperty (e: Event) {
+    if (this.propertyName === 'Caption') {
+      this.updateAppearance(e)
+    } else {
+      e.preventDefault()
+    }
   }
 }
 </script>

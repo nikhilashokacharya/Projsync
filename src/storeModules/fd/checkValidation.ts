@@ -17,7 +17,7 @@ export function checkPropertyValue (propertyName: keyof controlProperties, value
       break
     case 'TabFixedHeight':
     case 'TabFixedWidth':
-      result = value >= 0 && value < 7200
+      result = value >= 0 && value <= 7200
       break
     case 'Zoom':
       result = value >= 10 && value < 401

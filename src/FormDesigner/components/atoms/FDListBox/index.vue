@@ -3,7 +3,7 @@
     class="listStyle"
     :style="listStyleObj"
     :title="properties.ControlTipText"
-    @click.stop="selectedItem"
+    @click.stop="listBoxClick"
     @mousedown="controlEditMode"
     @click.self="selectListBox"
     :tabindex="properties.TabIndex"
@@ -84,6 +84,7 @@ import {
   Ref
 } from 'vue-property-decorator'
 import FdControlVue from '@/api/abstract/FormDesigner/FdControlVue'
+import { EventBus } from '@/FormDesigner/event-bus'
 
 @Component({
   name: 'FDListBox'
@@ -91,6 +92,7 @@ import FdControlVue from '@/api/abstract/FormDesigner/FdControlVue'
 export default class FDListBox extends Mixins(FdControlVue) {
   @Ref('listStyleRef') listStyleRef : HTMLTableRowElement[]
   @Ref('listBoxTableRef') listBoxTableRef!: HTMLTableElement
+  @Prop() isActivated: boolean
 
   $el: HTMLDivElement
 
@@ -317,6 +319,12 @@ export default class FDListBox extends Mixins(FdControlVue) {
     const eventStop = (event: Event) => event.stopPropagation()
     return this.isEditMode === false ? null : {
       keydown: eventStop
+    }
+  }
+  listBoxClick (e: MouseEvent) {
+    this.selectedItem(e)
+    if (!this.isActivated) {
+      EventBus.$emit('focusUserForm')
     }
   }
 }

@@ -117,7 +117,7 @@ export default class ResizeControl extends FdSelectVue {
 
   handleDrag (event: MouseEvent) {
     if (this.selectedControls[this.userFormId].selected.length > 1 && this.selMultipleCtrl === false) {
-      if (event.which !== 3) {
+      if (event.which !== 3 && this.isMoveWhenMouseDown) {
         this.selectedItem(event)
       }
     }
@@ -139,7 +139,7 @@ export default class ResizeControl extends FdSelectVue {
 
   dragGroupControl (event: MouseEvent) {
     if (this.selectedControls[this.userFormId].selected.length > 1 && this.selMultipleCtrl === false) {
-      if (event.which !== 3) {
+      if (event.which !== 3 && this.isMoveWhenMouseDown) {
         this.selectedItem(event)
       }
     }
@@ -239,7 +239,13 @@ export default class ResizeControl extends FdSelectVue {
         targetId: controlId
       })
     }
-    EventBus.$emit('focusUserForm')
+    this.selectControl({
+      userFormId: this.userFormId,
+      select: {
+        container: this.getContainerList(containerId),
+        selected: [containerId]
+      }
+    })
   }
   selectedItem (e: MouseEvent) {
     if (this.selMultipleCtrl === false) {
@@ -259,13 +265,12 @@ export default class ResizeControl extends FdSelectVue {
           this.isMoveWhenMouseDown = false
         }
       } else {
-        if (currentSelect.length > 1) {
+        if (currentSelect.length > 1 && (currentSelect.includes(this.controlId) || currentSelect.includes(this.userformData[this.userFormId][this.controlId].properties.GroupID!))) {
           if (currentSelect.includes(this.controlId)) {
             this.exchangeSelect()
           } else {
             if (
-              this.userformData[this.userFormId][this.controlId].properties
-                .GroupID !== ''
+              this.userformData[this.userFormId][this.controlId].properties.GroupID !== ''
             ) {
               const selGrpName = this.userformData[this.userFormId][this.controlId].properties.GroupID!
               this.groupExchange(selGrpName)

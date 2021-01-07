@@ -5,7 +5,15 @@
       :class="getGroupEditStyle(groupName)"
       :key="groupName.concat(index)"
       :style="getGroupStyle(groupName)"
+      :id="groupName"
       @mousedown.stop="handleMouseDown($event,'drag')"
+      @contextmenu.self.stop="openMenu($event,'control')"
+    >
+    <div
+    :style="getGroupStyle(groupName)"
+    class="innerGroupStyle"
+    :id="groupName"
+    @contextmenu="openMenu($event,'container')"
     >
     <div class="handle handle-tl" :style="handlerStyle(groupName)" @mousedown.stop="handleMouseDown($event,'tl')"></div>
       <div class="handle handle-tr" :style="handlerStyle(groupName)" @mousedown.stop="handleMouseDown($event,'tr')"></div>
@@ -15,6 +23,7 @@
       <div class="handle handle-bl" :style="handlerStyle(groupName)" @mousedown.stop="handleMouseDown($event,'bl')"></div>
       <div class="handle handle-br" :style="handlerStyle(groupName)" @mousedown.stop="handleMouseDown($event,'br')"></div>
       <div class="handle handle-bm" :style="handlerStyle(groupName)" @mousedown.stop="handleMouseDown($event,'bm')"></div>
+    </div>
     </div>
   </div>
 </template>
@@ -649,6 +658,19 @@ export default class GroupControl extends FDCommonMethod {
       }
     }
   }
+  openContextMenu (e: MouseEvent, parentID: string, controlID: string, type: string) {
+    this.$emit('openMenu', e, parentID, controlID, type)
+  }
+  openMenu (event: MouseEvent, type: string) {
+    event.preventDefault()
+    event.stopPropagation()
+    const container = this.selectedControls[this.userFormId].container[0]
+    let controlId = container
+    if (type === 'control') {
+      controlId = this.getSelectedControlsDatas![0]
+    }
+    this.openContextMenu(event, container, controlId, type)
+  }
 
   closeDragElement (event:MouseEvent, handler: string): void {
     if (this.value === 'same') {
@@ -865,6 +887,12 @@ export default class GroupControl extends FDCommonMethod {
   margin-top: -5px;
   margin-left: -5px;
   display: none;
+}
+.innerGroupStyle {
+    margin-top: -5px;
+    margin-left: -5px;
+    padding-right: 10px;
+    padding-bottom: 10px;
 }
 .handle {
   box-sizing: border-box;

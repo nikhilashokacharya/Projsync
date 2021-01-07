@@ -4,11 +4,11 @@
       class="outer-page"
       :style="pageStyleObj"
       :title="properties.ControlTipText"
-      @mousedown.stop="multiPageMouseDown"
+      @mousedown="multiPageMouseDown"
       @click.stop="!isEditMode ? selectedItem : addControlObj($event, selectedPageID)"
       @mouseup="dragSelectorControl($event)"
       @contextmenu.stop="handleContextMenu"
-      @keydown.delete.exact.stop="deleteMultiPage"
+      @keydown.delete.stop.exact="deleteMultiPage"
       @keyup.stop="selectMultipleCtrl($event, false)"
       :tabindex="properties.TabIndex"
     >
@@ -35,6 +35,7 @@
               @isChecked="isChecked"
               :setFontStyle="setFontStyle"
               @tempStretch="tempStretch"
+              @deleteMultiPageControl="(event) => {deleteMultiPageControl(event)}"
               :data="data"
               :pageValue="value"
               :indexValue="key"
@@ -45,6 +46,7 @@
               :tempStretch="tempStretch"
               :tempWeight="tempWeight"
               :tempWidth="tempWidth"
+              ref="controlTab"
             />
           </div>
         </div>
@@ -60,6 +62,7 @@
             :style="containerDivStyle"
             :title="properties.ControlTipText"
             :tabindex="properties.TabIndex"
+            @keydown.delete.exact="deleteMultiPageControl"
             @keydown.ctrl.exact.stop="selectMultipleCtrl($event,true)"
             @keydown.ctrl.stop="handleKeyDown"
             @keydown.enter.exact="setContentEditable($event, true)"
@@ -104,7 +107,6 @@
         :selectedTab="updatedValue"
         :data="data"
         :userFormId="userFormId"
-        @closeMenu="closeContextMenu"
       />
     </div>
   </div>
@@ -145,6 +147,7 @@ export default class FDMultiPage extends FdContainerVue {
   @Ref('containerRef') readonly containerRef!: Container;
   @Ref('multipage') multipage: HTMLDivElement
   @Ref('controlTabsRef') controlTabsRef: HTMLDivElement[];
+  @Ref('controlTab') controlTab: FDControlTabs[]
 
   viewMenu?: boolean = false;
   top: string = '0px';
@@ -193,8 +196,17 @@ export default class FDMultiPage extends FdContainerVue {
       }
     }
   }
+  focusPage () {
+    if (typeof (this.properties.Value) === 'number' && (this.controls.length > 0)) {
+      const value: number = (this.properties.Value) as number
+      (this.controlTab[value].$el.children[1] as HTMLSpanElement).focus()
+    } else {
+      (this.$el.children[0] as HTMLDivElement).focus()
+    }
+  }
   closeContextMenu () {
     this.multiPageContextMenu = false
+    this.focusPage()
   }
   /**
    * @description takes a single page value based on the value of the control
@@ -417,6 +429,7 @@ export default class FDMultiPage extends FdContainerVue {
           selected: [this.selectedPageID]
         }
       })
+      this.focusPage()
     }
   }
 
@@ -701,6 +714,7 @@ export default class FDMultiPage extends FdContainerVue {
     this.scrollLeftTop(this.data)
     this.selectedPageID = this.controls[0]
     this.calculateWidthHeight()
+    // this.focusPage()
   }
   dragSelectorControl (event: MouseEvent) {
     this.selectedControlArray = []
@@ -743,12 +757,7 @@ export default class FDMultiPage extends FdContainerVue {
     Vue.nextTick(() => this.containerRef.contextmenu.focus())
   }
   handleKeyDown (event: KeyboardEvent) {
-    const userData = this.userformData[this.userFormId]
-    const selected = this.selectedControls[this.userFormId].selected
-    const type = selected[0].startsWith('group') ? '' : userData[selected[0]].type
-    if (!(selected.length === 1 && (type === 'Page'))) {
-      this.containerRef.refContextMenu.updateAction(event)
-    }
+    this.containerRef.refContextMenu.updateAction(event)
   }
   changeSelect (control: string) {
     this.selectControl({
@@ -779,10 +788,7 @@ export default class FDMultiPage extends FdContainerVue {
     }
   }
   deleteMultiPage (event: KeyboardEvent) {
-    const userData = this.userformData[this.userFormId]
-    const selected = this.selectedControls[this.userFormId].selected
-    const type = selected[0].startsWith('group') ? '' : userData[selected[0]].type
-    if (selected.length === 1 && (type === 'Page' || type === 'MultiPage')) {
+    if (this.controlId === this.selectedControls[this.userFormId].selected[0]) {
       this.deleteItem(event)
     } else {
       this.handleKeyDown(event)
@@ -813,18 +819,32 @@ export default class FDMultiPage extends FdContainerVue {
     }
   }
 
-  @Watch('controls')
-  updatePageId () {
-    const userData = this.userformData[this.userFormId]
-    let selectedPage = -1
-    if (this.controls.length > 0) {
-      selectedPage = this.controls.findIndex((val) => this.properties.Value === userData[val].properties.Index)
+  created () {
+    EventBus.$on('updateMultiPageValue', this.updateValue)
+  }
+  destroyed () {
+    EventBus.$off('updateMultiPageValue')
+  }
+  updateValue () {
+    {
+      const userData = this.userformData[this.userFormId]
+      let selectedPage = -1
+      if (this.controls.length > 0) {
+        selectedPage = this.controls.findIndex((val) => this.properties.Value === userData[val].properties.Index)
+      }
+      if (this.data.controls.length > 0 && selectedPage !== -1) {
+        this.selectedPageID = this.controls[selectedPage]
+        this.changeSelect(this.controls[selectedPage])
+      } else {
+        this.changeSelect(this.controlId)
+      }
     }
-    if (this.data.controls.length > 0 && selectedPage !== -1) {
-      this.selectedPageID = this.controls[selectedPage]
-      this.changeSelect(this.controls[selectedPage])
-    } else {
-      this.changeSelect(this.controlId)
+  }
+  deleteMultiPageControl (event: KeyboardEvent) {
+    const userData = this.userformData[this.userFormId]
+    if (this.selectedPageID && this.userformData[this.userFormId][this.selectedPageID].controls.length <= 0) {
+      event.stopPropagation()
+      this.deleteItem(event)
     }
   }
 }
@@ -1025,7 +1045,7 @@ export default class FDMultiPage extends FdContainerVue {
   text-decoration: underline;
   text-underline-position: under;
 }
-:focus{
+:focus {
   outline: none;
 }
 </style>
