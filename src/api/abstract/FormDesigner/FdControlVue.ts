@@ -731,7 +731,7 @@ export default class FdControlVue extends Vue {
    const colChangeCheck: boolean = controlProp.ColumnCount! - 1 < index
    return {
      textAlign: controlProp.TextAlign === 0 ? 'left' : controlProp.TextAlign === 2 ? 'right' : 'center',
-     width: colChangeCheck ? '0px' : ((updateColWidth[index]) ? parseInt(updateColWidth[index]) + 'px' : controlProp.ColumnCount! > index ? '100px' : '0px'),
+     width: controlProp.ColumnCount! === -1 ? parseInt(updateColWidth[index]) + 'px' : colChangeCheck ? '0px' : ((updateColWidth[index]) ? parseInt(updateColWidth[index]) + 'px' : controlProp.ColumnCount! > index ? '100px' : '0px'),
      overflow: 'hidden'
    }
  }
@@ -741,7 +741,7 @@ export default class FdControlVue extends Vue {
    return {
      textAlign: controlProp.TextAlign === 0 ? 'left' : controlProp.TextAlign === 2 ? 'right' : 'center',
      borderRight: (index < controlProp.ColumnCount! - 1) ? '1px solid' : '',
-     width: (updateColWidth[index]) ? parseInt(updateColWidth[index]) + 'px' : '100px',
+     width: controlProp.ColumnCount! === -1 ? parseInt(updateColWidth[index]) + 'px' : (updateColWidth[index]) ? parseInt(updateColWidth[index]) + 'px' : '100px',
      overflow: 'hidden'
    }
  }
@@ -938,7 +938,6 @@ handleMultiSelect (e: MouseEvent) {
  *
  */
 handleExtendArrowKeySelect (e: KeyboardEvent) {
-  // if (e.target instanceof HTMLTableRowElement) {
   const x = e.key.toUpperCase().charCodeAt(0)
   const tempPath = e.composedPath()
   const eventTarget = e.target as HTMLTableRowElement
@@ -1225,14 +1224,16 @@ clearOptionBGColorAndChecked (e: any) {
 setOptionBGColorAndChecked (e: KeyboardEvent | MouseEvent) {
   const currentTargetElement = e.currentTarget as HTMLTableElement
   const childNodeChecked = currentTargetElement.children[0].childNodes[0] as HTMLInputElement
-  currentTargetElement.style.backgroundColor =
+  if (this.data.type === 'ComboBox') {
+    currentTargetElement.style.backgroundColor =
    currentTargetElement.style.backgroundColor === 'rgb(59, 122, 231)'
      ? ''
      : 'rgb(59, 122, 231)'
+  }
   if (this.data.type === 'ComboBox') {
     childNodeChecked.checked = !childNodeChecked.checked
   }
-  if ((e.target instanceof HTMLTableCellElement || e.target instanceof HTMLTableRowElement)) {
+  if ((e.target instanceof HTMLTableCellElement || e.target instanceof HTMLTableRowElement || e.target instanceof HTMLInputElement)) {
     const targetEvent = e.target
     if (this.data.type === 'ComboBox') {
       currentTargetElement.style.backgroundColor = ''
@@ -1242,19 +1243,43 @@ setOptionBGColorAndChecked (e: KeyboardEvent | MouseEvent) {
    this.properties.MultiSelect === 0
     ) {
       childNodeChecked.checked = !childNodeChecked.checked
-    } else if (
-      this.properties.ListStyle === 1 &&
-   this.properties.MultiSelect === 1 &&
-   targetEvent.tagName === 'INPUT'
-    ) {
-    } else if (this.properties.MultiSelect === 2) {
-      currentTargetElement.style.backgroundColor = 'rgb(59, 122, 231)'
-      childNodeChecked.checked = true
+      if (childNodeChecked.checked === true) {
+        currentTargetElement.style.backgroundColor = 'rgb(59, 122, 231)'
+      } else {
+        currentTargetElement.style.backgroundColor = ''
+      }
     } else {
       childNodeChecked.checked = !childNodeChecked.checked
+      if (this.properties.MultiSelect === 0) {
+        currentTargetElement.style.backgroundColor = 'rgb(59, 122, 231)'
+        if (this.properties.ListStyle === 1) {
+          if (childNodeChecked.checked) {
+            currentTargetElement.style.backgroundColor = 'rgb(59, 122, 231)'
+          }
+        }
+      } else if (this.properties.MultiSelect === 1) {
+        if (currentTargetElement.style.backgroundColor === 'rgb(59, 122, 231)') {
+          currentTargetElement.style.backgroundColor = ''
+          if (this.properties.ListStyle === 1) {
+            if (childNodeChecked.checked) {
+              currentTargetElement.style.backgroundColor = 'rgb(59, 122, 231)'
+            } else {
+              currentTargetElement.style.backgroundColor = ''
+            }
+          }
+        } else {
+          currentTargetElement.style.backgroundColor = 'rgb(59, 122, 231)'
+          if (this.properties.ListStyle === 1) {
+            if (childNodeChecked.checked) {
+              currentTargetElement.style.backgroundColor = 'rgb(59, 122, 231)'
+            }
+          }
+        }
+      } else if (this.properties.MultiSelect === 2) {
+        childNodeChecked.checked = true
+        currentTargetElement.style.backgroundColor = 'rgb(59, 122, 231)'
+      }
     }
-  } else if (this.properties.MultiSelect === 2) {
-    currentTargetElement.style.backgroundColor = 'rgb(59, 122, 231)'
   }
 }
 
@@ -1310,9 +1335,6 @@ get setFontStyle () {
     this.tempStretch = 'normal'
     return this.properties.Font!.FontName!
   }
-}
-setInitial (e: Event) {
-  this.tempListBoxComboBoxEvent = e
 }
 
 @Watch('properties.BorderStyle', { deep: true })

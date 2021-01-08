@@ -162,7 +162,7 @@
                   v-for="(a, columnIndex) in extraDatas.ColumnHeadsValues"
                 >
                   <div
-                    v-if="columnIndex < properties.ColumnCount"
+                    v-if="columnIndex < properties.ColumnCount || properties.ColumnCount === -1"
                     :key="columnIndex"
                     :style="updateColHeads(columnIndex)"
                     class="colHeadsClass"
@@ -199,7 +199,7 @@
                   :style="tdStyleObj"
                   class="tdClassIn"
                   v-if="
-                    properties.ListStyle === 1 && properties.ColumnCount > 0
+                    properties.ListStyle === 1 && properties.ColumnCount > 0 || properties.ListStyle === 1 && properties.ColumnCount === -1
                   "
                 >
                   <input name="radio" type="radio" class="inputClass" />
@@ -210,7 +210,7 @@
                   :key="index"
                   :style="updateColumnWidths(index)"
                 >
-                  <template v-if="index < properties.ColumnCount">{{
+                  <template v-if="index < properties.ColumnCount || properties.ColumnCount === -1">{{
                     i
                   }}</template>
                 </div>
@@ -580,7 +580,6 @@ export default class FDComboBox extends Mixins(FdControlVue) {
             : font.FontStrikethrough
               ? 'line-through'
               : '',
-      textUnderlinePosition: 'under',
       fontWeight: font.FontBold
         ? 'bold'
         : font.FontStyle !== ''
