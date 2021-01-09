@@ -47,8 +47,13 @@
         },
       ]"
     >
-      <span v-if="pageData.Accelerator === ''">{{ pageData.Caption }}</span>
-      <span v-else
+      <span v-if="pageData.Accelerator === '' && pageData.Caption === ''"
+        ><p></p
+      ></span>
+      <span class="caption-span" v-else-if="pageData.Accelerator === ''"
+        >{{ pageData.Caption }}
+      </span>
+      <span class="caption-span" v-else
         ><span>{{
           pageData.Caption | afterbeginCaption(pageData.Accelerator)
         }}</span>
@@ -257,14 +262,40 @@ export default class FDControlTabs extends Vue {
             ? 'gray'
             : ''
           : '',
-      paddingTop: this.indexValue === this.data.properties.Value ? '5px' : '1px',
+      paddingTop:
+        this.indexValue === this.data.properties.Value ? '5px' : '1px',
       // paddingBottom: this.indexValue === this.data.properties.Value ? '5px' : '3px',
       paddingBottom: '9px',
-      marginTop: this.data.properties.TabOrientation === 1 ? (this.indexValue === this.data.properties.Value ? '' : '0px') : this.data.properties.TabOrientation === 0 ? (this.indexValue === this.data.properties.Value ? '' : '5px') : '',
+      marginTop:
+        this.data.properties.TabOrientation === 1
+          ? this.indexValue === this.data.properties.Value
+            ? ''
+            : '0px'
+          : this.data.properties.TabOrientation === 0
+            ? this.indexValue === this.data.properties.Value
+              ? ''
+              : '5px'
+            : '',
       borderTop: '2px solid white',
-      borderRight: this.data.properties.TabOrientation === 2 ? '0px' : '2px solid gray',
-      borderBottom: this.data.properties.TabOrientation === 2 || this.data.properties.TabOrientation === 3 ? '2px solid gray' : this.data.properties.TabOrientation === 1 ? this.data.type === 'TabStrip' ? '6px solid gray' : '2px solid gray' : 'none',
-      marginBottom: this.data.type === 'MultiPage' ? this.data.properties.TabOrientation === 1 ? this.indexValue === this.data.properties.Value ? '4px' : '6px' : '' : '',
+      borderRight:
+        this.data.properties.TabOrientation === 2 ? '0px' : '2px solid gray',
+      borderBottom:
+        this.data.properties.TabOrientation === 2 ||
+        this.data.properties.TabOrientation === 3
+          ? '2px solid gray'
+          : this.data.properties.TabOrientation === 1
+            ? this.data.type === 'TabStrip'
+              ? '6px solid gray'
+              : '2px solid gray'
+            : 'none',
+      marginBottom:
+        this.data.type === 'MultiPage'
+          ? this.data.properties.TabOrientation === 1
+            ? this.indexValue === this.data.properties.Value
+              ? '4px'
+              : '6px'
+            : ''
+          : '',
       borderRadius: '3px',
       display: 'flex',
       alignItems: 'center',
@@ -357,5 +388,8 @@ export default class FDControlTabs extends Vue {
 }
 :focus {
   outline: none;
+}
+.caption-span {
+  white-space: pre;
 }
 </style>
