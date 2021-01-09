@@ -258,7 +258,8 @@ export default class FDControlTabs extends Vue {
             : ''
           : '',
       paddingTop: this.indexValue === this.data.properties.Value ? '5px' : '1px',
-      paddingBottom: this.indexValue === this.data.properties.Value ? '5px' : '3px',
+      // paddingBottom: this.indexValue === this.data.properties.Value ? '5px' : '3px',
+      paddingBottom: '9px',
       marginTop: this.data.properties.TabOrientation === 1 ? (this.indexValue === this.data.properties.Value ? '' : '0px') : this.data.properties.TabOrientation === 0 ? (this.indexValue === this.data.properties.Value ? '' : '5px') : '',
       borderTop: '2px solid white',
       borderRight: this.data.properties.TabOrientation === 2 ? '0px' : '2px solid gray',

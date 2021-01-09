@@ -244,6 +244,7 @@ export default class FDMultiPage extends FdContainerVue {
       top: `${controlProp.Top}px`,
       backgroundColor: controlProp.BackColor,
       display: display
+      // borderBottom: controlProp.TabOrientation === 0 ? '1px solid gray' : ''
     }
   }
 
@@ -538,25 +539,25 @@ export default class FDMultiPage extends FdContainerVue {
       controlProp.Style !== 2 ? controlProp.TabOrientation === 0
         ? controlProp.MultiRow ? (this.tempHeight + 12) * this.multiRowCount + 'px' : controlProp.TabFixedHeight! > 0
           ? controlProp.TabFixedHeight! + 10 + 'px'
-          : controlProp.TabFixedHeight! === 0 ? (this.tempHeight + 9) + 'px'
+          : controlProp.TabFixedHeight! === 0 ? (this.tempHeight + 12) + 'px'
             : '33px'
         : '0px' : '0px',
       height:
       controlProp.Style !== 2 ? controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1
         ? controlProp.MultiRow ? controlProp.Height! - ((this.tempHeight + 12) * this.multiRowCount) + 'px' : controlProp.TabFixedHeight! > 0
           ? controlProp.TabOrientation === 0 ? controlProp.Height! - controlProp.TabFixedHeight! - 10 + 'px' : controlProp.Height! - controlProp.TabFixedHeight! - 5 + 'px'
-          : controlProp.TabFixedHeight! === 0 ? controlProp.Font!.FontSize! === 72 ? (controlProp.Height! - controlProp.Font!.FontSize! - 17) + 'px' : (controlProp.Height! - controlProp.Font!.FontSize! - 11) + 'px'
+          : controlProp.TabFixedHeight! === 0 ? controlProp.Font!.FontSize! === 72 ? (controlProp.Height! - controlProp.Font!.FontSize! - 18) + 'px' : (controlProp.Height! - controlProp.Font!.FontSize! - 16) + 'px'
             : controlProp.TabOrientation === 1
               ? `${controlProp.Height! - 21}px`
               : `${controlProp.Height! - 35}px`
-        : `${controlProp.Height!}px` : `${controlProp.Height!}px`,
+        : `${controlProp.Height! - 1}px` : `${controlProp.Height! - 1}px`,
       width:
         controlProp.Style !== 2 ? controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1
-          ? `${controlProp.Width!}px`
+          ? `${controlProp.Width! - 1}px`
           : controlProp.TabFixedWidth! > 0
             ? controlProp.Width! - controlProp.TabFixedWidth! - 10 + 'px'
-            : controlProp.TabFixedWidth! === 0 ? controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3 ? `${controlProp.Width! - this.tempWidth - 12}px` : (controlProp.Width! - controlProp.Font!.FontSize! - 20) + 'px'
-              : 'calc(100% - 44px)' : `${controlProp.Width!}px`,
+            : controlProp.TabFixedWidth! === 0 ? controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3 ? `${controlProp.Width! - this.tempWidth - 13}px` : (controlProp.Width! - controlProp.Font!.FontSize! - 20) + 'px'
+              : 'calc(100% - 44px)' : `${controlProp.Width! - 1}px`,
       left:
         controlProp.Style !== 2 ? controlProp.TabOrientation === 2
           ? controlProp.TabFixedWidth! > 0
@@ -570,7 +571,8 @@ export default class FDMultiPage extends FdContainerVue {
       overflowY: this.getScrollBarPage ? this.getScrollBarPage.overflowY! : '',
       backgroundColor: 'rgb(238,238,238)',
       backgroundImage: 'radial-gradient(circle, rgb(0, 0, 0) 0.5px, rgba(0, 0, 0, 0) 0.2px) !important',
-      backgroundSize: '9px 10px'
+      backgroundSize: '9px 10px',
+      boxShadow: '1px 1px gray'
     }
   }
 

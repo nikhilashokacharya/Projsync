@@ -965,7 +965,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
 }
 .tr {
   outline: none;
-  display: flex;
+  display: -webkit-box;
 }
 .tr:hover:not([disabled]) {
   background-color: rgb(59, 122, 231);
