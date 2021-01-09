@@ -128,7 +128,8 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
       cursor:
         controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''
           ? this.getMouseCursorData
-          : 'default'
+          : 'default',
+      backgroundColor: 'white'
     }
   }
 
@@ -149,7 +150,7 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
         controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''
           ? this.getMouseCursorData
           : 'default',
-      backgroundColor: controlProp.BackColor!.startsWith('rgb') ? `rgba(${a![0]},${a![1]},${a![2]},0.8)` : temprgba,
+      backgroundColor: controlProp.BackColor!.startsWith('rgb') ? `rgba(${a![0]},${a![1]},${a![2]},0.5)` : temprgba,
       margin: '0px'
     }
   }
@@ -161,7 +162,7 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
         c = [c[0], c[0], c[1], c[1], c[2], c[2]]
       }
       c = '0x' + c.join('')
-      return 'rgba(' + [(c >> 16) & 255, (c >> 8) & 255, c & 255].join(',') + ',0.8)'
+      return 'rgba(' + [(c >> 16) & 255, (c >> 8) & 255, c & 255].join(',') + ',0.5)'
     }
   }
   get scrollBarButtonStyleObj () {
@@ -210,7 +211,7 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
   -webkit-appearance: none;
   content: '';
   --rgb:250,250,250;
-  --alpha: 0.8;
+  --alpha: 0.5;
   background-color: rgba(var(--rgb), var(--alpha));
   outline: none;
   overflow: hidden;

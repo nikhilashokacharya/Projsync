@@ -1,7 +1,7 @@
 <template>
   <div class="inner-userform-window" :style="innerWindowStyle">
     <div class="inner-userform-header">
-      <div class="innerWindowHeaderStyle">
+      <div class="innerWindowHeaderStyle" :style="innerWindowHeaderStyle">
           {{ properties.Caption }}
       </div>
       <div>
@@ -142,10 +142,10 @@ export default class UserForm extends FdContainerVue {
     const scale = (this.properties.Zoom! * 10) / 100
     return {
       ...this.getSampleDotPattern,
-      borderLeft: this.properties.SpecialEffect === 2 ? '2px solid gray' : this.properties.SpecialEffect === 3 ? '1.5px solid gray' : this.properties.SpecialEffect === 4 ? '0.5px solid gray' : '',
-      borderRight: this.properties.SpecialEffect === 1 ? '2px solid gray' : this.properties.SpecialEffect === 4 ? '1.5px solid gray' : this.properties.SpecialEffect === 3 ? '0.5px solid gray' : '',
-      borderTop: this.properties.SpecialEffect === 2 ? '2px solid gray' : this.properties.SpecialEffect === 3 ? '1.5px solid gray' : this.properties.SpecialEffect === 4 ? '0.5px solid gray' : '',
-      borderBottom: this.properties.SpecialEffect === 1 ? '2px solid gray' : this.properties.SpecialEffect === 4 ? '1.5px solid gray' : this.properties.SpecialEffect === 3 ? '0.5px solid gray' : '',
+      borderLeft: this.data.properties.BorderStyle === 1 ? '1px solid ' + this.data.properties.BorderColor : this.data.properties.SpecialEffect === 2 ? '2px solid gray' : this.data.properties.SpecialEffect === 3 ? '1.5px solid gray' : this.data.properties.SpecialEffect === 4 ? '0.5px solid gray' : '',
+      borderRight: this.data.properties.BorderStyle === 1 ? '1px solid ' + this.data.properties.BorderColor : this.data.properties.SpecialEffect === 1 ? '2px solid gray' : this.data.properties.SpecialEffect === 4 ? '1.5px solid gray' : this.data.properties.SpecialEffect === 3 ? '0.5px solid gray' : '',
+      borderTop: this.data.properties.BorderStyle === 1 ? '1px solid ' + this.data.properties.BorderColor : this.data.properties.SpecialEffect === 2 ? '2px solid gray' : this.data.properties.SpecialEffect === 3 ? '1.5px solid gray' : this.data.properties.SpecialEffect === 4 ? '0.5px solid gray' : '',
+      borderBottom: this.data.properties.BorderStyle === 1 ? '1px solid ' + this.data.properties.BorderColor : this.data.properties.SpecialEffect === 1 ? '2px solid gray' : this.data.properties.SpecialEffect === 4 ? '1.5px solid gray' : this.data.properties.SpecialEffect === 3 ? '0.5px solid gray' : '',
       cursor:
         this.properties.MousePointer !== 0 || this.properties.MouseIcon !== ''
           ? `${this.getMouseCursorData} !important`
@@ -162,9 +162,7 @@ export default class UserForm extends FdContainerVue {
               ? 'line-through'
               : '',
       fontWeight: font.FontBold ? 'bold' : '',
-      border: this.properties.BorderStyle
-        ? `1px solid ${this.properties.BorderColor}`
-        : 'none',
+      borderColor: this.data.properties.BorderStyle === 1 ? this.data.properties.BorderColor : '',
       backgroundImage:
         this.properties.Picture === ''
           ? this.getSampleDotPattern.backgroundImage
@@ -225,6 +223,11 @@ export default class UserForm extends FdContainerVue {
     EventBus.$off('selectMultipleCtrl')
     EventBus.$off('actMultipleCtrl')
   }
+  get innerWindowHeaderStyle () {
+    return {
+      textAlign: this.properties.RightToLeft ? 'right' : 'left'
+    }
+  }
 }
 </script>
 
@@ -258,7 +261,7 @@ export default class UserForm extends FdContainerVue {
 }
 .inner-userform-header {
   display: grid;
-  grid-template-columns: 9fr 1fr;
+  grid-template-columns: 9.5fr 0.5fr;
   width: 100%;
   height: 30px;
   background-color: rgba(153,180,209);

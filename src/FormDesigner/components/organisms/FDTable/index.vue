@@ -505,10 +505,30 @@ export default class FDTable extends Vue {
       }
     } else if (inputType === 'array') {
       if ((e.target as HTMLInputElement).value !== '') {
-        this.emitUpdateProperty(
-          propertyName,
-          parseInt((e.target as HTMLInputElement).value)
-        )
+        if (propertyName === 'BorderStyle' && propertyValue === '1') {
+          this.emitUpdateProperty(
+            propertyName,
+            parseInt((e.target as HTMLInputElement).value)
+          )
+          this.emitUpdateProperty(
+            'SpecialEffect',
+            0
+          )
+        } else if (propertyName === 'SpecialEffect' && parseInt(propertyValue) > 0) {
+          this.emitUpdateProperty(
+            propertyName,
+            parseInt((e.target as HTMLInputElement).value)
+          )
+          this.emitUpdateProperty(
+            'BorderStyle',
+            0
+          )
+        } else {
+          this.emitUpdateProperty(
+            propertyName,
+            parseInt((e.target as HTMLInputElement).value)
+          )
+        }
       }
     }
   }

@@ -1,5 +1,9 @@
 <template>
-  <div id="popup1" class="overlay" :style="tabOrderStyleObj">
+  <div id="popup1" class="overlay" :style="tabOrderStyleObj"
+  @keydown.enter="updateChanges"
+    @keydown.esc="closeDialog()"
+    tabindex="2"
+    ref="renameDialogRef">
     <div class="rename-div-1 popup" :style="tabOrderDialogInitialStyle">
       <div class="remane-header-div" @mousedown.stop="dragTabOrderDialog">
         Rename
@@ -46,18 +50,12 @@
         </div>
         <div></div>
         <div>
-          <input
-            type="Button"
-            value="OK"
-            class="btn-outline inputTwoClass"
-            @click="updateChanges()"
-          />
-          <input
-            type="Button"
-            value="Cancel"
-            class="btn-outline inputTwoClass cancelButtonStyle"
+          <button  class="inputTwoClass"
+            @click="updateChanges()">OK</button>
+          <button
+            class="inputTwoClass cancelButtonStyle"
             @click="closeDialog"
-          />
+          >Cancel</button>
         </div>
       </div>
     </div>
@@ -66,7 +64,7 @@
 
 <script lang="ts">
 import { IupdateControlExtraData, IupdateControl } from '@/storeModules/fd/actions'
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Ref } from 'vue-property-decorator'
 import { State, Action } from 'vuex-class'
 import { EventBus } from '@/FormDesigner/event-bus'
 import FdDialogDragVue from '@/api/abstract/FormDesigner/FdDialogDragVue'
@@ -82,6 +80,7 @@ export default class FDRenameMultiPageDialog extends FdDialogDragVue {
   ) => void;
   @Action('fd/updateControl') updateControl!: (payload: IupdateControl) => void;
   @State((state) => state.fd.userformData) userformData!: userformData;
+  @Ref('renameDialogRef') renameDialogRef!: HTMLDivElement;
   tabOrderList: tabsItems[];
   selectedTabData: tabsItems = {
     Name: '',
@@ -169,11 +168,15 @@ export default class FDRenameMultiPageDialog extends FdDialogDragVue {
         this.isTabOrderOpen = true
         this.userFormId = userFormId
         this.controlId = controlId
+        this.renameDialogRef.focus()
       }
     )
   }
   destroyed () {
     EventBus.$off('renamePage')
+  }
+  mounted () {
+    this.renameDialogRef.focus()
   }
 }
 </script>
@@ -201,19 +204,6 @@ h1 {
 .box {
   background: rgba(255, 255, 255, 0.2);
   text-align: right;
-}
-
-.button {
-  font-size: 1em;
-  padding: 10px;
-  color: #fff;
-  border: 2px solid #06d85f;
-  border-radius: 20px/50px;
-  text-decoration: none;
-  cursor: pointer;
-}
-.button:hover {
-  background: #06d85f;
 }
 
 .overlay {
@@ -340,6 +330,7 @@ h1 {
 .btn-outline {
   outline: none;
 }
+
 .hr {
   margin: 1px;
 }
@@ -348,8 +339,19 @@ h1 {
 }
 .inputTwoClass {
   width: 55px !important;
-  box-shadow: 1px 1px !important;
-  border: 0.5px solid gray !important;
+  height: 23px;
+  font-family: "Candara";
+  font-weight: bold;
+  font-size: 13px;
+  box-shadow: 1px 1px;
+  border-top-color: rgb(238, 238, 238);
+  border-bottom-color: rgb(238, 238, 238);
+  border-left-color: rgb(238, 238, 238);
+  border-right-color: rgb(238, 238, 238);
+  white-space: pre;
+}
+.inputTwoClass:focus{
+  outline:1px solid black;
 }
 .cancelButtonStyle {
   margin-left: 10px;

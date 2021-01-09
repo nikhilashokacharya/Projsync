@@ -6,13 +6,13 @@ export class ControlPropertyData {
   };
   constructor () {
     this.data = {
-      UseForm: {
+      UserForm: {
         properties: {
           BackColor: '#ffffff',
           BorderColor: '#ffffff',
           BorderStyle: 1,
           Caption: 'UserForm1',
-          Cycle: 1,
+          Cycle: 0,
           DrawBuffer: 32000,
           Enabled: true,
           Font: {
@@ -44,7 +44,7 @@ export class ControlPropertyData {
           ScrollTop: 0,
           ScrollWidth: 0,
           ShowModal: true,
-          SpecilalEffect: 3,
+          SpecilalEffect: 0,
           StartUpPosition: 1,
           Tag: '',
           Top: 0,
@@ -66,7 +66,7 @@ export class ControlPropertyData {
           BackColor: '#eeeeee',
           BackStyle: 1,
           BorderColor: '#eeeeee',
-          BorderStyle: 1,
+          BorderStyle: 0,
           Caption: 'Label1',
           ControlTipText: 'helptext',
           Enabled: true,
@@ -194,7 +194,7 @@ export class ControlPropertyData {
           ID: 'ID_CheckBox1',
           Picture: '',
           PicturePosition: 7,
-          SpecialEffect: 0,
+          SpecialEffect: 1,
           TabIndex: 8,
           TabStop: true,
           Tag: '',
@@ -522,7 +522,7 @@ export class ControlPropertyData {
           ID: 'ID_OptionButton1',
           Picture: '',
           PicturePosition: 12,
-          SpecialEffect: 0,
+          SpecialEffect: 1,
           TabIndex: 9,
           TabStop: true,
           Tag: '',
@@ -760,7 +760,7 @@ export class ControlPropertyData {
           BackColor: '#ffffff',
           BackStyle: 1,
           BorderColor: '#ffffff',
-          BorderStyle: 1,
+          BorderStyle: 0,
           ControlSource: '',
           ControlTipText: 'helptext',
           CursorStartPosition: 0,

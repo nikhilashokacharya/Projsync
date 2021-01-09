@@ -107,8 +107,10 @@ const mutations: MutationTree<fdState> & FdMutations = {
   addControl (state, payload) {
     const userFormData = state.userformData[payload.userFormId]
     const targetData = userFormData[payload.controlId]
+    const targetDataControls = [...targetData.controls]
     if (Object.keys(userFormData).includes(payload.addId) === false) {
-      targetData.controls.push(payload.addId)
+      targetDataControls.push(payload.addId)
+      targetData.controls = targetDataControls
       Vue.set(userFormData, payload.addId, payload.item)
     } else {
       console.warn('duplicated control Id: ', payload.addId)
@@ -117,8 +119,10 @@ const mutations: MutationTree<fdState> & FdMutations = {
   addCopiedControl (state, payload) {
     const userFormData = state.copiedControl[payload.userFormId]
     const targetData = userFormData[payload.controlId]
+    const targetDataControls = [...targetData.controls]
     if (Object.keys(userFormData).includes(payload.addId) === false) {
-      targetData.controls.push(payload.addId)
+      targetDataControls.push(payload.addId)
+      targetData.controls = targetDataControls
       Vue.set(userFormData, payload.addId, payload.item)
     } else {
       console.warn('duplicated control Id: ', payload.addId)

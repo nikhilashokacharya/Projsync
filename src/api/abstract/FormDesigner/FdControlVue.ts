@@ -731,7 +731,7 @@ export default class FdControlVue extends Vue {
    const colChangeCheck: boolean = controlProp.ColumnCount! - 1 < index
    return {
      textAlign: controlProp.TextAlign === 0 ? 'left' : controlProp.TextAlign === 2 ? 'right' : 'center',
-     width: controlProp.ColumnCount! === -1 ? parseInt(updateColWidth[index]) + 'px' : colChangeCheck ? '0px' : ((updateColWidth[index]) ? parseInt(updateColWidth[index]) + 'px' : controlProp.ColumnCount! > index ? '100px' : '0px'),
+     width: controlProp.ColumnCount! === -1 ? (updateColWidth[index] ? parseInt(updateColWidth[index]) + 'px' : '100px') : colChangeCheck ? '0px' : ((updateColWidth[index]) ? parseInt(updateColWidth[index]) + 'px' : controlProp.ColumnCount! > index ? '100px' : '0px'),
      overflow: 'hidden'
    }
  }
@@ -806,8 +806,8 @@ handleMultiSelect (e: MouseEvent) {
   if (e.target instanceof HTMLTableCellElement || e.target instanceof HTMLTableRowElement || e.target instanceof HTMLDivElement) {
     this.tempListBoxComboBoxEvent = e
     const targetElement = e.target
-    const tempData = targetElement.parentElement!.children[0] as HTMLTableElement
-    const tempDataOption = targetElement.parentElement!.children[1] as HTMLTableElement
+    const tempData = targetElement.parentElement!.children[0] as HTMLDivElement
+    const tempDataOption = targetElement.parentElement!.children[1] as HTMLDivElement
     const tempPath = e.composedPath()
     targetElement.focus()
     let data = targetElement.innerText
@@ -857,11 +857,11 @@ handleMultiSelect (e: MouseEvent) {
           let startPoint = 0
           let endPoint = 0
           for (let i = 0; i < tempPath.length; i++) {
-            const ele = tempPath[i] as HTMLTableElement
+            const ele = tempPath[i] as HTMLDivElement
             if (ele.className === 'table-body') {
             // extend points start and end
               for (let j = 0; j < ele.childNodes.length; j++) {
-                const cd = ele.childNodes[j] as HTMLTableElement
+                const cd = ele.childNodes[j] as HTMLDivElement
                 if (cd.innerText === this.properties.Value) {
                   startPoint = j + 1
                 }
@@ -877,7 +877,7 @@ handleMultiSelect (e: MouseEvent) {
               }
               // setting selection
               for (let k = startPoint; k <= endPoint; k++) {
-                const node = ele.childNodes[k] as HTMLTableElement
+                const node = ele.childNodes[k] as HTMLDivElement
                 const tempNode = node.childNodes[0].childNodes[0] as HTMLInputElement
                 node.style.backgroundColor = 'rgb(59, 122, 231)'
                 if (
@@ -941,8 +941,8 @@ handleExtendArrowKeySelect (e: KeyboardEvent) {
   const x = e.key.toUpperCase().charCodeAt(0)
   const tempPath = e.composedPath()
   const eventTarget = e.target as HTMLTableRowElement
-  const nextSiblingEvent = eventTarget.nextSibling as HTMLTableElement
-  const prevSiblingEvent = eventTarget.previousSibling as HTMLTableElement
+  const nextSiblingEvent = eventTarget.nextSibling as HTMLDivElement
+  const prevSiblingEvent = eventTarget.previousSibling as HTMLDivElement
   if (
    this.properties.MatchEntry! === 0 &&
    x >= 48 && x <= 90
@@ -953,10 +953,10 @@ handleExtendArrowKeySelect (e: KeyboardEvent) {
     this.updateDataModelExtraData({ propertyName: 'MatchData', value: prevMatchData !== e.key ? e.key : prevMatchData })
 
     for (let index = 0; index < tempPath.length; index++) {
-      const element = tempPath[index] as HTMLTableElement
+      const element = tempPath[index] as HTMLDivElement
       if (element.className === 'table-body') {
         for (let index = 0; index < element.childNodes.length; index++) {
-          const ei = element.childNodes[index] as HTMLTableElement
+          const ei = element.childNodes[index] as HTMLDivElement
           let splitData = ei.innerText.replace(/\t/g, ' ').split(' ')
           let si = 0
           if (this.properties.ListStyle === 0) {
@@ -972,7 +972,7 @@ handleExtendArrowKeySelect (e: KeyboardEvent) {
          this.extraDatas.MatchData![0] === e.key &&
          this.extraDatas.MatchData!.length > 0
         ) {
-          const tempChildNode = element.childNodes[this.matchEntry[this.matchIndex]] as HTMLTableElement
+          const tempChildNode = element.childNodes[this.matchEntry[this.matchIndex]] as HTMLDivElement
           this.matchIndex++
           if (
             this.matchIndex === this.matchEntry.length &&
@@ -1014,11 +1014,11 @@ handleExtendArrowKeySelect (e: KeyboardEvent) {
     this.updateDataModelExtraData({ propertyName: 'MatchData', value: temp })
 
     for (let point = 0; point < tempPath.length; point++) {
-      const tbody = tempPath[point] as HTMLTableElement
+      const tbody = tempPath[point] as HTMLDivElement
       if (tbody.className === 'table-body') {
         this.matchEntry = []
         for (let p = 0; p < tbody.childNodes.length; p++) {
-          const ei = tbody.childNodes[p] as HTMLTableElement
+          const ei = tbody.childNodes[p] as HTMLDivElement
           let matchEntryComplete = ei.innerText
             .replace(/\t/g, ' ')
             .split(' ')
@@ -1040,7 +1040,7 @@ handleExtendArrowKeySelect (e: KeyboardEvent) {
         }
 
         if (this.extraDatas.MatchData!.length <= 1) {
-          let singleMatch = tbody.childNodes[this.matchEntry[0]] as HTMLTableElement
+          let singleMatch = tbody.childNodes[this.matchEntry[0]] as HTMLDivElement
           this.clearOptionBGColorAndChecked(e)
           this.setBGandCheckedForMatch(singleMatch)
           break
@@ -1048,7 +1048,7 @@ handleExtendArrowKeySelect (e: KeyboardEvent) {
          this.extraDatas.MatchData!.length > 1 &&
          this.matchEntry.length !== 0
         ) {
-          let completeAutoMatch = tbody.childNodes[this.matchEntry[0]] as HTMLTableElement
+          let completeAutoMatch = tbody.childNodes[this.matchEntry[0]] as HTMLDivElement
           this.clearOptionBGColorAndChecked(e)
           this.setBGandCheckedForMatch(completeAutoMatch)
         }
@@ -1061,9 +1061,9 @@ handleExtendArrowKeySelect (e: KeyboardEvent) {
    e.shiftKey === true &&
    (nextSiblingEvent !== null || prevSiblingEvent.nextSibling !== null)
   ) {
-    let currentElement: HTMLTableElement
+    let currentElement: HTMLDivElement
     if (nextSiblingEvent === null) {
-      currentElement = prevSiblingEvent.nextSibling! as HTMLTableElement
+      currentElement = prevSiblingEvent.nextSibling! as HTMLDivElement
     } else {
       currentElement = nextSiblingEvent
     }
@@ -1090,9 +1090,9 @@ handleExtendArrowKeySelect (e: KeyboardEvent) {
    e.shiftKey === true &&
    (prevSiblingEvent !== null || nextSiblingEvent.previousSibling !== null)
   ) {
-    let currentElement: HTMLTableElement
+    let currentElement: HTMLDivElement
     if (prevSiblingEvent === null) {
-      currentElement = nextSiblingEvent.previousSibling! as HTMLTableElement
+      currentElement = nextSiblingEvent.previousSibling! as HTMLDivElement
     } else {
       currentElement = prevSiblingEvent
     }
@@ -1124,9 +1124,14 @@ handleExtendArrowKeySelect (e: KeyboardEvent) {
 *
 */
 handleDrag (e: MouseEvent) {
+  const etarget = e.target as HTMLDivElement
   if (this.properties.MultiSelect === 2) {
     if (e.which === 1) {
-      this.setOptionBGColorAndChecked(e)
+      if (etarget.style.backgroundColor === 'rgb(59, 122, 231)') {
+        this.unselectBGColorAndchecked(e)
+      } else {
+        this.setOptionBGColorAndChecked(e)
+      }
     }
    window.getSelection()!.removeAllRanges()
   }
@@ -1138,9 +1143,9 @@ handleDrag (e: MouseEvent) {
 * @param event its of type MouseEvent or KeyboardEvent
 */
 setBGColorForNextSibling (e: MouseEvent | KeyboardEvent) {
-  if (e.target instanceof HTMLTableCellElement) {
+  if (e.target instanceof HTMLTableCellElement || e.target instanceof HTMLDivElement) {
     const targetEvent = e.target
-    const nextSiblingEvent = targetEvent.nextSibling as HTMLTableElement
+    const nextSiblingEvent = targetEvent.nextSibling as HTMLDivElement
     const nextSiblingCheckedEvent = nextSiblingEvent.children[0].childNodes[0] as HTMLInputElement
     nextSiblingEvent.style.backgroundColor =
    nextSiblingEvent.style.backgroundColor === 'rgb(59, 122, 231)'
@@ -1161,9 +1166,9 @@ setBGColorForNextSibling (e: MouseEvent | KeyboardEvent) {
 * @param event its of type MouseEvent or KeyboardEvent
 */
 setBGColorForPreviousSibling (e: KeyboardEvent) {
-  if (e.target instanceof HTMLTableCellElement || e.target instanceof HTMLTableRowElement) {
+  if (e.target instanceof HTMLTableCellElement || e.target instanceof HTMLTableRowElement || e.target instanceof HTMLDivElement) {
     const targetEvent = e.target
-    const prevSiblingEvent = targetEvent.previousSibling as HTMLTableElement
+    const prevSiblingEvent = targetEvent.previousSibling as HTMLDivElement
     const prevSiblingCheckedEvent = prevSiblingEvent.children[0].childNodes[0] as HTMLInputElement
     prevSiblingEvent.style.backgroundColor =
    prevSiblingEvent.style.backgroundColor === 'rgb(59, 122, 231)'
@@ -1196,14 +1201,14 @@ clearOptionBGColorAndChecked (e: any) {
   const tempPath = e.path
   if (tempPath && tempPath.length > 0) {
     for (let index = 0; index < tempPath.length; index++) {
-      const element = tempPath[index] as HTMLTableElement
+      const element = tempPath[index] as HTMLDivElement
       if (element.className === 'table-body') {
         for (
           let childIndex = 0;
           childIndex < element.childNodes.length;
           childIndex++
         ) {
-          const childNode = element.childNodes[childIndex] as HTMLTableElement
+          const childNode = element.childNodes[childIndex] as HTMLDivElement
           childNode.style.backgroundColor = ''
           const ChildChecked = childNode.childNodes[0].childNodes[0] as HTMLInputElement
           if (ChildChecked && this.properties.ListStyle === 1) {
@@ -1222,7 +1227,7 @@ clearOptionBGColorAndChecked (e: any) {
 * @param event KeyboardEvent or MouseEvent
 */
 setOptionBGColorAndChecked (e: KeyboardEvent | MouseEvent) {
-  const currentTargetElement = e.currentTarget as HTMLTableElement
+  const currentTargetElement = e.currentTarget as HTMLDivElement
   const childNodeChecked = currentTargetElement.children[0].childNodes[0] as HTMLInputElement
   if (this.data.type === 'ComboBox') {
     currentTargetElement.style.backgroundColor =
@@ -1233,7 +1238,7 @@ setOptionBGColorAndChecked (e: KeyboardEvent | MouseEvent) {
   if (this.data.type === 'ComboBox') {
     childNodeChecked.checked = !childNodeChecked.checked
   }
-  if ((e.target instanceof HTMLTableCellElement || e.target instanceof HTMLTableRowElement || e.target instanceof HTMLInputElement)) {
+  if ((e.target instanceof HTMLDivElement || e.target instanceof HTMLTableCellElement || e.target instanceof HTMLTableRowElement || e.target instanceof HTMLInputElement)) {
     const targetEvent = e.target
     if (this.data.type === 'ComboBox') {
       currentTargetElement.style.backgroundColor = ''
@@ -1283,12 +1288,21 @@ setOptionBGColorAndChecked (e: KeyboardEvent | MouseEvent) {
   }
 }
 
+unselectBGColorAndchecked (e: KeyboardEvent | MouseEvent) {
+  const currentTargetElement = e.currentTarget as HTMLDivElement
+  const childNodeChecked = currentTargetElement.children[0].childNodes[0] as HTMLInputElement
+  if (this.properties.MultiSelect === 2) {
+    childNodeChecked.checked = false
+    currentTargetElement.style.backgroundColor = ''
+  }
+}
+
 /**
 * @description set BGColor and Checked matchEntry
 * @function setBGandCheckedForMatch
-* @param singleMatch which is an HTMLTableElement
+* @param singleMatch which is an HTMLDivElement
 */
-setBGandCheckedForMatch (singleMatch: HTMLTableElement) {
+setBGandCheckedForMatch (singleMatch: HTMLDivElement) {
   if (singleMatch !== undefined) {
     singleMatch.style.backgroundColor = 'rgb(59, 122, 231)'
     if ((this.properties.ListStyle === 1)) {
@@ -1334,20 +1348,6 @@ get setFontStyle () {
     this.tempWeight = '400'
     this.tempStretch = 'normal'
     return this.properties.Font!.FontName!
-  }
-}
-
-@Watch('properties.BorderStyle', { deep: true })
-borderStyleValidate () {
-  if (this.properties.BorderStyle === 1) {
-    this.updateDataModel({ propertyName: 'SpecialEffect', value: 0 })
-  }
-}
-
-@Watch('properties.SpecialEffect', { deep: true })
-specialEffectValidate () {
-  if (this.properties.BorderStyle === 1 && this.properties.SpecialEffect !== 0) {
-    this.updateDataModel({ propertyName: 'BorderStyle', value: 0 })
   }
 }
 }

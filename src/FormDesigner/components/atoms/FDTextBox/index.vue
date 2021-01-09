@@ -148,19 +148,18 @@ export default class FDTextBox extends Mixins(FdControlVue) {
       width: `${controlProp.Width}px`,
       height: `${controlProp.Height}px`,
       top: `${controlProp.Top}px`,
-      borderColor: controlProp.BorderColor,
+      borderColor: controlProp.BorderStyle === 1 ? controlProp.BorderColor : '',
       textAlign:
         controlProp.TextAlign === 0
           ? 'left'
           : controlProp.TextAlign === 1
             ? 'center'
             : 'right',
-      border: this.getBorderStyle,
       backgroundColor: controlProp.BackStyle ? controlProp.BackColor : 'transparent',
-      borderLeft: controlProp.SpecialEffect === 2 ? '2px solid gray' : controlProp.SpecialEffect === 3 ? '1.5px solid gray' : controlProp.SpecialEffect === 4 ? '0.5px solid gray' : '',
-      borderRight: controlProp.SpecialEffect === 1 ? '2px solid gray' : controlProp.SpecialEffect === 4 ? '1.5px solid gray' : controlProp.SpecialEffect === 3 ? '0.5px solid gray' : '',
-      borderTop: controlProp.SpecialEffect === 2 ? '2px solid gray' : controlProp.SpecialEffect === 3 ? '1.5px solid gray' : controlProp.SpecialEffect === 4 ? '0.5px solid gray' : '',
-      borderBottom: controlProp.SpecialEffect === 1 ? '2px solid gray' : controlProp.SpecialEffect === 4 ? '1.5px solid gray' : controlProp.SpecialEffect === 3 ? '0.5px solid gray' : '',
+      borderLeft: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 2 ? '2px solid gray' : controlProp.SpecialEffect === 3 ? '1.5px solid gray' : controlProp.SpecialEffect === 4 ? '0.5px solid gray' : '',
+      borderRight: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 1 ? '2px solid gray' : controlProp.SpecialEffect === 4 ? '1.5px solid gray' : controlProp.SpecialEffect === 3 ? '0.5px solid gray' : '',
+      borderTop: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 2 ? '2px solid gray' : controlProp.SpecialEffect === 3 ? '1.5px solid gray' : controlProp.SpecialEffect === 4 ? '0.5px solid gray' : '',
+      borderBottom: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 1 ? '2px solid gray' : controlProp.SpecialEffect === 4 ? '1.5px solid gray' : controlProp.SpecialEffect === 3 ? '0.5px solid gray' : '',
       whiteSpace:
         controlProp.WordWrap && controlProp.MultiLine ? 'normal' : 'nowrap',
       wordBreak:
@@ -584,10 +583,7 @@ export default class FDTextBox extends Mixins(FdControlVue) {
 </script>
 
 <style scoped>
-/* For default values */
 .text-box-design {
-  border: 0.2px solid gray;
-  box-shadow: -1px -1px gray;
   width: 0px;
   height: 0px;
   left: 0px;

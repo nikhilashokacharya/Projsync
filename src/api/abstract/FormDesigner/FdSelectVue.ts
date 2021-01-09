@@ -64,7 +64,6 @@ export default class FdSelectVue extends FDCommonMethod {
   updateEditMode (value: boolean) {
     this.isEditMode = value
   }
-  @Emit('updateUserFormResize')
   private updateUserFormResize (value: IResizeValue) {
     if (value.handler === 'br') {
       this.updateControlAction('Width', value.x, this.userFormId)

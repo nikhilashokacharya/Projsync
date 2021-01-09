@@ -603,10 +603,17 @@ export default class ContextMenu extends FDCommonMethod {
     const userFormData = this.userformData[this.userFormId]
     const selContainer = this.selectedControls[this.userFormId].container[0]
     const selSelected = this.selectedControls[this.userFormId].selected
+    const updateSelected = []
+    for (let control of selSelected) {
+      if (!control.startsWith('group') && userFormData[control].type === 'Page') {
+        control = this.getContainerList(control)[0]
+      }
+      updateSelected.push(control)
+    }
     this.updateCopyControlList({
       userFormId: this.userFormId,
       parentId: selContainer,
-      targetId: selSelected,
+      targetId: updateSelected,
       type: type
     })
 
@@ -614,9 +621,8 @@ export default class ContextMenu extends FDCommonMethod {
       const daTargetControls = userFormData[daTarget].controls
       if (daTargetControls.length > 0) {
         for (let i in daTargetControls) {
-          const controlObject = JSON.parse(
-            JSON.stringify(userFormData[daTargetControls[i]])
-          )
+          const controlObject = JSON.parse(JSON.stringify(userFormData[daTargetControls[i]]))
+          const controlArray = []
           const ctrlObj = { ...controlObject, controls: [] }
           this.addCopiedControl({
             userFormId: this.userFormId,
@@ -629,8 +635,11 @@ export default class ContextMenu extends FDCommonMethod {
       }
     }
 
-    for (const key of selSelected) {
+    for (let key of selSelected) {
       if (!key.startsWith('group')) {
+        if (userFormData[key].type === 'Page') {
+          key = this.getContainerList(key)[0]
+        }
         const controlObject = JSON.parse(JSON.stringify(userFormData[key]))
         const ctrlObj = { ...controlObject, controls: [] }
         this.addCopiedControl({
@@ -676,10 +685,15 @@ export default class ContextMenu extends FDCommonMethod {
     }
   }
 
-  newPasteControlId (key: string) {
+  newPasteControlId (key: string, parentId: string) {
     const userFormData = this.userformData[this.userFormId]
-    let lastControlId = -1
-    const selectedControlName: string | undefined = key.replace(/[0-9]/g, '').split('_').pop()
+    let lastControlId = 0
+    const type = userFormData[key].type
+    const parentName = parentId !== '' ? parentId.split('MultiPage').pop() : -1
+    const selectedControlName: string | undefined =
+    type === 'Page'
+      ? `Page${parentName}_`
+      : key.replace(/[0-9]/g, '').split('_').pop()
     const userformControlIds = Object.keys(userFormData)
     for (let i = 0; i < userformControlIds.length; i++) {
       if (userformControlIds[i].indexOf(selectedControlName!) !== -1) {
@@ -742,7 +756,7 @@ export default class ContextMenu extends FDCommonMethod {
         if (daTargetControls.length > 0) {
           for (let i = 0, limit = daTargetControls.length; i < limit; i++) {
             const key = daTargetControls[i]
-            const Name = this.newPasteControlId(key)
+            const Name = this.newPasteControlId(key, daTarget)
             const controlID:| string| undefined = `ID_${Name}`
             const controlObj = { ...this.copiedControl[this.userFormId][key] }
             let groupIdIndex = -1
@@ -766,7 +780,7 @@ export default class ContextMenu extends FDCommonMethod {
       for (const key of selSelected) {
         if (!key.startsWith('group')) {
           oldControlId.push(key)
-          const Name = this.newPasteControlId(key)
+          const Name = this.newPasteControlId(key, '')
           const controlID:| string| undefined = `ID_${Name}`
           const controlObj = { ...this.copiedControl[this.userFormId][key] }
           newControlId.push(controlID)
@@ -796,7 +810,7 @@ export default class ContextMenu extends FDCommonMethod {
               .properties.GroupID
             if (controlProp) {
               if (controlProp === key) {
-                const Name = this.newPasteControlId(ctrlId)
+                const Name = this.newPasteControlId(ctrlId, '')
                 const controlID:| string| undefined = `ID_${Name}`
                 const controlObj = this.copiedControl[this.userFormId][ctrlId]
 
@@ -845,70 +859,66 @@ export default class ContextMenu extends FDCommonMethod {
     } else if (this.copyControlList.type === 'cut') {
       const selContainer = this.copyControlList.parentId
       const selSelected = this.copyControlList.targetId
-      if (this.containerId === selContainer) {
-        const userFormData = this.copiedControl[this.userFormId]
-        const recCopyControl = (daTarget: string) => {
-          const daTargetControls = userFormData[daTarget].controls
-          if (daTargetControls.length > 0) {
-            for (let i = 0, limit = daTargetControls.length; i < limit; i++) {
-              const key = daTargetControls[i]
-              const controlObj = JSON.parse(JSON.stringify(this.copiedControl[this.userFormId][key]))
-              const item: controlData = {
-                ...controlObj
-              }
-              this.removeChildControl(daTarget, key)
-              this.updateNewControl(daTarget, key, item, false)
-              recCopyControl(key)
-            }
-          }
-        }
-        for (const key of selSelected) {
-          if (!key.startsWith('group')) {
-            const controlObj = JSON.parse(
-              JSON.stringify(this.copiedControl[this.userFormId][key])
-            )
-            if (selSelected.length === 1 && userFormData[selSelected[0]].properties.GroupID! !== '') {
-              controlObj.properties.GroupID = ''
-            }
+      const userFormData = this.copiedControl[this.userFormId]
+      const recCopyControl = (daTarget: string) => {
+        const daTargetControls = userFormData[daTarget].controls
+        if (daTargetControls.length > 0) {
+          for (let i = 0, limit = daTargetControls.length; i < limit; i++) {
+            const key = daTargetControls[i]
+            const controlObj = JSON.parse(JSON.stringify(this.copiedControl[this.userFormId][key]))
             const item: controlData = {
               ...controlObj
             }
-            this.updateNewControl(this.containerId, key, item, true)
+            this.removeChildControl(daTarget, key)
+            this.updateNewControl(daTarget, key, item, false)
             recCopyControl(key)
-          } else {
-            for (let ctrlId in userFormData) {
-              const controlProp = userFormData[ctrlId].properties.GroupID
-              if (controlProp) {
-                if (controlProp === key) {
-                  const controlObj = JSON.parse(
-                    JSON.stringify(this.copiedControl[this.userFormId][ctrlId])
-                  )
-                  const item: controlData = {
-                    ...controlObj
-                  }
-                  this.updateNewControl(this.containerId, ctrlId, item, true)
-                  recCopyControl(ctrlId)
+          }
+        }
+      }
+      for (const key of selSelected) {
+        if (!key.startsWith('group')) {
+          const controlObj = JSON.parse(
+            JSON.stringify(this.copiedControl[this.userFormId][key])
+          )
+          if (selSelected.length === 1 && userFormData[selSelected[0]].properties.GroupID! !== '') {
+            controlObj.properties.GroupID = ''
+          }
+          const item: controlData = {
+            ...controlObj
+          }
+          this.updateNewControl(this.containerId, key, item, true)
+          recCopyControl(key)
+        } else {
+          for (let ctrlId in userFormData) {
+            const controlProp = userFormData[ctrlId].properties.GroupID
+            if (controlProp) {
+              if (controlProp === key) {
+                const controlObj = JSON.parse(
+                  JSON.stringify(this.copiedControl[this.userFormId][ctrlId])
+                )
+                const item: controlData = {
+                  ...controlObj
                 }
+                this.updateNewControl(this.containerId, ctrlId, item, true)
+                recCopyControl(ctrlId)
               }
             }
           }
         }
-        this.selectControl({
-          userFormId: this.userFormId,
-          select: {
-            container: this.getContainerList(selSelected[0]),
-            selected: selSelected
-          }
-        })
-      } else {
-        this.updateCopyControlList({
-          userFormId: this.userFormId,
-          parentId: this.containerId,
-          targetId: selSelected,
-          type: 'copy'
-        })
-        this.pasteControl()
       }
+      this.selectControl({
+        userFormId: this.userFormId,
+        select: {
+          container: this.getContainerList(selSelected[0]),
+          selected: selSelected
+        }
+      })
+      this.updateCopyControlList({
+        userFormId: this.userFormId,
+        parentId: this.containerId,
+        targetId: selSelected,
+        type: 'copy'
+      })
     }
   }
 
@@ -948,10 +958,8 @@ export default class ContextMenu extends FDCommonMethod {
         const curSelect = filterControls[0] === selected[0] ? filterControls[1] : filterControls[0]
         const selGroupId = userData[selected[0]].properties.GroupID
         this.updateControlProperty('GroupID', '', curSelect)
-        console.log(curSelect, userData[curSelect].properties.GroupID)
       }
     }
-    console.log(selControl)
     for (let i = 0; i < selControl.length; i++) {
       const controlId = userData[selControl[i]].type === 'Page' ? selContainer[0] : selControl[i]
       this.deleteZIndex(controlId)
@@ -970,6 +978,7 @@ export default class ContextMenu extends FDCommonMethod {
         selected: userData[selContainer[0]].type === 'MultiPage' ? [this.getContainerList(selContainer[0])[0]] : [selContainer[0]]
       }
     })
+    EventBus.$emit('focusUserForm')
   }
   updateAction (event: KeyboardEvent) {
     let controlActionName = ''

@@ -229,8 +229,8 @@ export default abstract class FdContainerVue extends FdControlVue {
 
       item.properties.Left = isNaN(sw!) ? e.offsetX : parseInt(this.selectedAreaStyle!.left)
       item.properties.Top = isNaN(sh!) ? e.offsetY : parseInt(this.selectedAreaStyle!.top)
-      item.properties.Width = isNaN(sw!) ? item.properties.Width : sw
-      item.properties.Height = isNaN(sh!) ? item.properties.Height : sh
+      item.properties.Width = sw! === 0 ? item.properties.Width : sw
+      item.properties.Height = sh! === 0 ? item.properties.Height : sh
       const controls = item.controls
       item.controls = item.type === 'MultiPage' ? [] : item.controls
       const newControlId = type === 'MultiPage' ? pageId : this.controlId
@@ -438,11 +438,12 @@ export default abstract class FdContainerVue extends FdControlVue {
       ? this.userformContextMenu
       : this.controlContextMenu
     for (const val of contextMenuData) {
+      debugger
       if (val.id === 'ID_SELECTALL') {
         val.disabled = controlLength === 0
       }
       if (val.id === 'ID_DELETE' && this.contextMenuType) {
-        val.disabled = !(selected.length === 1 &&
+        val.disabled = !(selected.length === 1 && !selected[0].startsWith('group') &&
           (userData[controlID].type === 'Frame' || userData[selected[0]].type === 'Page'))
       }
       if (val.id === 'ID_PASTE') {

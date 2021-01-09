@@ -580,6 +580,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
             : font.FontStrikethrough
               ? 'line-through'
               : '',
+      textUnderlinePosition: 'under',
       fontWeight: font.FontBold
         ? 'bold'
         : font.FontStyle !== ''
@@ -812,46 +813,11 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   protected get boxStyleObj (): Partial<CSSStyleDeclaration> {
     const controlProp = this.properties
     return {
-      border:
-        controlProp.BorderStyle === 0
-          ? 'none'
-          : '1px solid ' + controlProp.BorderColor,
-      cursor:
-        controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''
-          ? this.getMouseCursorData
-          : 'default',
-      borderLeft:
-        controlProp.SpecialEffect === 2
-          ? '2px solid gray'
-          : controlProp.SpecialEffect === 3
-            ? '1.5px solid gray'
-            : controlProp.SpecialEffect === 4
-              ? '0.5px solid gray'
-              : '',
-      borderRight:
-        controlProp.SpecialEffect === 1
-          ? '2px solid gray'
-          : controlProp.SpecialEffect === 4
-            ? '1.5px solid gray'
-            : controlProp.SpecialEffect === 3
-              ? '0.5px solid gray'
-              : '',
-      borderTop:
-        controlProp.SpecialEffect === 2
-          ? '2px solid gray'
-          : controlProp.SpecialEffect === 3
-            ? '1.5px solid gray'
-            : controlProp.SpecialEffect === 4
-              ? '0.5px solid gray'
-              : '',
-      borderBottom:
-        controlProp.SpecialEffect === 1
-          ? '2px solid gray'
-          : controlProp.SpecialEffect === 4
-            ? '1.5px solid gray'
-            : controlProp.SpecialEffect === 3
-              ? '0.5px solid gray'
-              : '',
+      borderColor: controlProp.BorderStyle === 1 ? controlProp.BorderColor : '',
+      borderLeft: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 2 ? '2px solid gray' : controlProp.SpecialEffect === 3 ? '1.5px solid gray' : controlProp.SpecialEffect === 4 ? '0.5px solid gray' : '',
+      borderRight: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 1 ? '2px solid gray' : controlProp.SpecialEffect === 4 ? '1.5px solid gray' : controlProp.SpecialEffect === 3 ? '0.5px solid gray' : '',
+      borderTop: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 2 ? '2px solid gray' : controlProp.SpecialEffect === 3 ? '1.5px solid gray' : controlProp.SpecialEffect === 4 ? '0.5px solid gray' : '',
+      borderBottom: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 1 ? '2px solid gray' : controlProp.SpecialEffect === 4 ? '1.5px solid gray' : controlProp.SpecialEffect === 3 ? '0.5px solid gray' : '',
       display: 'grid',
       gridTemplateColumns: `${controlProp.Width! - 20}px` + ' 21px',
       gridTemplateRows: `${controlProp.Height!}px`,

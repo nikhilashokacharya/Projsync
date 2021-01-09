@@ -29,14 +29,16 @@ export default class FDCommonMethod extends Vue {
   getContainerList (selectTarget: string) {
     const containerList: string[] = []
     const controlContainer = (selectTarget: string) => {
-      for (let i in this.userformData[this.userFormId]) {
-        const controlData = this.userformData[this.userFormId][i]
-        if (
-          controlData.controls.length > 0 &&
-              controlData.controls.includes(selectTarget)
-        ) {
-          containerList.push(i)
-          controlContainer(i)
+      if (this.userformData[this.userFormId][selectTarget].type !== 'Userform') {
+        for (let i in this.userformData[this.userFormId]) {
+          const controlData = this.userformData[this.userFormId][i]
+          if (controlData.controls.length > 0 && controlData.controls.includes(selectTarget)) {
+            containerList.push(i)
+            controlContainer(i)
+            if (this.userformData[this.userFormId][i].type !== 'Userform') {
+              break
+            }
+          }
         }
       }
     }

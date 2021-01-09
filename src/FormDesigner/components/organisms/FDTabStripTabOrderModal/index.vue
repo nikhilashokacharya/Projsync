@@ -246,7 +246,7 @@ h1 {
   text-align: left;
   outline: none;
   width: 100%;
-  height: auto;
+  height: 14px;
   font-family: "SESimplex";
   font-weight: 500;
   font-size: 11px;
@@ -282,7 +282,7 @@ h1 {
   width: 90px;
   height: 23px;
   font-family: "Candara";
-  font-weight: lighter;
+  font-weight: bold;
   font-size: 13px;
   box-shadow: 1px 1px;
   border-top-color: rgb(238, 238, 238);

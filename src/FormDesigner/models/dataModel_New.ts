@@ -9,7 +9,7 @@ export const userDataNew = {
         BorderColor: '#ffffff',
         BorderStyle: 0,
         Caption: 'UserForm1',
-        Cycle: 1,
+        Cycle: 0,
         DrawBuffer: 32000,
         Enabled: true,
         Font: {
@@ -41,7 +41,7 @@ export const userDataNew = {
         ScrollTop: 0,
         ScrollWidth: 0,
         ShowModal: true,
-        SpecialEffect: 3,
+        SpecialEffect: 0,
         StartUpPosition: 1,
         Tag: '',
         Top: 0,

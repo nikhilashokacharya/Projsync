@@ -22,7 +22,7 @@ export class PropertyListDefine {
         BorderStyle: {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
-          values: ['0-fmBorderStyleNone', '1-fmBorderStyleSingle']
+          values: ['0 - fmBorderStyleNone', '1 - fmBorderStyleSingle']
         },
         Caption: {
           category: 'ID_CATEGORY_APPEARANCE',
@@ -36,8 +36,8 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_BEHAVIOR',
           type: 'array',
           values: [
-            '0-fmCycleAllForms',
-            '2-fmCycleCurrentForms'
+            '0 - fmCycleAllForms',
+            '2 - fmCycleCurrentForms'
           ]
         },
         DrawBuffer: {
@@ -86,21 +86,21 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_MISC',
           type: 'array',
           values: [
-            '0-fmMousePointerDefault',
-            '1-fmMousePointerArrow',
-            '2-fmMousePointerCross',
-            '3-fmMousePointerIBeam',
-            '6-fmMousePointerNESW',
-            '7-fmMousePointerNS',
-            '8-fmMousePointerNWSE',
-            '9-fmMousePointerWE',
-            '10-fmMousePointerUpArrow',
-            '11-fmMousePointerHourGlass',
-            '12-fmMousePointerNoDrop',
-            '13-fmMousePointerAppStarting',
-            '14-fmMousePointerHelp',
-            '15-fmMousePointerSizeAll',
-            '99-fmMousePointerCustom'
+            '0 - fmMousePointerDefault',
+            '1 - fmMousePointerArrow',
+            '2 - fmMousePointerCross',
+            '3 - fmMousePointerIBeam',
+            '6 - fmMousePointerNESW',
+            '7 - fmMousePointerNS',
+            '8 - fmMousePointerNWSE',
+            '9 - fmMousePointerWE',
+            '10 - fmMousePointerUpArrow',
+            '11 - fmMousePointerHourGlass',
+            '12 - fmMousePointerNoDrop',
+            '13 - fmMousePointerAppStarting',
+            '14 - fmMousePointerHelp',
+            '15 - fmMousePointerSizeAll',
+            '99 - fmMousePointerCustom'
           ]
         },
         Picture: {
@@ -129,6 +129,10 @@ export class PropertyListDefine {
         },
         PictureTiling: {
           category: 'ID_CATEGORY_PICTURE',
+          type: 'Boolean'
+        },
+        RightToLeft: {
+          category: 'ID_CATEGORY_BEHAVIOR',
           type: 'Boolean'
         },
         ScrollBars: {
@@ -165,21 +169,21 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
           values: [
-            '0-fmSpecialEffectFlat',
-            '1-fmSpecialEffectRaised',
-            '2-fmSpecialEffectSunken',
-            '3-fmSpecialEffectEtched',
-            '6-fmSpecialEffectBump'
+            '0 - fmSpecialEffectFlat',
+            '1 - fmSpecialEffectRaised',
+            '2 - fmSpecialEffectSunken',
+            '3 - fmSpecialEffectEtched',
+            '6 - fmSpecialEffectBump'
           ]
         },
         StartUpPosition: {
           category: 'ID_CATEGORY_POSITION',
           type: 'array',
           values: [
-            '0-Manual',
-            '1-CenterOwner',
-            '2-CenterScreen',
-            '3-Windows Default'
+            '0 - Manual',
+            '1 - CenterOwner',
+            '2 - CenterScreen',
+            '3 - Windows Default'
           ]
         },
         Tag: {
@@ -227,7 +231,7 @@ export class PropertyListDefine {
         BackStyle: {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
-          values: ['0-fmBackStyleTransparent', '1-fmBackStyleOpaque']
+          values: ['0 - fmBackStyleTransparent', '1 - fmBackStyleOpaque']
         },
         BorderColor: {
           category: 'ID_CATEGORY_APPEARANCE',
@@ -236,7 +240,7 @@ export class PropertyListDefine {
         BorderStyle: {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
-          values: ['0-fmBorderStyleNone', '1-fmBorderStyleSingle']
+          values: ['0 - fmBorderStyleNone', '1 - fmBorderStyleSingle']
         },
         Caption: {
           category: 'ID_CATEGORY_APPEARANCE',
@@ -278,21 +282,21 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_MISC',
           type: 'array',
           values: [
-            '0-fmMousePointerDefault',
-            '1-fmMousePointerArrow',
-            '2-fmMousePointerCross',
-            '3-fmMousePointerIBeam',
-            '6-fmMousePointerNESW',
-            '7-fmMousePointerNS',
-            '8-fmMousePointerNWSE',
-            '9-fmMousePointerWE',
-            '10-fmMousePointerUpArrow',
-            '11-fmMousePointerHourGlass',
-            '12-fmMousePointerNoDrop',
-            '13-fmMousePointerAppStarting',
-            '14-fmMousePointerHelp',
-            '15-fmMousePointerSizeAll',
-            '99-fmMousePointerCustom'
+            '0 - fmMousePointerDefault',
+            '1 - fmMousePointerArrow',
+            '2 - fmMousePointerCross',
+            '3 - fmMousePointerIBeam',
+            '6 - fmMousePointerNESW',
+            '7 - fmMousePointerNS',
+            '8 - fmMousePointerNWSE',
+            '9 - fmMousePointerWE',
+            '10 - fmMousePointerUpArrow',
+            '11 - fmMousePointerHourGlass',
+            '12 - fmMousePointerNoDrop',
+            '13 - fmMousePointerAppStarting',
+            '14 - fmMousePointerHelp',
+            '15 - fmMousePointerSizeAll',
+            '99 - fmMousePointerCustom'
           ]
         },
         Picture: {
@@ -303,30 +307,30 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_PICTURE',
           type: 'array',
           values: [
-            '0-fmPicturePositionLeftTop',
-            '1-fmPicturePositionLeftCenter',
-            '2-fmPicturePositionLeftBottom',
-            '3-fmPicturePositionRightTop',
-            '4-fmPicturePositionRightCenter',
-            '5-fmPicturePositionRightBottom',
-            '6-fmPicturePositionAboveLeft',
-            '7-fmPicturePositionAboveCenter',
-            '8-fmPicturePositionAboveRight',
-            '9-fmPicturePositionBelowLeft',
-            '10-fmPicturePositionBelowCenter',
-            '11-fmPicturePositionBelowRight',
-            '12-fmPicturePositionCenter'
+            '0 - fmPicturePositionLeftTop',
+            '1 - fmPicturePositionLeftCenter',
+            '2 - fmPicturePositionLeftBottom',
+            '3 - fmPicturePositionRightTop',
+            '4 - fmPicturePositionRightCenter',
+            '5 - fmPicturePositionRightBottom',
+            '6 - fmPicturePositionAboveLeft',
+            '7 - fmPicturePositionAboveCenter',
+            '8 - fmPicturePositionAboveRight',
+            '9 - fmPicturePositionBelowLeft',
+            '10 - fmPicturePositionBelowCenter',
+            '11 - fmPicturePositionBelowRight',
+            '12 - fmPicturePositionCenter'
           ]
         },
         SpecialEffect: {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
           values: [
-            '0-fmSpecialEffectFlat',
-            '1-fmSpecialEffectRaised',
-            '2-fmSpecialEffectSunken',
-            '3-fmSpecialEffectEtched',
-            '6-fmSpecialEffectBump'
+            '0 - fmSpecialEffectFlat',
+            '1 - fmSpecialEffectRaised',
+            '2 - fmSpecialEffectSunken',
+            '3 - fmSpecialEffectEtched',
+            '6 - fmSpecialEffectBump'
           ]
         },
         TabIndex: {
@@ -345,9 +349,9 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_BEHAVIOR',
           type: 'array',
           values: [
-            '1-fmTextAlignLeft',
-            '2-fmTextAlignCenter',
-            '3-fmTextAlignRight'
+            '1 - fmTextAlignLeft',
+            '2 - fmTextAlignCenter',
+            '3 - fmTextAlignRight'
           ]
         },
         Top: {
@@ -387,7 +391,7 @@ export class PropertyListDefine {
         BackStyle: {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
-          values: ['0-fmBackStyleTransparent', '1-fmBackStyleOpaque']
+          values: ['0 - fmBackStyleTransparent', '1 - fmBackStyleOpaque']
         },
         Cancel: {
           category: 'ID_CATEGORY_BEHAVIOR',
@@ -441,21 +445,21 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_MISC',
           type: 'array',
           values: [
-            '0-fmMousePointerDefault',
-            '1-fmMousePointerArrow',
-            '2-fmMousePointerCross',
-            '3-fmMousePointerIBeam',
-            '6-fmMousePointerNESW',
-            '7-fmMousePointerNS',
-            '8-fmMousePointerNWSE',
-            '9-fmMousePointerWE',
-            '10-fmMousePointerUpArrow',
-            '11-fmMousePointerHourGlass',
-            '12-fmMousePointerNoDrop',
-            '13-fmMousePointerAppStarting',
-            '14-fmMousePointerHelp',
-            '15-fmMousePointerSizeAll',
-            '99-fmMousePointerCustom'
+            '0 - fmMousePointerDefault',
+            '1 - fmMousePointerArrow',
+            '2 - fmMousePointerCross',
+            '3 - fmMousePointerIBeam',
+            '6 - fmMousePointerNESW',
+            '7 - fmMousePointerNS',
+            '8 - fmMousePointerNWSE',
+            '9 - fmMousePointerWE',
+            '10 - fmMousePointerUpArrow',
+            '11 - fmMousePointerHourGlass',
+            '12 - fmMousePointerNoDrop',
+            '13 - fmMousePointerAppStarting',
+            '14 - fmMousePointerHelp',
+            '15 - fmMousePointerSizeAll',
+            '99 - fmMousePointerCustom'
           ]
         },
         Picture: {
@@ -466,19 +470,19 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_PICTURE',
           type: 'array',
           values: [
-            '0-fmPicturePositionLeftTop',
-            '1-fmPicturePositionLeftCenter',
-            '2-fmPicturePositionLeftBottom',
-            '3-fmPicturePositionRightTop',
-            '4-fmPicturePositionRightCenter',
-            '5-fmPicturePositionRightBottom',
-            '6-fmPicturePositionAboveLeft',
-            '7-fmPicturePositionAboveCenter',
-            '8-fmPicturePositionAboveRight',
-            '9-fmPicturePositionBelowLeft',
-            '10-fmPicturePositionBelowCenter',
-            '11-fmPicturePositionBelowRight',
-            '12-fmPicturePositionCenter'
+            '0 - fmPicturePositionLeftTop',
+            '1 - fmPicturePositionLeftCenter',
+            '2 - fmPicturePositionLeftBottom',
+            '3 - fmPicturePositionRightTop',
+            '4 - fmPicturePositionRightCenter',
+            '5 - fmPicturePositionRightBottom',
+            '6 - fmPicturePositionAboveLeft',
+            '7 - fmPicturePositionAboveCenter',
+            '8 - fmPicturePositionAboveRight',
+            '9 - fmPicturePositionBelowLeft',
+            '10 - fmPicturePositionBelowCenter',
+            '11 - fmPicturePositionBelowRight',
+            '12 - fmPicturePositionCenter'
           ]
         },
         TabIndex: {
@@ -526,7 +530,7 @@ export class PropertyListDefine {
         Alignment: {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
-          values: ['0-fmAlignmentLeft', '1-fmAlignmentRight']
+          values: ['0 - fmAlignmentLeft', '1 - fmAlignmentRight']
         },
         AutoSize: {
           category: 'ID_CATEGORY_BEHAVIOR',
@@ -539,7 +543,7 @@ export class PropertyListDefine {
         BackStyle: {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
-          values: ['0-fmBackStyleTransparent', '1-fmBackStyleOpaque']
+          values: ['0 - fmBackStyleTransparent', '1 - fmBackStyleOpaque']
         },
         Caption: {
           category: 'ID_CATEGORY_APPEARANCE',
@@ -593,21 +597,21 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_MISC',
           type: 'array',
           values: [
-            '0-fmMousePointerDefault',
-            '1-fmMousePointerArrow',
-            '2-fmMousePointerCross',
-            '3-fmMousePointerIBeam',
-            '6-fmMousePointerNESW',
-            '7-fmMousePointerNS',
-            '8-fmMousePointerNWSE',
-            '9-fmMousePointerWE',
-            '10-fmMousePointerUpArrow',
-            '11-fmMousePointerHourGlass',
-            '12-fmMousePointerNoDrop',
-            '13-fmMousePointerAppStarting',
-            '14-fmMousePointerHelp',
-            '15-fmMousePointerSizeAll',
-            '99-fmMousePointerCustom'
+            '0 - fmMousePointerDefault',
+            '1 - fmMousePointerArrow',
+            '2 - fmMousePointerCross',
+            '3 - fmMousePointerIBeam',
+            '6 - fmMousePointerNESW',
+            '7 - fmMousePointerNS',
+            '8 - fmMousePointerNWSE',
+            '9 - fmMousePointerWE',
+            '10 - fmMousePointerUpArrow',
+            '11 - fmMousePointerHourGlass',
+            '12 - fmMousePointerNoDrop',
+            '13 - fmMousePointerAppStarting',
+            '14 - fmMousePointerHelp',
+            '15 - fmMousePointerSizeAll',
+            '99 - fmMousePointerCustom'
           ]
         },
         Picture: {
@@ -618,27 +622,27 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_PICTURE',
           type: 'array',
           values: [
-            '0-fmPicturePositionLeftTop',
-            '1-fmPicturePositionLeftCenter',
-            '2-fmPicturePositionLeftBottom',
-            '3-fmPicturePositionRightTop',
-            '4-fmPicturePositionRightCenter',
-            '5-fmPicturePositionRightBottom',
-            '6-fmPicturePositionAboveLeft',
-            '7-fmPicturePositionAboveCenter',
-            '8-fmPicturePositionAboveRight',
-            '9-fmPicturePositionBelowLeft',
-            '10-fmPicturePositionBelowCenter',
-            '11-fmPicturePositionBelowRight',
-            '12-fmPicturePositionCenter'
+            '0 - fmPicturePositionLeftTop',
+            '1 - fmPicturePositionLeftCenter',
+            '2 - fmPicturePositionLeftBottom',
+            '3 - fmPicturePositionRightTop',
+            '4 - fmPicturePositionRightCenter',
+            '5 - fmPicturePositionRightBottom',
+            '6 - fmPicturePositionAboveLeft',
+            '7 - fmPicturePositionAboveCenter',
+            '8 - fmPicturePositionAboveRight',
+            '9 - fmPicturePositionBelowLeft',
+            '10 - fmPicturePositionBelowCenter',
+            '11 - fmPicturePositionBelowRight',
+            '12 - fmPicturePositionCenter'
           ]
         },
         SpecialEffect: {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
           values: [
-            '0-fmSpecialEffectFlat',
-            '2-fmSpecialEffectSunken'
+            '0 - fmButtonEffectFlat',
+            '2 - fmButtonEffectSunken'
           ]
         },
         TabIndex: {
@@ -657,9 +661,9 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_BEHAVIOR',
           type: 'array',
           values: [
-            '1-fmTextAlignLeft',
-            '2-fmTextAlignCenter',
-            '3-fmTextAlignRight'
+            '1 - fmTextAlignLeft',
+            '2 - fmTextAlignCenter',
+            '3 - fmTextAlignRight'
           ]
         },
         Top: {
@@ -699,7 +703,7 @@ export class PropertyListDefine {
         Alignment: {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
-          values: ['0-fmAlignmentLeft', '1-fmAlignmentRight']
+          values: ['0 - fmAlignmentLeft', '1 - fmAlignmentRight']
         },
         AutoSize: {
           category: 'ID_CATEGORY_BEHAVIOR',
@@ -712,7 +716,7 @@ export class PropertyListDefine {
         BackStyle: {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
-          values: ['0-fmBackStyleTransparent', '1-fmBackStyleOpaque']
+          values: ['0 - fmBackStyleTransparent', '1 - fmBackStyleOpaque']
         },
         Caption: {
           category: 'ID_CATEGORY_APPEARANCE',
@@ -766,21 +770,21 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_MISC',
           type: 'array',
           values: [
-            '0-fmMousePointerDefault',
-            '1-fmMousePointerArrow',
-            '2-fmMousePointerCross',
-            '3-fmMousePointerIBeam',
-            '6-fmMousePointerNESW',
-            '7-fmMousePointerNS',
-            '8-fmMousePointerNWSE',
-            '9-fmMousePointerWE',
-            '10-fmMousePointerUpArrow',
-            '11-fmMousePointerHourGlass',
-            '12-fmMousePointerNoDrop',
-            '13-fmMousePointerAppStarting',
-            '14-fmMousePointerHelp',
-            '15-fmMousePointerSizeAll',
-            '99-fmMousePointerCustom'
+            '0 - fmMousePointerDefault',
+            '1 - fmMousePointerArrow',
+            '2 - fmMousePointerCross',
+            '3 - fmMousePointerIBeam',
+            '6 - fmMousePointerNESW',
+            '7 - fmMousePointerNS',
+            '8 - fmMousePointerNWSE',
+            '9 - fmMousePointerWE',
+            '10 - fmMousePointerUpArrow',
+            '11 - fmMousePointerHourGlass',
+            '12 - fmMousePointerNoDrop',
+            '13 - fmMousePointerAppStarting',
+            '14 - fmMousePointerHelp',
+            '15 - fmMousePointerSizeAll',
+            '99 - fmMousePointerCustom'
           ]
         },
         Picture: {
@@ -791,27 +795,27 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_PICTURE',
           type: 'array',
           values: [
-            '0-fmPicturePositionLeftTop',
-            '1-fmPicturePositionLeftCenter',
-            '2-fmPicturePositionLeftBottom',
-            '3-fmPicturePositionRightTop',
-            '4-fmPicturePositionRightCenter',
-            '5-fmPicturePositionRightBottom',
-            '6-fmPicturePositionAboveLeft',
-            '7-fmPicturePositionAboveCenter',
-            '8-fmPicturePositionAboveRight',
-            '9-fmPicturePositionBelowLeft',
-            '10-fmPicturePositionBelowCenter',
-            '11-fmPicturePositionBelowRight',
-            '12-fmPicturePositionCenter'
+            '0 - fmPicturePositionLeftTop',
+            '1 - fmPicturePositionLeftCenter',
+            '2 - fmPicturePositionLeftBottom',
+            '3 - fmPicturePositionRightTop',
+            '4 - fmPicturePositionRightCenter',
+            '5 - fmPicturePositionRightBottom',
+            '6 - fmPicturePositionAboveLeft',
+            '7 - fmPicturePositionAboveCenter',
+            '8 - fmPicturePositionAboveRight',
+            '9 - fmPicturePositionBelowLeft',
+            '10 - fmPicturePositionBelowCenter',
+            '11 - fmPicturePositionBelowRight',
+            '12 - fmPicturePositionCenter'
           ]
         },
         SpecialEffect: {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
           values: [
-            '0-fmSpecialEffectFlat',
-            '2-fmSpecialEffectSunken'
+            '0 - fmButtonEffectFlat',
+            '2 - fmButtonEffectSunken'
           ]
         },
         TabIndex: {
@@ -830,9 +834,9 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_BEHAVIOR',
           type: 'array',
           values: [
-            '1-fmTextAlignLeft',
-            '2-fmTextAlignCenter',
-            '3-fmTextAlignRight'
+            '1 - fmTextAlignLeft',
+            '2 - fmTextAlignCenter',
+            '3 - fmTextAlignRight'
           ]
         },
         Top: {
@@ -921,30 +925,30 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_MISC',
           type: 'array',
           values: [
-            '0-fmMousePointerDefault',
-            '1-fmMousePointerArrow',
-            '2-fmMousePointerCross',
-            '3-fmMousePointerIBeam',
-            '6-fmMousePointerNESW',
-            '7-fmMousePointerNS',
-            '8-fmMousePointerNWSE',
-            '9-fmMousePointerWE',
-            '10-fmMousePointerUpArrow',
-            '11-fmMousePointerHourGlass',
-            '12-fmMousePointerNoDrop',
-            '13-fmMousePointerAppStarting',
-            '14-fmMousePointerHelp',
-            '15-fmMousePointerSizeAll',
-            '99-fmMousePointerCustom'
+            '0 - fmMousePointerDefault',
+            '1 - fmMousePointerArrow',
+            '2 - fmMousePointerCross',
+            '3 - fmMousePointerIBeam',
+            '6 - fmMousePointerNESW',
+            '7 - fmMousePointerNS',
+            '8 - fmMousePointerNWSE',
+            '9 - fmMousePointerWE',
+            '10 - fmMousePointerUpArrow',
+            '11 - fmMousePointerHourGlass',
+            '12 - fmMousePointerNoDrop',
+            '13 - fmMousePointerAppStarting',
+            '14 - fmMousePointerHelp',
+            '15 - fmMousePointerSizeAll',
+            '99 - fmMousePointerCustom'
           ]
         },
         Orientation: {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
           values: [
-            '-1-fmOrientationAuto',
-            '0-fmOrientationVertical',
-            '1-fmOrientationHorizontal'
+            '-1 - fmOrientationAuto',
+            '0 - fmOrientationVertical',
+            '1 - fmOrientationHorizontal'
           ]
         },
         ProportionalThumb: {
@@ -1041,30 +1045,30 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_MISC',
           type: 'array',
           values: [
-            '0-fmMousePointerDefault',
-            '1-fmMousePointerArrow',
-            '2-fmMousePointerCross',
-            '3-fmMousePointerIBeam',
-            '6-fmMousePointerNESW',
-            '7-fmMousePointerNS',
-            '8-fmMousePointerNWSE',
-            '9-fmMousePointerWE',
-            '10-fmMousePointerUpArrow',
-            '11-fmMousePointerHourGlass',
-            '12-fmMousePointerNoDrop',
-            '13-fmMousePointerAppStarting',
-            '14-fmMousePointerHelp',
-            '15-fmMousePointerSizeAll',
-            '99-fmMousePointerCustom'
+            '0 - fmMousePointerDefault',
+            '1 - fmMousePointerArrow',
+            '2 - fmMousePointerCross',
+            '3 - fmMousePointerIBeam',
+            '6 - fmMousePointerNESW',
+            '7 - fmMousePointerNS',
+            '8 - fmMousePointerNWSE',
+            '9 - fmMousePointerWE',
+            '10 - fmMousePointerUpArrow',
+            '11 - fmMousePointerHourGlass',
+            '12 - fmMousePointerNoDrop',
+            '13 - fmMousePointerAppStarting',
+            '14 - fmMousePointerHelp',
+            '15 - fmMousePointerSizeAll',
+            '99 - fmMousePointerCustom'
           ]
         },
         Orientation: {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
           values: [
-            '-1-fmOrientationAuto',
-            '0-fmOrientationVertical',
-            '1-fmOrientationHorizontal'
+            '-1 - fmOrientationAuto',
+            '0 - fmOrientationVertical',
+            '1 - fmOrientationHorizontal'
           ]
         },
         SmallChange: {
@@ -1145,21 +1149,21 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_MISC',
           type: 'array',
           values: [
-            '0-fmMousePointerDefault',
-            '1-fmMousePointerArrow',
-            '2-fmMousePointerCross',
-            '3-fmMousePointerIBeam',
-            '6-fmMousePointerNESW',
-            '7-fmMousePointerNS',
-            '8-fmMousePointerNWSE',
-            '9-fmMousePointerWE',
-            '10-fmMousePointerUpArrow',
-            '11-fmMousePointerHourGlass',
-            '12-fmMousePointerNoDrop',
-            '13-fmMousePointerAppStarting',
-            '14-fmMousePointerHelp',
-            '15-fmMousePointerSizeAll',
-            '99-fmMousePointerCustom'
+            '0 - fmMousePointerDefault',
+            '1 - fmMousePointerArrow',
+            '2 - fmMousePointerCross',
+            '3 - fmMousePointerIBeam',
+            '6 - fmMousePointerNESW',
+            '7 - fmMousePointerNS',
+            '8 - fmMousePointerNWSE',
+            '9 - fmMousePointerWE',
+            '10 - fmMousePointerUpArrow',
+            '11 - fmMousePointerHourGlass',
+            '12 - fmMousePointerNoDrop',
+            '13 - fmMousePointerAppStarting',
+            '14 - fmMousePointerHelp',
+            '15 - fmMousePointerSizeAll',
+            '99 - fmMousePointerCustom'
           ]
         },
         MultiRow: {
@@ -1170,9 +1174,9 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
           values: [
-            '0-fmTabStyleTabs',
-            '1-fmTabStyleButtons',
-            '2-fmTabStyleNone'
+            '0 - fmTabStyleTabs',
+            '1 - fmTabStyleButtons',
+            '2 - fmTabStyleNone'
           ]
         },
         TabFixedHeight: {
@@ -1191,10 +1195,10 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
           values: [
-            '0-fmTabOrientationTop',
-            '1-fmTabOrientationBottom',
-            '2-fmTabOrientationLeft',
-            '3-fmTabOrientationRight'
+            '0 - fmTabOrientationTop',
+            '1 - fmTabOrientationBottom',
+            '2 - fmTabOrientationLeft',
+            '3 - fmTabOrientationRight'
           ]
         },
         TabStop: {
@@ -1267,9 +1271,9 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
           values: [
-            '0-fmTabStyleTabs',
-            '1-fmTabStyleButtons',
-            '2-fmTabStyleNone'
+            '0 - fmTabStyleTabs',
+            '1 - fmTabStyleButtons',
+            '2 - fmTabStyleNone'
           ]
         },
         TabFixedHeight: {
@@ -1288,10 +1292,10 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
           values: [
-            '0-fmTabOrientationTop',
-            '1-fmTabOrientationBottom',
-            '2-fmTabOrientationLeft',
-            '3-fmTabOrientationRight'
+            '0 - fmTabOrientationTop',
+            '1 - fmTabOrientationBottom',
+            '2 - fmTabOrientationLeft',
+            '3 - fmTabOrientationRight'
           ]
         },
         TabStop: {
@@ -1335,7 +1339,7 @@ export class PropertyListDefine {
         BackStyle: {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
-          values: ['0-fmBackStyleTransparent', '1-fmBackStyleOpaque']
+          values: ['0 - fmBackStyleTransparent', '1 - fmBackStyleOpaque']
         },
         BorderColor: {
           category: 'ID_CATEGORY_APPEARANCE',
@@ -1344,7 +1348,7 @@ export class PropertyListDefine {
         BorderStyle: {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
-          values: ['0-fmBorderStyleNone', '1-fmBorderStyleSingle']
+          values: ['0 - fmBorderStyleNone', '1 - fmBorderStyleSingle']
         },
         ControlTipText: {
           category: 'ID_CATEGORY_APPEARANCE',
@@ -1370,21 +1374,21 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_MISC',
           type: 'array',
           values: [
-            '0-fmMousePointerDefault',
-            '1-fmMousePointerArrow',
-            '2-fmMousePointerCross',
-            '3-fmMousePointerIBeam',
-            '6-fmMousePointerNESW',
-            '7-fmMousePointerNS',
-            '8-fmMousePointerNWSE',
-            '9-fmMousePointerWE',
-            '10-fmMousePointerUpArrow',
-            '11-fmMousePointerHourGlass',
-            '12-fmMousePointerNoDrop',
-            '13-fmMousePointerAppStarting',
-            '14-fmMousePointerHelp',
-            '15-fmMousePointerSizeAll',
-            '99-fmMousePointerCustom'
+            '0 - fmMousePointerDefault',
+            '1 - fmMousePointerArrow',
+            '2 - fmMousePointerCross',
+            '3 - fmMousePointerIBeam',
+            '6 - fmMousePointerNESW',
+            '7 - fmMousePointerNS',
+            '8 - fmMousePointerNWSE',
+            '9 - fmMousePointerWE',
+            '10 - fmMousePointerUpArrow',
+            '11 - fmMousePointerHourGlass',
+            '12 - fmMousePointerNoDrop',
+            '13 - fmMousePointerAppStarting',
+            '14 - fmMousePointerHelp',
+            '15 - fmMousePointerSizeAll',
+            '99 - fmMousePointerCustom'
           ]
         },
         Picture: {
@@ -1419,11 +1423,11 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
           values: [
-            '0-fmSpecialEffectFlat',
-            '1-fmSpecialEffectRaised',
-            '2-fmSpecialEffectSunken',
-            '3-fmSpecialEffectEtched',
-            '6-fmSpecialEffectBump'
+            '0 - fmSpecialEffectFlat',
+            '1 - fmSpecialEffectRaised',
+            '2 - fmSpecialEffectSunken',
+            '3 - fmSpecialEffectEtched',
+            '6 - fmSpecialEffectBump'
           ]
         },
         Tag: {
@@ -1463,7 +1467,7 @@ export class PropertyListDefine {
         BackStyle: {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
-          values: ['0-fmBackStyleTransparent', '1-fmBackStyleOpaque']
+          values: ['0 - fmBackStyleTransparent', '1 - fmBackStyleOpaque']
         },
         Caption: {
           category: 'ID_CATEGORY_APPEARANCE',
@@ -1513,21 +1517,21 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_MISC',
           type: 'array',
           values: [
-            '0-fmMousePointerDefault',
-            '1-fmMousePointerArrow',
-            '2-fmMousePointerCross',
-            '3-fmMousePointerIBeam',
-            '6-fmMousePointerNESW',
-            '7-fmMousePointerNS',
-            '8-fmMousePointerNWSE',
-            '9-fmMousePointerWE',
-            '10-fmMousePointerUpArrow',
-            '11-fmMousePointerHourGlass',
-            '12-fmMousePointerNoDrop',
-            '13-fmMousePointerAppStarting',
-            '14-fmMousePointerHelp',
-            '15-fmMousePointerSizeAll',
-            '99-fmMousePointerCustom'
+            '0 - fmMousePointerDefault',
+            '1 - fmMousePointerArrow',
+            '2 - fmMousePointerCross',
+            '3 - fmMousePointerIBeam',
+            '6 - fmMousePointerNESW',
+            '7 - fmMousePointerNS',
+            '8 - fmMousePointerNWSE',
+            '9 - fmMousePointerWE',
+            '10 - fmMousePointerUpArrow',
+            '11 - fmMousePointerHourGlass',
+            '12 - fmMousePointerNoDrop',
+            '13 - fmMousePointerAppStarting',
+            '14 - fmMousePointerHelp',
+            '15 - fmMousePointerSizeAll',
+            '99 - fmMousePointerCustom'
           ]
         },
         Picture: {
@@ -1538,19 +1542,19 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_PICTURE',
           type: 'array',
           values: [
-            '0-fmPicturePositionLeftTop',
-            '1-fmPicturePositionLeftCenter',
-            '2-fmPicturePositionLeftBottom',
-            '3-fmPicturePositionRightTop',
-            '4-fmPicturePositionRightCenter',
-            '5-fmPicturePositionRightBottom',
-            '6-fmPicturePositionAboveLeft',
-            '7-fmPicturePositionAboveCenter',
-            '8-fmPicturePositionAboveRight',
-            '9-fmPicturePositionBelowLeft',
-            '10-fmPicturePositionBelowCenter',
-            '11-fmPicturePositionBelowRight',
-            '12-fmPicturePositionCenter'
+            '0 - fmPicturePositionLeftTop',
+            '1 - fmPicturePositionLeftCenter',
+            '2 - fmPicturePositionLeftBottom',
+            '3 - fmPicturePositionRightTop',
+            '4 - fmPicturePositionRightCenter',
+            '5 - fmPicturePositionRightBottom',
+            '6 - fmPicturePositionAboveLeft',
+            '7 - fmPicturePositionAboveCenter',
+            '8 - fmPicturePositionAboveRight',
+            '9 - fmPicturePositionBelowLeft',
+            '10 - fmPicturePositionBelowCenter',
+            '11 - fmPicturePositionBelowRight',
+            '12 - fmPicturePositionCenter'
           ]
         },
         TabIndex: {
@@ -1569,9 +1573,9 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_BEHAVIOR',
           type: 'array',
           values: [
-            '1-fmTextAlignLeft',
-            '2-fmTextAlignCenter',
-            '3-fmTextAlignRight'
+            '1 - fmTextAlignLeft',
+            '2 - fmTextAlignCenter',
+            '3 - fmTextAlignRight'
           ]
         },
         Top: {
@@ -1615,7 +1619,7 @@ export class PropertyListDefine {
         BorderStyle: {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
-          values: ['0-fmBorderStyleNone', '1-fmBorderStyleSingle']
+          values: ['0 - fmBorderStyleNone', '1 - fmBorderStyleSingle']
         },
         Caption: {
           category: 'ID_CATEGORY_APPEARANCE',
@@ -1629,8 +1633,8 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_BEHAVIOR',
           type: 'array',
           values: [
-            '0-fmCycleAllForms',
-            '2-fmCycleCurrentForms'
+            '0 - fmCycleAllForms',
+            '2 - fmCycleCurrentForms'
           ]
         },
         Enabled: {
@@ -1675,21 +1679,21 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_MISC',
           type: 'array',
           values: [
-            '0-fmMousePointerDefault',
-            '1-fmMousePointerArrow',
-            '2-fmMousePointerCross',
-            '3-fmMousePointerIBeam',
-            '6-fmMousePointerNESW',
-            '7-fmMousePointerNS',
-            '8-fmMousePointerNWSE',
-            '9-fmMousePointerWE',
-            '10-fmMousePointerUpArrow',
-            '11-fmMousePointerHourGlass',
-            '12-fmMousePointerNoDrop',
-            '13-fmMousePointerAppStarting',
-            '14-fmMousePointerHelp',
-            '15-fmMousePointerSizeAll',
-            '99-fmMousePointerCustom'
+            '0 - fmMousePointerDefault',
+            '1 - fmMousePointerArrow',
+            '2 - fmMousePointerCross',
+            '3 - fmMousePointerIBeam',
+            '6 - fmMousePointerNESW',
+            '7 - fmMousePointerNS',
+            '8 - fmMousePointerNWSE',
+            '9 - fmMousePointerWE',
+            '10 - fmMousePointerUpArrow',
+            '11 - fmMousePointerHourGlass',
+            '12 - fmMousePointerNoDrop',
+            '13 - fmMousePointerAppStarting',
+            '14 - fmMousePointerHelp',
+            '15 - fmMousePointerSizeAll',
+            '99 - fmMousePointerCustom'
           ]
         },
         Picture: {
@@ -1750,11 +1754,11 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
           values: [
-            '0-fmSpecialEffectFlat',
-            '1-fmSpecialEffectRaised',
-            '2-fmSpecialEffectSunken',
-            '3-fmSpecialEffectEtched',
-            '6-fmSpecialEffectBump'
+            '0 - fmSpecialEffectFlat',
+            '1 - fmSpecialEffectRaised',
+            '2 - fmSpecialEffectSunken',
+            '3 - fmSpecialEffectEtched',
+            '6 - fmSpecialEffectBump'
           ]
         },
         TabIndex: {
@@ -1810,7 +1814,7 @@ export class PropertyListDefine {
         BackStyle: {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
-          values: ['0-fmBackStyleTransparent', '1-fmBackStyleOpaque']
+          values: ['0 - fmBackStyleTransparent', '1 - fmBackStyleOpaque']
         },
         BorderColor: {
           category: 'ID_CATEGORY_APPEARANCE',
@@ -1819,7 +1823,7 @@ export class PropertyListDefine {
         BorderStyle: {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
-          values: ['0-fmBorderStyleNone', '1-fmBorderStyleSingle']
+          values: ['0 - fmBorderStyleNone', '1 - fmBorderStyleSingle']
         },
         BoundColumn: {
           category: 'ID_CATEGORY_DATA',
@@ -1849,18 +1853,18 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_MISC',
           type: 'array',
           values: [
-            '0-fmDragBehaviorDisabled',
-            '1-fmDragBehaviorEnabled'
+            '0 - fmDragBehaviorDisabled',
+            '1 - fmDragBehaviorEnabled'
           ]
         },
         DropButtonStyle: {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
           values: [
-            '0-fmDropButtonStylePlain',
-            '1-fmDropButtonStyleArrow',
-            '2-fmDropButtonStyleEllipsis',
-            '3-fmDropButtonStyleReduce'
+            '0 - fmDropButtonStylePlain',
+            '1 - fmDropButtonStyleArrow',
+            '2 - fmDropButtonStyleEllipsis',
+            '3 - fmDropButtonStyleReduce'
           ]
         },
         Enabled: {
@@ -1871,8 +1875,8 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_MISC',
           type: 'array',
           values: [
-            '0-fmEnterFieldBehaviorSelectAll',
-            '1-fmEnterFieldBehaviorRecallSelection'
+            '0 - fmEnterFieldBehaviorSelectAll',
+            '1 - fmEnterFieldBehaviorRecallSelection'
           ]
         },
         Font: {
@@ -1899,7 +1903,7 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_MISC',
           type: 'array',
           values: [
-            '0-fmIMEModeNoControl'
+            '0 - fmIMEModeNoControl'
           ]
         },
         Left: {
@@ -1914,8 +1918,8 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_DATA',
           type: 'array',
           values: [
-            '0-fmListStylePlain',
-            '1-fmListStyleOption'
+            '0 - fmListStylePlain',
+            '1 - fmListStyleOption'
           ]
         },
         ListWidth: {
@@ -1930,9 +1934,9 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_BEHAVIOR',
           type: 'array',
           values: [
-            '0-fmMatchEntryFirstLetter',
-            '1-fmMatchEntryComplete',
-            '2-fmMatchEntryNone'
+            '0 - fmMatchEntryFirstLetter',
+            '1 - fmMatchEntryComplete',
+            '2 - fmMatchEntryNone'
           ]
         },
         MatchRequired: {
@@ -1951,21 +1955,21 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_MISC',
           type: 'array',
           values: [
-            '0-fmMousePointerDefault',
-            '1-fmMousePointerArrow',
-            '2-fmMousePointerCross',
-            '3-fmMousePointerIBeam',
-            '6-fmMousePointerNESW',
-            '7-fmMousePointerNS',
-            '8-fmMousePointerNWSE',
-            '9-fmMousePointerWE',
-            '10-fmMousePointerUpArrow',
-            '11-fmMousePointerHourGlass',
-            '12-fmMousePointerNoDrop',
-            '13-fmMousePointerAppStarting',
-            '14-fmMousePointerHelp',
-            '15-fmMousePointerSizeAll',
-            '99-fmMousePointerCustom'
+            '0 - fmMousePointerDefault',
+            '1 - fmMousePointerArrow',
+            '2 - fmMousePointerCross',
+            '3 - fmMousePointerIBeam',
+            '6 - fmMousePointerNESW',
+            '7 - fmMousePointerNS',
+            '8 - fmMousePointerNWSE',
+            '9 - fmMousePointerWE',
+            '10 - fmMousePointerUpArrow',
+            '11 - fmMousePointerHourGlass',
+            '12 - fmMousePointerNoDrop',
+            '13 - fmMousePointerAppStarting',
+            '14 - fmMousePointerHelp',
+            '15 - fmMousePointerSizeAll',
+            '99 - fmMousePointerCustom'
           ]
         },
         RowSource: {
@@ -1980,28 +1984,28 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
           values: [
-            '0-fmShowDropButtonNever',
-            '1-fmShowDropButtonFocus',
-            '2-fmShowDropButtonAlways'
+            '0 - fmShowDropButtonNever',
+            '1 - fmShowDropButtonFocus',
+            '2 - fmShowDropButtonAlways'
           ]
         },
         SpecialEffect: {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
           values: [
-            '0-fmSpecialEffectFlat',
-            '1-fmSpecialEffectRaised',
-            '2-fmSpecialEffectSunken',
-            '3-fmSpecialEffectEtched',
-            '6-fmSpecialEffectBump'
+            '0 - fmSpecialEffectFlat',
+            '1 - fmSpecialEffectRaised',
+            '2 - fmSpecialEffectSunken',
+            '3 - fmSpecialEffectEtched',
+            '6 - fmSpecialEffectBump'
           ]
         },
         Style: {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
           values: [
-            '0-fmStyleDropDownCombo',
-            '2-fmStyleDropDownList'
+            '0 - fmStyleDropDownCombo',
+            '2 - fmStyleDropDownList'
           ]
         },
         TabIndex: {
@@ -2024,9 +2028,9 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_BEHAVIOR',
           type: 'array',
           values: [
-            '1-fmTextAlignLeft',
-            '2-fmTextAlignCenter',
-            '3-fmTextAlignRight'
+            '1 - fmTextAlignLeft',
+            '2 - fmTextAlignCenter',
+            '3 - fmTextAlignRight'
           ]
         },
         TextColumn: {
@@ -2070,7 +2074,7 @@ export class PropertyListDefine {
         BorderStyle: {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
-          values: ['0-fmBorderStyleNone', '1-fmBorderStyleSingle']
+          values: ['0 - fmBorderStyleNone', '1 - fmBorderStyleSingle']
         },
         BoundColumn: {
           category: 'ID_CATEGORY_DATA',
@@ -2120,7 +2124,7 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_MISC',
           type: 'array',
           values: [
-            '0-fmIMEModeNoControl'
+            '0 - fmIMEModeNoControl'
           ]
         },
         IntegralHeight: {
@@ -2135,8 +2139,8 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_DATA',
           type: 'array',
           values: [
-            '0-fmListStylePlain',
-            '1-fmListStyleOption'
+            '0 - fmListStylePlain',
+            '1 - fmListStyleOption'
           ]
         },
         Locked: {
@@ -2147,9 +2151,9 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_BEHAVIOR',
           type: 'array',
           values: [
-            '0-fmMatchEntryFirstLetter',
-            '1-fmMatchEntryComplete',
-            '2-fmMatchEntryNone'
+            '0 - fmMatchEntryFirstLetter',
+            '1 - fmMatchEntryComplete',
+            '2 - fmMatchEntryNone'
           ]
         },
         MouseIcon: {
@@ -2160,30 +2164,30 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_MISC',
           type: 'array',
           values: [
-            '0-fmMousePointerDefault',
-            '1-fmMousePointerArrow',
-            '2-fmMousePointerCross',
-            '3-fmMousePointerIBeam',
-            '6-fmMousePointerNESW',
-            '7-fmMousePointerNS',
-            '8-fmMousePointerNWSE',
-            '9-fmMousePointerWE',
-            '10-fmMousePointerUpArrow',
-            '11-fmMousePointerHourGlass',
-            '12-fmMousePointerNoDrop',
-            '13-fmMousePointerAppStarting',
-            '14-fmMousePointerHelp',
-            '15-fmMousePointerSizeAll',
-            '99-fmMousePointerCustom'
+            '0 - fmMousePointerDefault',
+            '1 - fmMousePointerArrow',
+            '2 - fmMousePointerCross',
+            '3 - fmMousePointerIBeam',
+            '6 - fmMousePointerNESW',
+            '7 - fmMousePointerNS',
+            '8 - fmMousePointerNWSE',
+            '9 - fmMousePointerWE',
+            '10 - fmMousePointerUpArrow',
+            '11 - fmMousePointerHourGlass',
+            '12 - fmMousePointerNoDrop',
+            '13 - fmMousePointerAppStarting',
+            '14 - fmMousePointerHelp',
+            '15 - fmMousePointerSizeAll',
+            '99 - fmMousePointerCustom'
           ]
         },
         MultiSelect: {
           category: 'ID_CATEGORY_BEHAVIOR',
           type: 'array',
           values: [
-            '0-fmMultiSelectSingle',
-            '1-fmMultiSelectMulti',
-            '2-fmMultiSelectExtended'
+            '0 - fmMultiSelectSingle',
+            '1 - fmMultiSelectMulti',
+            '2 - fmMultiSelectExtended'
           ]
         },
         RowSource: {
@@ -2194,11 +2198,11 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
           values: [
-            '0-fmSpecialEffectFlat',
-            '1-fmSpecialEffectRaised',
-            '2-fmSpecialEffectSunken',
-            '3-fmSpecialEffectEtched',
-            '6-fmSpecialEffectBump'
+            '0 - fmSpecialEffectFlat',
+            '1 - fmSpecialEffectRaised',
+            '2 - fmSpecialEffectSunken',
+            '3 - fmSpecialEffectEtched',
+            '6 - fmSpecialEffectBump'
           ]
         },
         TabIndex: {
@@ -2221,9 +2225,9 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_BEHAVIOR',
           type: 'array',
           values: [
-            '1-fmTextAlignLeft',
-            '2-fmTextAlignCenter',
-            '3-fmTextAlignRight'
+            '1 - fmTextAlignLeft',
+            '2 - fmTextAlignCenter',
+            '3 - fmTextAlignRight'
           ]
         },
         TextColumn: {
@@ -2275,7 +2279,7 @@ export class PropertyListDefine {
         BackStyle: {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
-          values: ['0-fmBackStyleTransparent', '1-fmBackStyleOpaque']
+          values: ['0 - fmBackStyleTransparent', '1 - fmBackStyleOpaque']
         },
         BorderColor: {
           category: 'ID_CATEGORY_APPEARANCE',
@@ -2284,7 +2288,7 @@ export class PropertyListDefine {
         BorderStyle: {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
-          values: ['0-fmBorderStyleNone', '1-fmBorderStyleSingle']
+          values: ['0 - fmBorderStyleNone', '1 - fmBorderStyleSingle']
         },
         ControlSource: {
           category: 'ID_CATEGORY_DATA',
@@ -2298,8 +2302,8 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_MISC',
           type: 'array',
           values: [
-            '0-fmDragBehaviorDisabled',
-            '1-fmDragBehaviorEnabled'
+            '0 - fmDragBehaviorDisabled',
+            '1 - fmDragBehaviorEnabled'
           ]
         },
         Enabled: {
@@ -2310,8 +2314,8 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_MISC',
           type: 'array',
           values: [
-            '0-fmEnterFieldBehaviorSelectAll',
-            '1-fmEnterFieldBehaviorRecallSelection'
+            '0 - fmEnterFieldBehaviorSelectAll',
+            '1 - fmEnterFieldBehaviorRecallSelection'
           ]
         },
         EnterKeyBehavior: {
@@ -2342,7 +2346,7 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_MISC',
           type: 'array',
           values: [
-            '0-fmIMEModeNoControl'
+            '0 - fmIMEModeNoControl'
           ]
         },
         IntegralHeight: {
@@ -2369,21 +2373,21 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_MISC',
           type: 'array',
           values: [
-            '0-fmMousePointerDefault',
-            '1-fmMousePointerArrow',
-            '2-fmMousePointerCross',
-            '3-fmMousePointerIBeam',
-            '6-fmMousePointerNESW',
-            '7-fmMousePointerNS',
-            '8-fmMousePointerNWSE',
-            '9-fmMousePointerWE',
-            '10-fmMousePointerUpArrow',
-            '11-fmMousePointerHourGlass',
-            '12-fmMousePointerNoDrop',
-            '13-fmMousePointerAppStarting',
-            '14-fmMousePointerHelp',
-            '15-fmMousePointerSizeAll',
-            '99-fmMousePointerCustom'
+            '0 - fmMousePointerDefault',
+            '1 - fmMousePointerArrow',
+            '2 - fmMousePointerCross',
+            '3 - fmMousePointerIBeam',
+            '6 - fmMousePointerNESW',
+            '7 - fmMousePointerNS',
+            '8 - fmMousePointerNWSE',
+            '9 - fmMousePointerWE',
+            '10 - fmMousePointerUpArrow',
+            '11 - fmMousePointerHourGlass',
+            '12 - fmMousePointerNoDrop',
+            '13 - fmMousePointerAppStarting',
+            '14 - fmMousePointerHelp',
+            '15 - fmMousePointerSizeAll',
+            '99 - fmMousePointerCustom'
           ]
         },
         MultiLine: {
@@ -2412,11 +2416,11 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_APPEARANCE',
           type: 'array',
           values: [
-            '0-fmSpecialEffectFlat',
-            '1-fmSpecialEffectRaised',
-            '2-fmSpecialEffectSunken',
-            '3-fmSpecialEffectEtched',
-            '6-fmSpecialEffectBump'
+            '0 - fmSpecialEffectFlat',
+            '1 - fmSpecialEffectRaised',
+            '2 - fmSpecialEffectSunken',
+            '3 - fmSpecialEffectEtched',
+            '6 - fmSpecialEffectBump'
           ]
         },
         TabIndex: {
@@ -2443,9 +2447,9 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_BEHAVIOR',
           type: 'array',
           values: [
-            '1-fmTextAlignLeft',
-            '2-fmTextAlignCenter',
-            '3-fmTextAlignRight'
+            '1 - fmTextAlignLeft',
+            '2 - fmTextAlignCenter',
+            '3 - fmTextAlignRight'
           ]
         },
         Top: {
@@ -2490,8 +2494,8 @@ export class PropertyListDefine {
           category: 'ID_CATEGORY_BEHAVIOR',
           type: 'array',
           values: [
-            '0-fmCycleAllForms',
-            '2-fmCycleCurrentForms'
+            '0 - fmCycleAllForms',
+            '2 - fmCycleCurrentForms'
           ]
         },
         Enabled: {

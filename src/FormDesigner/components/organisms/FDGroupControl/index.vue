@@ -88,7 +88,6 @@ export default class GroupControl extends FDCommonMethod {
     EventBus.$on('endGroupMoveControl', this.endGroupMoveControl)
     EventBus.$on('getClientValue', this.getClientValue)
     EventBus.$on('updasteGroupSize', this.updasteGroupSize)
-    EventBus.$on('IncDecspacing', this.IncDecspacing)
     EventBus.$on('getGroupSize', this.getGroupSize)
   }
   destroyed () {
@@ -97,7 +96,8 @@ export default class GroupControl extends FDCommonMethod {
     EventBus.$off('moveGroupControl', this.moveGroupControl)
     EventBus.$off('endGroupMoveControl', this.endGroupMoveControl)
     EventBus.$off('getClientValue', this.getClientValue)
-    EventBus.$on('updasteGroupSize', this.updasteGroupSize)
+    EventBus.$off('updasteGroupSize', this.updasteGroupSize)
+    EventBus.$on('getGroupSize', this.getGroupSize)
   }
   updasteGroupSize (propName: keyof controlProperties, propertyValue: number, groupIndex: number) {
     if (this.selectedControls[this.userFormId].container[0] === this.containerId) {
@@ -111,30 +111,6 @@ export default class GroupControl extends FDCommonMethod {
         this.updatedValue(groupIndex, propName, propertyValue)
         this.groupStyle(this.divStyleArray[groupIndex].groupName!)
       }
-    }
-  }
-  IncDecspacing (groupName: string, type: keyof controlProperties, value: number) {
-    if (this.containerId === this.selectedControls[this.userFormId].container[0]) {
-      const groupIndex: number = this.divStyleArray.findIndex((val) => val.groupName === groupName)
-      let propValue: number = 0
-      const ctrlSel = this.selectedControls[this.userFormId].selected
-      const usrFrmData = this.userformData[this.userFormId]
-      const selCtrlProp = usrFrmData[ctrlSel[0]].properties
-      const groupProp = this.divStyleArray[groupIndex]
-      if (type === 'Left') {
-        if (parseInt(groupProp.left!) <= selCtrlProp.Left!) {
-          propValue = parseInt(groupProp.left!) - value
-        } else {
-          propValue = parseInt(groupProp.left!) + value
-        }
-      } else if (type === 'Top') {
-        if (parseInt(groupProp.top!) <= selCtrlProp.Top!) {
-          propValue = parseInt(groupProp.top!) - value
-        } else {
-          propValue = parseInt(groupProp.top!) + value
-        }
-      }
-      this.updasteGroupSize(type, propValue, groupIndex)
     }
   }
   updatedValue (groupIndex: number, propName: keyof controlProperties, diff: number) {

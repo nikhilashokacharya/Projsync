@@ -3,7 +3,7 @@
     <div>
       <div class="sideheader">
         <span class="sideheader1">
-          <span>Properties - {{userformData[userFormId][userFormId].properties.Name}}</span>
+          <span>Properties - {{displayName ? userformData[userFormId][getSelectedControlsDatas[0]].properties.Name : userformData[userFormId][userFormId].properties.Name }}</span>
           <div id="mdiv" v-on:click="hideShowTable">
             <div class="mdiv">
               <div class="md"></div>

@@ -40,6 +40,12 @@ export function checkPropertyValue (propertyName: keyof controlProperties, value
       const nameRegex = /^[a-zA-Z][a-zA-Z0-9_]+$/
       result = nameRegex.test(value)
       break
+    case 'DrawBuffer':
+      result = value >= 16000 && value <= 1048576
+      break
+    case 'TransitionPeriod':
+      result = value >= 0 && value <= 10000
+      break
   }
   return result
 }
