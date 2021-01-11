@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-    v-on="eventStoppers()"
+      v-on="eventStoppers()"
       class="outer-page"
       :style="pageStyleObj"
       @contextmenu="contextMenuVisible($event, -1)"
@@ -9,6 +9,7 @@
       @mousedown="controlEditMode"
       @keydown.enter="setContentEditable($event, true)"
       @keydown.esc="setContentEditable($event, false)"
+      @keydown.delete="deleteTabControl($event)"
       :tabindex="properties.TabIndex"
       :title="properties.ControlTipText"
     >
@@ -21,7 +22,24 @@
             :key="key"
             :style="getTabStyle"
           >
-          <FDControlTabs @setValue="setValue" :tempWidth="tempWidth" @isChecked="isChecked" :getMouseCursorData="getMouseCursorData" :setFontStyle="setFontStyle" :data="data" @tempStretch="tempStretch" :pageValue="value" :indexValue="key" :pageData="value" :isRunMode="isRunMode" :isEditMode="isEditMode"  :isItalic="isItalic" :tempStretch="tempStretch" :tempWeight="tempWeight"/>
+          <FDControlTabs
+          @setValue="setValue"
+          :tempWidth="tempWidth"
+          @isChecked="isChecked"
+          :getMouseCursorData="getMouseCursorData"
+          :setFontStyle="setFontStyle"
+          :data="data"
+          @tempStretch="tempStretch"
+          :pageValue="value"
+          :indexValue="key"
+          :pageData="value"
+          :isRunMode="isRunMode"
+          :isEditMode="isEditMode"
+          :isItalic="isItalic"
+          :tempStretch="tempStretch"
+          :tempWeight="tempWeight"
+          @deleteMultiPageControl="(event) => {deleteTabControl(event)}"
+          />
           <div
               class="content"
               :style="styleContentObj"
@@ -51,7 +69,6 @@
         :selectedTab="updatedValue"
         :data="data"
         :userFormId="userFormId"
-        @closeMenu="closeMenu"
       />
     </div>
   </div>
@@ -84,7 +101,7 @@ export default class FDTabStrip extends FdControlVue {
   $el: HTMLDivElement
 
   isScroll = true;
-  viewMenu?: boolean = false;
+  viewMenu: boolean = false;
   top: string = '0px';
   left: string = '0px';
   contextMenuValue: Array<IcontextMenu> = tabsContextMenu;
@@ -175,6 +192,7 @@ export default class FDTabStrip extends FdControlVue {
   isChecked (value: selectedTab) {
     this.updatedValue = value.indexValue
     this.updateDataModel({ propertyName: 'Value', value: value.indexValue })
+    this.focusPage()
   }
 
   /**
@@ -370,7 +388,7 @@ export default class FDTabStrip extends FdControlVue {
           : controlProp.Width! < 30 || controlProp.Height! < 30
             ? 'none'
             : 'block',
-      top: controlProp.TabOrientation === 0 ? controlProp.MultiRow ? (this.tempHeight + 12) * this.multiRowCount + 'px' : controlProp.TabFixedHeight! > 0 ? (controlProp.TabFixedHeight! + 10) + 'px' : controlProp.TabFixedHeight! === 0 ? (this.tempHeight + 15) + 'px' : '33px' : controlProp.TabOrientation === 1 ? controlProp.MultiRow ? '-' + (this.tempHeight + 12) * (this.multiRowCount - 1) + 'px' : controlProp.TabFixedHeight! > 0 ? '0px' : '0px' : '0px',
+      top: controlProp.TabOrientation === 0 ? controlProp.MultiRow ? (this.tempHeight + 12) * this.multiRowCount + 'px' : controlProp.TabFixedHeight! > 0 ? (controlProp.TabFixedHeight! + 10) + 'px' : controlProp.TabFixedHeight! === 0 ? (this.tempHeight + 9) + 'px' : '33px' : controlProp.TabOrientation === 1 ? controlProp.MultiRow ? '-' + (this.tempHeight + 12) * (this.multiRowCount - 1) + 'px' : controlProp.TabFixedHeight! > 0 ? '0px' : '0px' : '0px',
       height: controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1
         ? controlProp.TabFixedHeight! > 0 ? (controlProp.Height! - controlProp.TabFixedHeight! - 5) + 'px' : controlProp.TabFixedHeight! === 0 ? (controlProp.Height! - controlProp.Font!.FontSize! - 13) + 'px'
           : controlProp.TabOrientation === 1
@@ -483,14 +501,48 @@ export default class FDTabStrip extends FdControlVue {
   updateDataModel (updateData: IupdateDataModel) {
     return updateData
   }
-
+  focusPage () {
+    if (this.extraDatas!.Tabs!.length > 0) {
+      const value: number = this.updatedValue;
+      (this.controlTabsRef[value].children[0].children[1] as HTMLLabelElement).focus()
+    } else {
+      (this.$el.children[0] as HTMLDivElement).focus()
+    }
+  }
   closeMenu () {
     this.viewMenu = false
+    this.focusPage()
   }
   eventStoppers () {
     const eventStop = (event: Event) => event.stopPropagation()
     return this.isEditMode === false ? null : {
       keydown: eventStop
+    }
+  }
+  deleteTabControl (event: KeyboardEvent) {
+    if (this.isEditMode) {
+      event.stopPropagation()
+      const tabControlData = JSON.parse(JSON.stringify(this.extraDatas.Tabs))
+      if (tabControlData && tabControlData.length > 0) {
+        tabControlData.splice(this.updatedValue, 1)
+        this.updateDataModelExtraData({ propertyName: 'Tabs', value: tabControlData })
+        this.updateTabStripValue(this.updatedValue! - 1)
+        Vue.nextTick(() => { this.focusPage() })
+      }
+    }
+  }
+  updateTabStripValue (index: number) {
+    const userData = this.userformData[this.userFormId]
+    const tabs = userData[this.controlId].extraDatas!.Tabs!
+    const tabIndex = tabs.findIndex((val, key) => key === index + 1)
+    if (tabIndex !== -1) {
+      const value = index + 1
+      this.updateDataModel({ propertyName: 'Value', value: value })
+    } else if (tabIndex === -1 && index !== -1) {
+      const value = index
+      this.updateDataModel({ propertyName: 'Value', value: value })
+    } else {
+      this.updateDataModel({ propertyName: 'Value', value: -1 })
     }
   }
 }

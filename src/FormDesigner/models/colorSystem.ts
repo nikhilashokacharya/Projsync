@@ -121,7 +121,7 @@ export const colorSystem = [
   },
   {
     name: '&H80000018&',
-    value: '#FFF0F0',
+    value: '#ffffe6',
     displayName: 'ToolTip'
   }
 ]

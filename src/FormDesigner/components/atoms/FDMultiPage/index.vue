@@ -149,7 +149,7 @@ export default class FDMultiPage extends FdContainerVue {
   @Ref('controlTabsRef') controlTabsRef: HTMLDivElement[];
   @Ref('controlTab') controlTab: FDControlTabs[]
 
-  viewMenu?: boolean = false;
+  viewMenu: boolean = false;
   top: string = '0px';
   left: string = '0px';
   contextMenuValue: Array<IcontextMenu> = tabsContextMenu;
@@ -243,8 +243,8 @@ export default class FDMultiPage extends FdContainerVue {
       height: `${controlProp.Height}px`,
       top: `${controlProp.Top}px`,
       backgroundColor: controlProp.BackColor,
-      display: display
-      // borderBottom: controlProp.TabOrientation === 0 ? '1px solid gray' : ''
+      display: display,
+      borderLeft: '2px solid whitesmoke'
     }
   }
 
@@ -539,7 +539,7 @@ export default class FDMultiPage extends FdContainerVue {
       controlProp.Style !== 2 ? controlProp.TabOrientation === 0
         ? controlProp.MultiRow ? (this.tempHeight + 12) * this.multiRowCount + 'px' : controlProp.TabFixedHeight! > 0
           ? controlProp.TabFixedHeight! + 10 + 'px'
-          : controlProp.TabFixedHeight! === 0 ? (this.tempHeight + 12) + 'px'
+          : controlProp.TabFixedHeight! === 0 ? (this.tempHeight + 13) + 'px'
             : '33px'
         : '0px' : '0px',
       height:
@@ -553,11 +553,11 @@ export default class FDMultiPage extends FdContainerVue {
         : `${controlProp.Height! - 1}px` : `${controlProp.Height! - 1}px`,
       width:
         controlProp.Style !== 2 ? controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1
-          ? `${controlProp.Width! - 1}px`
+          ? `${controlProp.Width! - 3}px`
           : controlProp.TabFixedWidth! > 0
             ? controlProp.Width! - controlProp.TabFixedWidth! - 10 + 'px'
             : controlProp.TabFixedWidth! === 0 ? controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3 ? `${controlProp.Width! - this.tempWidth - 13}px` : (controlProp.Width! - controlProp.Font!.FontSize! - 20) + 'px'
-              : 'calc(100% - 44px)' : `${controlProp.Width! - 1}px`,
+              : 'calc(100% - 44px)' : `${controlProp.Width! - 3}px`,
       left:
         controlProp.Style !== 2 ? controlProp.TabOrientation === 2
           ? controlProp.TabFixedWidth! > 0

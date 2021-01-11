@@ -47,7 +47,7 @@
         },
       ]"
     >
-      <span v-if="pageData.Accelerator === '' && pageData.Caption === ''"
+      <span v-if="pageData.Caption === ''" :style="emptyTabWidth"
         ><p></p
       ></span>
       <span class="caption-span" v-else-if="pageData.Accelerator === ''"
@@ -179,6 +179,12 @@ export default class FDControlTabs extends Vue {
     }
   }
 
+  get emptyTabWidth () {
+    const controlProp = this.data.properties
+    return {
+      width: controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3 ? this.tempWidth + 'px' : ''
+    }
+  }
   /**
    * @description setVisible checks for the RunMode of the control and then returns after checking for the Enabled property
    * @function setForeColor

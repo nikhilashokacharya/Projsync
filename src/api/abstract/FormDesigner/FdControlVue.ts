@@ -639,10 +639,8 @@ export default class FdControlVue extends Vue {
      if (propData.Text !== propData.Value && propData.ControlSource === '') {
        const propText: number = propData.Text!.length
        const propValue: number = (propData.Value as string).length
-       this.updateDataModel({ propertyName: propText > propValue ? 'Value' : 'Text',
-         value: propText > propValue
-           ? this.properties.Text!
-           : this.properties.Value! })
+       this.updateDataModel({ propertyName: 'Text',
+         value: this.properties.Value! })
      }
    } else if (this.data.type!.includes('CheckBox') || this.data.type!.includes('OptionButton')) {
      const value = this.properties.Value

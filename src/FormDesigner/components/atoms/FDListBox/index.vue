@@ -197,9 +197,7 @@ export default class FDListBox extends Mixins(FdControlVue) {
           if (this.listStyleRef[i].style.backgroundColor !== '') {
             const text = this.extraDatas.RowSourceData![i][0]
             this.updateDataModel({ propertyName: 'Text', value: text })
-            const x = this.extraDatas.RowSourceData![i][
-              this.properties.BoundColumn! - 1
-            ]
+            const x = this.extraDatas.RowSourceData![i][this.properties.BoundColumn! - 1]
             this.updateDataModel({ propertyName: 'Value', value: x })
           }
         }
@@ -467,9 +465,7 @@ export default class FDListBox extends Mixins(FdControlVue) {
       for (let i = 0; i < this.extraDatas.RowSourceData!.length; i++) {
         this.listStyleRef[i].style.backgroundColor = ''
         if (
-          this.extraDatas.RowSourceData![i][
-            this.properties.BoundColumn! - 1
-          ] === this.extraDatas.ControlSourceValue!
+          this.extraDatas.RowSourceData![i][this.properties.BoundColumn! - 1] === this.extraDatas.ControlSourceValue!
         ) {
           const listRow = this.listStyleRef[i]
           listRow.style.backgroundColor = 'rgb(59, 122, 231)'

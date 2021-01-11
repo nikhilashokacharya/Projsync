@@ -2,7 +2,7 @@
   <div id="popup1" class="overlay" :style="tabOrderStyleObj"
   @keydown.enter="updateChanges"
     @keydown.esc="closeDialog()"
-    tabindex="2"
+    tabindex="0"
     ref="renameDialogRef">
     <div class="rename-div-1 popup" :style="tabOrderDialogInitialStyle">
       <div class="remane-header-div" @mousedown.stop="dragTabOrderDialog">
@@ -168,15 +168,14 @@ export default class FDRenameMultiPageDialog extends FdDialogDragVue {
         this.isTabOrderOpen = true
         this.userFormId = userFormId
         this.controlId = controlId
-        this.renameDialogRef.focus()
+        Vue.nextTick(() => {
+          this.renameDialogRef.focus()
+        })
       }
     )
   }
   destroyed () {
     EventBus.$off('renamePage')
-  }
-  mounted () {
-    this.renameDialogRef.focus()
   }
 }
 </script>
