@@ -129,7 +129,6 @@ export default class FDToggleButton extends Mixins(FdControlVue) {
       width: `${controlProp.Width}px`,
       height: `${controlProp.Height}px`,
       top: `${controlProp.Top}px`,
-      borderColor: controlProp.BorderColor,
       boxShadow: controlProp.Enabled
         ? controlProp.Value === 'False' || controlProp.Value === 'false'
           ? '1px 1px gray'
@@ -185,7 +184,15 @@ export default class FDToggleButton extends Mixins(FdControlVue) {
       backgroundRepeat: this.getRepeat,
       backgroundPosition: controlProp.Picture ? this.getPosition : '',
       backgroundPositionX: controlProp.Picture ? this.getPositionX : '',
-      backgroundPositionY: controlProp.Picture ? this.getPositionY : ''
+      backgroundPositionY: controlProp.Picture ? this.getPositionY : '',
+      borderLeft: controlProp.Value !== 'True' ? '1px solid' : '',
+      borderTop: controlProp.Value !== 'True' ? '1px solid' : '',
+      borderRight: controlProp.Value === 'True' ? '1px solid' : '',
+      borderBottom: controlProp.Value === 'True' ? '1px solid' : '',
+      borderTopColor: controlProp.Value !== 'True' ? 'white !important' : '',
+      borderLeftColor: controlProp.Value !== 'True' ? 'white !important' : '',
+      borderBottomColor: controlProp.Value === 'True' ? 'white !important' : '',
+      borderRightColor: controlProp.Value === 'True' ? 'white !important' : ''
     }
   }
 

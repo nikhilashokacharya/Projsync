@@ -218,7 +218,8 @@ export default class FDTabStrip extends FdControlVue {
         controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''
           ? this.getMouseCursorData
           : 'default',
-      display: display
+      display: display,
+      borderLeft: '1px solid white'
     }
   }
 
@@ -347,7 +348,8 @@ export default class FDTabStrip extends FdControlVue {
       display: controlProp.TabOrientation === 1 ? 'flex' : '',
       position: 'absolute',
       width: `${controlProp.Width!}px`,
-      height: `${controlProp.Height!}px`
+      height: `${controlProp.Height!}px`,
+      boxShadow: controlProp.TabOrientation === 0 ? '0px 1px gray' : ''
     }
   }
 
@@ -394,17 +396,18 @@ export default class FDTabStrip extends FdControlVue {
           : controlProp.TabOrientation === 1
             ? `${controlProp.Height! - 21}px`
             : `${controlProp.Height! - 35}px`
-        : `${controlProp.Height! - 2}px`,
+        : `${controlProp.Height! - 3}px`,
       width:
         controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1
           ? `${controlProp.Width! - 3}px`
-          : controlProp.TabFixedWidth! > 0 ? (controlProp.Width! - controlProp.TabFixedWidth! - 15) + 'px' : controlProp.TabFixedWidth! === 0 ? controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3 ? `${controlProp.Width! - this.tempWidth - 12}px` : (controlProp.Width! - controlProp.Font!.FontSize! - 20) + 'px' : `${controlProp.Width! - 34}px`,
-      left: controlProp.TabOrientation === 2 ? controlProp.TabFixedWidth! > 0 ? (controlProp.TabFixedWidth! + 12) + 'px' : controlProp.TabFixedWidth! === 0 ? controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3 ? `${this.tempWidth + 12}px` : (controlProp.Font!.FontSize! + 20) + 'px' : '40px' : controlProp.TabOrientation === 3 ? controlProp.TabFixedWidth! > 0 ? '0px' : '0px' : '0px',
+          : controlProp.TabFixedWidth! > 0 ? (controlProp.Width! - controlProp.TabFixedWidth! - 15) + 'px' : controlProp.TabFixedWidth! === 0 ? controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3 ? `${controlProp.Width! - this.tempWidth - 13}px` : (controlProp.Width! - controlProp.Font!.FontSize! - 20) + 'px' : `${controlProp.Width! - 34}px`,
+      left: controlProp.TabOrientation === 2 ? controlProp.TabFixedWidth! > 0 ? (controlProp.TabFixedWidth! + 12) + 'px' : controlProp.TabFixedWidth! === 0 ? controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3 ? `${this.tempWidth + 10}px` : (controlProp.Font!.FontSize! + 20) + 'px' : '40px' : controlProp.TabOrientation === 3 ? controlProp.TabFixedWidth! > 0 ? '0px' : '0px' : '0px',
       cursor:
         controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''
           ? this.getMouseCursorData
           : 'default',
-      padding: '0px'
+      padding: '0px',
+      boxShadow: controlProp.TabOrientation === 0 ? '2px 0px gray' : ''
     }
   }
 

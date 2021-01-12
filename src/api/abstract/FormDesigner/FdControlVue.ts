@@ -723,14 +723,15 @@ export default class FdControlVue extends Vue {
    }
    return controlProperties.acceleratorProp(this.properties.Caption!, accelerator)
  }
- updateColumnWidths (index: number) {
+ updateColumnWidths (index: number, height: number) {
    const controlProp = this.properties
    const updateColWidth = controlProp.ColumnWidths!.split(';')
    const colChangeCheck: boolean = controlProp.ColumnCount! - 1 < index
    return {
      textAlign: controlProp.TextAlign === 0 ? 'left' : controlProp.TextAlign === 2 ? 'right' : 'center',
      width: controlProp.ColumnCount! === -1 ? (updateColWidth[index] ? parseInt(updateColWidth[index]) + 'px' : '100px') : colChangeCheck ? '0px' : ((updateColWidth[index]) ? parseInt(updateColWidth[index]) + 'px' : controlProp.ColumnCount! > index ? '100px' : '0px'),
-     overflow: 'hidden'
+     overflow: 'hidden',
+     paddingBottom: this.data.properties.Font!.FontSize! > 48 ? '10px' : '5px'
    }
  }
  updateColHeads (index: number) {

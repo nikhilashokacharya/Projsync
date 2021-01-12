@@ -38,9 +38,8 @@
         :userFormId="getUserFormId"
         :data="propControlData"
         :isActivated="
-          this.selectedControls[this.userFormId].selected.includes(
-            this.controlId
-          )
+          this.selectedControls[this.userFormId].selected.includes(this.controlId) &&
+           this.selectedControls[this.userFormId].selected.length === 1
         "
         :isRunMode="isRunMode"
         :isEditMode="isEditMode"
@@ -165,34 +164,20 @@ export default class ResizeControl extends FdSelectVue {
     this.$emit('openMenu', e, parentID, controlID, type)
   }
   get resizeControlStyle () {
+    const userData = this.userformData[this.userFormId]
     const currentProperties = this.propControlData.properties
     const extraData = this.propControlData.extraDatas!
     const bs = currentProperties.BorderStyle!
     const isRotate = currentProperties.Width! > currentProperties.Height!
     const type = this.propControlData.type
-    const tempOrient = currentProperties.Orientation
-    let tempOrientBoolean = false
-    if (this.propControlData.type === 'ScrollBar') {
-      if (tempOrient === 1) {
-        tempOrientBoolean = false
-      } else if (tempOrient === -1) {
-        if (currentProperties.Height! >= currentProperties.Width!) {
-          console.log(
-            'heightwidth',
-            currentProperties.Height,
-            currentProperties.Width
-          )
-          tempOrientBoolean = true
-        } else {
-          console.log(
-            'heightwidth',
-            currentProperties.Height,
-            currentProperties.Width
-          )
-          tempOrientBoolean = false
-        }
-      } else {
-        tempOrientBoolean = true
+    let highestZIndex = -1
+    if (this.selectedControlArray.length === 1 && !this.selectedControlArray[0].startsWith('group')) {
+      if (this.selectedControlArray[0] === this.propControlData.properties.ID && (type === 'Frame' || type === 'MultiPage')) {
+        const containerControls = [...userData[this.selectedContainer[0]].controls]
+        containerControls.sort((a, b) => {
+          return userData[b].extraDatas!.zIndex! - userData[a].extraDatas!.zIndex!
+        })
+        highestZIndex = userData[containerControls[0]].extraDatas!.zIndex!
       }
     }
     return {
@@ -206,7 +191,7 @@ export default class ResizeControl extends FdSelectVue {
           ? 'none'
           : 'block',
       cursor: !this.isRunMode ? 'move' : 'default',
-      zIndex: extraData.zIndex!
+      zIndex: (highestZIndex !== -1 && type !== 'Page' && this.isEditMode) ? highestZIndex + 1 : extraData.zIndex!
     }
   }
   get mainSelected () {
@@ -301,7 +286,6 @@ export default class ResizeControl extends FdSelectVue {
         }
       }
       if ((this.propControlData.type === 'Frame' || this.propControlData.type === 'MultiPage' || this.propControlData.type === 'ListBox') && currentSelect.length === 1) {
-        this.bringFront()
         if (this.propControlData.type !== 'ListBox') {
           this.isMoving = true
           this.isEditMode = true

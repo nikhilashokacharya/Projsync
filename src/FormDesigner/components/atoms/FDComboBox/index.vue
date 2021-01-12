@@ -37,7 +37,7 @@
           class="text-box-design"
           :value="selectionData[0]"
           @dragstart="dragBehavior"
-          @focus="makeTextAreaFocus"
+          @keydown.enter.prevent
         />
         <div
           ref="hideSelectionDiv"
@@ -162,7 +162,7 @@
                   v-for="(a, columnIndex) in extraDatas.ColumnHeadsValues"
                 >
                   <div
-                    v-if="columnIndex < properties.ColumnCount || properties.ColumnCount === -1"
+                    v-if="properties.RowSource !== '' && columnIndex < properties.ColumnCount || properties.ColumnCount === -1"
                     :key="columnIndex"
                     :style="updateColHeads(columnIndex)"
                     class="colHeadsClass"
@@ -177,6 +177,7 @@
             <div
               class="tBodyStyle"
               @click="properties.Enabled ? (open = false) : (open = true)"
+              v-if="properties.RowSource !== ''"
             >
               <div
                 :tabindex="index"
@@ -208,7 +209,7 @@
                   class="column-item"
                   v-for="(i, index) in item"
                   :key="index"
-                  :style="updateColumnWidths(index)"
+                  :style="updateColumnValue(index)"
                 >
                   <template v-if="index < properties.ColumnCount || properties.ColumnCount === -1">{{
                     i
@@ -255,6 +256,8 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   tempInputValue: string = '';
   tempWidth: string = '0px';
   isScrolling: boolean = false;
+  tempHeight: number;
+  inBlur: boolean = false;
   makeOpen () {
     this.open = true
   }
@@ -267,7 +270,14 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   }
 
   updateColumnValue (index: number) {
-    return this.updateColumnWidths(index)
+    return this.updateColumnWidths(index, this.tempHeight)
+  }
+
+  @Watch('open')
+  updateTd () {
+    if (!this.open) {
+      this.tempHeight = this.comboRef.children[1].children[0].clientHeight
+    }
   }
 
   toFocus () {
@@ -288,6 +298,22 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     }
   }
 
+  @Watch('properties.RowSource')
+  rowSourceValidate () {
+    if (this.properties.RowSource !== '') {
+      const initialRowSourceData = this.extraDatas.RowSourceData!
+      if (initialRowSourceData) {
+        this.tempArray = initialRowSourceData
+      }
+      this.updateDataModel({ propertyName: 'ControlSource', value: '' })
+      if (initialRowSourceData && initialRowSourceData.length === 0) {
+        this.updateDataModel({ propertyName: 'TopIndex', value: -1 })
+      } else {
+        this.updateDataModel({ propertyName: 'TopIndex', value: 0 })
+      }
+    }
+  }
+
   handleTextInput (e: Event) {
     if (this.properties.AutoSize) {
       this.updateAutoSize()
@@ -297,36 +323,33 @@ export default class FDComboBox extends Mixins(FdControlVue) {
       const tempEvent = e.target
       this.eTargetValue = e.target.value
       this.updateDataModel({ propertyName: 'Value', value: this.eTargetValue })
-      if (this.properties.MatchEntry !== 0) {
-        this.textareaRef.focus()
-      }
-      if (this.properties.MatchEntry === 0) {
-        for (let i = 0; i < this.tempArray.length; i++) {
-          if (this.tempArray[i][0][0] === this.textareaRef.value[0]) {
-            this.textareaRef.value = this.tempArray[i][0]
-            this.updateDataModel({
-              propertyName: 'Text',
-              value: this.tempArray[i][0]
-            })
-            break
-          }
+      this.updateDataModel({ propertyName: 'Text', value: this.eTargetValue })
+      if (this.properties.RowSource !== '') {
+        if (this.properties.MatchEntry !== 0) {
+          this.textareaRef.focus()
         }
-        this.textareaRef.setSelectionRange(
-          0,
-          this.textareaRef.value.length,
-          'forward'
-        )
+        if (this.properties.MatchEntry === 0) {
+          for (let i = 0; i < this.tempArray.length; i++) {
+            if (this.tempArray[i][0][0] === this.textareaRef.value[0]) {
+              this.textareaRef.value = this.tempArray[i][0]
+              this.updateDataModel({
+                propertyName: 'Text',
+                value: this.tempArray[i][0]
+              })
+              break
+            }
+          }
+          this.textareaRef.setSelectionRange(
+            0,
+            this.textareaRef.value.length,
+            'forward'
+          )
+        }
+      } else {
+        this.tempArray = []
       }
     } else {
       throw new Error('target is not instance of div element')
-    }
-  }
-
-  makeTextAreaFocus () {
-    if (!this.getDisableValue) {
-      if (this.properties.ShowDropButtonWhen !== 0) {
-        this.open = true
-      }
     }
   }
 
@@ -371,10 +394,12 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     textareaRef: HTMLTextAreaElement,
     hideSelectionDiv: HTMLDivElement
   ) {
+    this.inBlur = false
     if (this.isScrolling) {
       this.open = true
       this.textareaRef.focus()
-    } else {
+    } else if (this.open) {
+      this.inBlur = true
       this.open = false
     }
     this.isScrolling = false
@@ -534,19 +559,29 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     }
   }
 
-  protected get listStyleObj (): Partial<CSSStyleDeclaration> {
+  protected get listStyleObj () {
     const controlProp = this.properties
-    return {
-      height: !controlProp.ColumnHeads
-        ? controlProp.ListRows! > 0 &&
+    if (this.properties.RowSource !== '') {
+      return {
+        height: !controlProp.ColumnHeads
+          ? controlProp.ListRows! > 0 &&
           controlProp.ListRows! < this.extraDatas.RowSourceData!.length
-          ? controlProp.ListRows! * (controlProp.Font!.FontSize! + 3) + 'px'
-          : ''
-        : controlProp.ListRows! > 0 &&
+            ? controlProp.ListRows! * (controlProp.Font!.FontSize! + 9) + 'px'
+            : ''
+          : controlProp.ListRows! > 0 &&
           controlProp.ListRows! < this.extraDatas.RowSourceData!.length
-          ? (controlProp.ListRows! + 1) * (controlProp.Font!.FontSize! + 3) + 'px'
-          : '',
-      backgroundColor: controlProp.BackColor
+            ? (controlProp.ListRows! + 1) * (controlProp.Font!.FontSize! + 9) + 'px'
+            : '',
+        backgroundColor: controlProp.BackColor
+      }
+    } else {
+      return {
+        backgroundColor: controlProp.BackColor,
+        border: '1px solid black',
+        width: 'calc(100% - 2px)',
+        height: 'calc(100% - 2px)',
+        minWidth: '100px'
+      }
     }
   }
 
@@ -589,8 +624,8 @@ export default class FDComboBox extends Mixins(FdControlVue) {
       fontStretch: font.FontStyle !== '' ? this.tempStretch : '',
       width:
         controlProp.ColumnWidths === ''
-          ? `${controlProp.Width}px`
-          : `${controlProp.Width}px` +
+          ? 'calc(100% - 2px)'
+          : 'calc(100% - 2px)' +
             parseInt(controlProp.ColumnWidths!) +
             'px',
       outline: 'none'
@@ -682,8 +717,8 @@ export default class FDComboBox extends Mixins(FdControlVue) {
       display = 'inline-block'
     }
     return {
-      display: display,
-      overflow: 'hidden'
+      display: display
+      // overflow: 'hidden'
     }
   }
   protected get tdStyleObj (): Partial<CSSStyleDeclaration> {
@@ -705,22 +740,28 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   }
   @Watch('properties.Value', { deep: true })
   textAndValueUpdateProp (newVal: string, oldVal: string) {
-    if (
+    if (this.properties.RowSource !== '') {
+      if (
       this.properties.BoundColumn! > 0 &&
       this.properties.BoundColumn! < this.extraDatas.RowSourceData!.length
-    ) {
-      let tempData = [...this.extraDatas.RowSourceData!]
-      if (tempData![0][this.properties.BoundColumn! - 1] === newVal) {
-        this.updateDataModel({ propertyName: 'Value', value: newVal })
-      } else {
-        if (newVal !== '' && this.properties.Value) {
-          this.updateDataModel({ propertyName: 'Text', value: newVal })
+      ) {
+        let tempData = [...this.extraDatas.RowSourceData!]
+        if (tempData![0][this.properties.BoundColumn! - 1] === newVal) {
+          this.updateDataModel({ propertyName: 'Value', value: newVal })
+        } else {
+          if (newVal !== '' && this.properties.Value) {
+            this.updateDataModel({ propertyName: 'Text', value: newVal })
+          }
         }
       }
-    }
-    if (newVal !== '' && this.properties.Value) {
-      this.selectionData[0] = newVal
-      this.updateDataModel({ propertyName: 'Text', value: newVal })
+      if (newVal !== '' && this.properties.Value) {
+        this.selectionData[0] = newVal
+        this.updateDataModel({ propertyName: 'Text', value: newVal })
+      }
+    } else {
+      if (newVal !== '') {
+        this.updateDataModel({ propertyName: 'Text', value: newVal })
+      }
     }
   }
 
@@ -735,15 +776,17 @@ export default class FDComboBox extends Mixins(FdControlVue) {
 
   mounted () {
     this.$el.focus()
-    const initialRowSourceData = this.extraDatas.RowSourceData!
-    if (initialRowSourceData) {
-      this.tempArray = initialRowSourceData
-    }
-    this.updateDataModel({ propertyName: 'ControlSource', value: '' })
-    if (initialRowSourceData && initialRowSourceData.length === 0) {
-      this.updateDataModel({ propertyName: 'TopIndex', value: -1 })
-    } else {
-      this.updateDataModel({ propertyName: 'TopIndex', value: 0 })
+    if (this.properties.RowSource !== '') {
+      const initialRowSourceData = this.extraDatas.RowSourceData!
+      if (initialRowSourceData) {
+        this.tempArray = initialRowSourceData
+      }
+      this.updateDataModel({ propertyName: 'ControlSource', value: '' })
+      if (initialRowSourceData && initialRowSourceData.length === 0) {
+        this.updateDataModel({ propertyName: 'TopIndex', value: -1 })
+      } else {
+        this.updateDataModel({ propertyName: 'TopIndex', value: 0 })
+      }
     }
   }
 
@@ -831,7 +874,8 @@ export default class FDComboBox extends Mixins(FdControlVue) {
       width:
         parseInt(controlProp.ListWidth!) > 0
           ? parseInt(controlProp.ListWidth!) + 'px'
-          : this.setdropDownWidth
+          : this.setdropDownWidth,
+      height: controlProp.RowSource !== '' ? '' : controlProp.ColumnHeads ? '40px' : '20px'
     }
   }
 
@@ -868,14 +912,17 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     }
   }
   enabledCheck (e: MouseEvent) {
-    if (this.isRunMode || this.isEditMode) {
+    if (this.isRunMode || this.isActivated || this.isEditMode) {
       if (this.open) {
         this.textareaRef.focus()
         this.open = false
+      } else if (this.inBlur) {
+        this.open = false
       } else {
         this.open = true
+        this.textareaRef.focus()
       }
-    }
+    } this.inBlur = false
   }
 
   eventStoppers () {
@@ -1041,7 +1088,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   background: lightblue;
 }
 .table-style {
-  width: 100%;
+  width: calc(100% - 2px);
 }
 .thClass {
   position: sticky;
