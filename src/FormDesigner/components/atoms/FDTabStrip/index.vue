@@ -100,7 +100,7 @@ export default class FDTabStrip extends FdControlVue {
   @Ref('controlTabsRef') controlTabsRef: HTMLDivElement[];
   $el: HTMLDivElement
 
-  isScroll = true;
+  // isScroll = true;
   viewMenu: boolean = false;
   top: string = '0px';
   left: string = '0px';
@@ -272,7 +272,7 @@ export default class FDTabStrip extends FdControlVue {
         controlProp.TabOrientation === 2
           ? 'rotate(90deg)'
           : this.transformScrollButtonStyle,
-      display: this.scrollButtonVerify(),
+      display: !this.properties.MultiRow ? (this.isScrollVisible ? 'block' : 'none') : 'none',
       right: controlProp.TabOrientation === 3 ? '0px' : controlProp.TabOrientation === 2 ? `${controlProp.Width! - 40}px` : '0px',
       top: '0px'
     }
@@ -289,46 +289,54 @@ export default class FDTabStrip extends FdControlVue {
   }
 
   scrollButtonVerify () {
-    const tabsLength = this.properties.TabFixedWidth! > 0 ? this.extraDatas.Tabs!.length * this.properties.TabFixedWidth! + (10 * this.extraDatas.Tabs!.length) : this.properties.Font!.FontSize! < 36 ? this.properties.Font!.FontSize! * 3.5 * this.extraDatas.Tabs!.length : this.properties.Font!.FontSize! * 2.3 * this.extraDatas.Tabs!.length
-    const tabsHeight = this.properties.TabFixedHeight! > 0 ? this.extraDatas.Tabs!.length * this.properties.TabFixedHeight! + (10 * this.extraDatas.Tabs!.length) : this.properties.Font!.FontSize! * 2.3 * this.extraDatas.Tabs!.length
-    if (this.properties.Style === 2) {
-      this.isScrollVisible = false
-      return 'none'
-    } if (!this.properties.MultiRow) {
-      if (this.properties.TabOrientation === 0 || this.properties.TabOrientation === 1) {
-        if (this.properties.Width! > 44) {
-          if (tabsLength > this.properties.Width!) {
-            this.isScrollVisible = true
-            return 'block'
-          } else {
-            this.isScrollVisible = false
-            return 'none'
-          }
+    this.isScrollVisible = false
+    let sum = 0
+    if (this.properties.TabOrientation === 0 || this.properties.TabOrientation === 1) {
+      if (this.scrolling && !this.properties.MultiRow) {
+        for (let i = 0; i < this.scrolling.children.length; i++) {
+          const a = this.scrolling.children[i] as HTMLDivElement
+          sum += a.offsetWidth
+        }
+        const tabsLength = sum
+        if (
+          tabsLength > this.properties.Width!
+        ) {
+          this.isScrollVisible = true
         } else {
           this.isScrollVisible = false
-          return 'none'
         }
-      } else if (this.properties.TabOrientation === 2 || this.properties.TabOrientation === 3) {
-        if (this.properties.Height! > 44) {
-          if (tabsHeight > this.properties.Height!) {
-            this.isScrollVisible = true
-            return 'block'
-          } else {
-            this.isScrollVisible = false
-            return 'none'
-          }
-        } else {
-          this.isScrollVisible = false
-          return 'none'
-        }
-      } else {
-        this.isScrollVisible = false
-        return 'none'
       }
     } else {
-      this.isScrollVisible = false
-      return 'none'
+      if (this.scrolling && !this.properties.MultiRow) {
+        for (let i = 0; i < this.scrolling.children.length; i++) {
+          const a = this.scrolling.children[i] as HTMLDivElement
+          sum += a.offsetHeight
+        }
+        const tabsHeight = sum
+        if (
+          tabsHeight > this.properties.Height!
+        ) {
+          this.isScrollVisible = true
+        } else {
+          this.isScrollVisible = false
+        }
+      }
     }
+  }
+
+  @Watch('properties.Height')
+  heightValidate () {
+    this.scrollButtonVerify()
+  }
+
+  @Watch('properties.TabFixedWidth')
+  tabFixedWidthValidate () {
+    this.scrollButtonVerify()
+  }
+
+  @Watch('properties.TabFixedWidth')
+  tabFixedHeightValidate () {
+    this.scrollButtonVerify()
   }
 
   /**
@@ -411,17 +419,6 @@ export default class FDTabStrip extends FdControlVue {
     }
   }
 
-  scrollCheck () {
-    const tabsLength = this.extraDatas.Tabs!.length * this.properties.TabFixedWidth! + (10 * this.extraDatas.Tabs!.length)
-    if (
-      tabsLength > this.properties.Width!
-    ) {
-      this.isScroll = true
-    } else {
-      this.isScroll = false
-    }
-  }
-
   /**
    * @description watches changes in propControlData to set autoset when true
    * @function isScrollUsed
@@ -448,13 +445,18 @@ export default class FDTabStrip extends FdControlVue {
         this.multiRowCount = 1
       }
     } else {
-      this.scrollCheck()
+      this.scrollButtonVerify()
     }
+  }
+
+  @Watch('properties.TabOrientation')
+  orientValidate () {
+    this.scrollButtonVerify()
   }
   mounted () {
     this.$el.focus()
+    this.scrollButtonVerify()
     this.tempScrollWidth = this.scrolling.offsetWidth!
-    this.scrollCheck()
     this.calculateWidthHeight()
   }
   /**
@@ -466,6 +468,7 @@ export default class FDTabStrip extends FdControlVue {
   @Watch('properties.Font.FontSize', { deep: true })
   checkFontValue (newVal: number, oldVal: number) {
     this.calculateWidthHeight()
+    this.scrollButtonVerify()
   }
 
   /**
@@ -477,6 +480,7 @@ export default class FDTabStrip extends FdControlVue {
   @Watch('selectedPageData.properties.Caption')
   captionValue (newVal: string, oldVal: string) {
     this.calculateWidthHeight()
+    this.scrollButtonVerify()
   }
 
   calculateWidthHeight () {

@@ -350,7 +350,7 @@ export default class FDMultiPage extends FdContainerVue {
         controlProp.TabOrientation === 2
           ? 'rotate(90deg)'
           : this.transformScrollButtonStyle,
-      display: this.scrollButtonVerify(),
+      display: !this.properties.MultiRow ? (this.isScrollVisible ? 'block' : 'none') : 'none',
       right:
         controlProp.TabOrientation === 3
           ? '-14px'
@@ -361,55 +361,91 @@ export default class FDMultiPage extends FdContainerVue {
     }
   }
 
+  // scrollButtonVerify () {
+  //   // const tabsLength =
+  //   //   this.properties.TabFixedWidth! > 0
+  //   //     ? this.controls.length * this.properties.TabFixedWidth! +
+  //   //       10 * this.controls!.length
+  //   //     : this.properties.Font!.FontSize! < 36 ? this.properties.Font!.FontSize! * 3.5 * this.controls!.length : this.properties.Font!.FontSize! * 2.3 * this.controls!.length
+  //   // const tabsHeight =
+  //   //   this.properties.TabFixedHeight! > 0
+  //   //     ? this.controls.length * this.properties.TabFixedHeight! +
+  //   //       this.properties.Font!.FontSize! * this.controls!.length
+  //   //     : this.properties.Font!.FontSize! * 2.3 * this.controls!.length
+  //   // if (this.properties.Style === 2) {
+  //   //   this.isScrollVisible = false
+  //   //   return 'none'
+  //   // }
+  //   // if (!this.properties.MultiRow) {
+  //   //   if (this.properties.TabOrientation === 0 || this.properties.TabOrientation === 1) {
+  //   //     if (this.properties.Width! > 44) {
+  //   //       if (tabsLength > this.properties.Width!) {
+  //   //         this.isScrollVisible = true
+  //   //         return 'block'
+  //   //       } else {
+  //   //         this.isScrollVisible = false
+  //   //         return 'none'
+  //   //       }
+  //   //     } else {
+  //   //       this.isScrollVisible = false
+  //   //       return 'none'
+  //   //     }
+  //   //   } else if (this.properties.TabOrientation === 2 || this.properties.TabOrientation === 3) {
+  //   //     if (this.properties.Height! > 44) {
+  //   //       if (tabsHeight > this.properties.Height!) {
+  //   //         this.isScrollVisible = true
+  //   //         return 'block'
+  //   //       } else {
+  //   //         this.isScrollVisible = false
+  //   //         return 'none'
+  //   //       }
+  //   //     } else {
+  //   //       this.isScrollVisible = false
+  //   //       return 'none'
+  //   //     }
+  //   //   } else {
+  //   //     this.isScrollVisible = false
+  //   //     return 'none'
+  //   //   }
+  //   // } else {
+  //   //   this.isScrollVisible = false
+  //   //   return 'none'
+  //   // }
+  // }
+
   scrollButtonVerify () {
-    const tabsLength =
-      this.properties.TabFixedWidth! > 0
-        ? this.controls.length * this.properties.TabFixedWidth! +
-          10 * this.controls!.length
-        : this.properties.Font!.FontSize! < 36 ? this.properties.Font!.FontSize! * 3.5 * this.controls!.length : this.properties.Font!.FontSize! * 2.3 * this.controls!.length
-    const tabsHeight =
-      this.properties.TabFixedHeight! > 0
-        ? this.controls.length * this.properties.TabFixedHeight! +
-          this.properties.Font!.FontSize! * this.controls!.length
-        : this.properties.Font!.FontSize! * 2.3 * this.controls!.length
-    if (this.properties.Style === 2) {
-      this.isScrollVisible = false
-      return 'none'
-    }
-    if (!this.properties.MultiRow) {
-      if (this.properties.TabOrientation === 0 || this.properties.TabOrientation === 1) {
-        if (this.properties.Width! > 44) {
-          if (tabsLength > this.properties.Width!) {
-            this.isScrollVisible = true
-            return 'block'
-          } else {
-            this.isScrollVisible = false
-            return 'none'
-          }
+    this.isScrollVisible = false
+    let sum = 0
+    if (this.properties.TabOrientation === 0 || this.properties.TabOrientation === 1) {
+      if (this.scrolling && !this.properties.MultiRow) {
+        for (let i = 0; i < this.scrolling.children.length; i++) {
+          const a = this.scrolling.children[i] as HTMLDivElement
+          sum += a.offsetWidth
+        }
+        const tabsLength = sum
+        if (
+          tabsLength > this.properties.Width!
+        ) {
+          this.isScrollVisible = true
         } else {
           this.isScrollVisible = false
-          return 'none'
         }
-      } else if (this.properties.TabOrientation === 2 || this.properties.TabOrientation === 3) {
-        if (this.properties.Height! > 44) {
-          if (tabsHeight > this.properties.Height!) {
-            this.isScrollVisible = true
-            return 'block'
-          } else {
-            this.isScrollVisible = false
-            return 'none'
-          }
-        } else {
-          this.isScrollVisible = false
-          return 'none'
-        }
-      } else {
-        this.isScrollVisible = false
-        return 'none'
       }
     } else {
-      this.isScrollVisible = false
-      return 'none'
+      if (this.scrolling && !this.properties.MultiRow) {
+        for (let i = 0; i < this.scrolling.children.length; i++) {
+          const a = this.scrolling.children[i] as HTMLDivElement
+          sum += a.offsetHeight
+        }
+        const tabsHeight = sum
+        if (
+          tabsHeight > this.properties.Height!
+        ) {
+          this.isScrollVisible = true
+        } else {
+          this.isScrollVisible = false
+        }
+      }
     }
   }
 
@@ -667,8 +703,31 @@ export default class FDMultiPage extends FdContainerVue {
       } else {
         this.multiRowCount = 1
       }
+    } else {
+      this.scrollButtonVerify()
     }
   }
+
+  @Watch('properties.TabOrientation')
+  orientValidate () {
+    this.scrollButtonVerify()
+  }
+
+  @Watch('properties.Height')
+  heightValidate () {
+    this.scrollButtonVerify()
+  }
+
+  @Watch('properties.TabFixedWidth')
+  tabFixedWidthValidate () {
+    this.scrollButtonVerify()
+  }
+
+  @Watch('properties.TabFixedWidth')
+  tabFixedHeightValidate () {
+    this.scrollButtonVerify()
+  }
+
   /**
    * @description watches changes in FontSize of Font
    * @function checkFontValue
@@ -678,6 +737,7 @@ export default class FDMultiPage extends FdContainerVue {
   @Watch('properties.Font.FontSize')
   checkFontValue (newVal: number, oldVal: number) {
     this.calculateWidthHeight()
+    this.scrollButtonVerify()
   }
 
   /**
@@ -689,6 +749,7 @@ export default class FDMultiPage extends FdContainerVue {
   @Watch('selectedPageData.properties.Caption')
   captionValue (newVal: string, oldVal: string) {
     this.calculateWidthHeight()
+    this.scrollButtonVerify()
   }
 
   calculateWidthHeight () {
@@ -713,6 +774,7 @@ export default class FDMultiPage extends FdContainerVue {
     }
   }
   mounted () {
+    this.scrollButtonVerify()
     this.scrollLeftTop(this.data)
     this.selectedPageID = this.controls[0]
     this.calculateWidthHeight()
