@@ -16,7 +16,7 @@
       tabindex="1"
       @click="toFocus"
     >
-      <div :class="properties.SelectionMargin ? 'selectionDiv' : ''">
+      <div :class="properties.SelectionMargin ? 'selectionDiv' : ''" :style="selectionStyle">
         <span
           v-if="properties.SelectionMargin"
           class="selectionSpan"
@@ -170,7 +170,8 @@
                     {{ a }}
                   </div>
                 </template>
-                <hr class="hrStyle" />
+                <div v-if="properties.RowSource===''" :style="emptyColHeads"></div>
+                <hr v-if="properties.ColumnHeads" class="hrStyle" />
               </div>
             </div>
             <div v-else></div>
@@ -269,13 +270,25 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     }
   }
 
+  get emptyColHeads () {
+    return {
+      height: '15px'
+    }
+  }
   updateColumnValue (index: number) {
     return this.updateColumnWidths(index, this.tempHeight)
   }
 
+  get selectionStyle () {
+    const controlProp = this.properties
+    return {
+      borderLeft: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 2 ? '2px solid gray' : controlProp.SpecialEffect === 3 ? '1.5px solid gray' : controlProp.SpecialEffect === 4 ? '0.5px solid gray' : '',
+      borderTop: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 2 ? '2px solid gray' : controlProp.SpecialEffect === 3 ? '1.5px solid gray' : controlProp.SpecialEffect === 4 ? '0.5px solid gray' : ''
+    }
+  }
   @Watch('open')
   updateTd () {
-    if (!this.open) {
+    if (!this.open && this.comboRef) {
       this.tempHeight = this.comboRef.children[1].children[0].clientHeight
     }
   }
@@ -857,9 +870,9 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     const controlProp = this.properties
     return {
       borderColor: controlProp.BorderStyle === 1 ? controlProp.BorderColor : '',
-      borderLeft: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 2 ? '2px solid gray' : controlProp.SpecialEffect === 3 ? '1.5px solid gray' : controlProp.SpecialEffect === 4 ? '0.5px solid gray' : '',
+      // borderLeft: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 2 ? '2px solid gray' : controlProp.SpecialEffect === 3 ? '1.5px solid gray' : controlProp.SpecialEffect === 4 ? '0.5px solid gray' : '',
       borderRight: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 1 ? '2px solid gray' : controlProp.SpecialEffect === 4 ? '1.5px solid gray' : controlProp.SpecialEffect === 3 ? '0.5px solid gray' : '',
-      borderTop: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 2 ? '2px solid gray' : controlProp.SpecialEffect === 3 ? '1.5px solid gray' : controlProp.SpecialEffect === 4 ? '0.5px solid gray' : '',
+      // borderTop: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 2 ? '2px solid gray' : controlProp.SpecialEffect === 3 ? '1.5px solid gray' : controlProp.SpecialEffect === 4 ? '0.5px solid gray' : '',
       borderBottom: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 1 ? '2px solid gray' : controlProp.SpecialEffect === 4 ? '1.5px solid gray' : controlProp.SpecialEffect === 3 ? '0.5px solid gray' : '',
       display: 'grid',
       gridTemplateColumns: `${controlProp.Width! - 20}px` + ' 21px',
@@ -875,7 +888,8 @@ export default class FDComboBox extends Mixins(FdControlVue) {
         parseInt(controlProp.ListWidth!) > 0
           ? parseInt(controlProp.ListWidth!) + 'px'
           : this.setdropDownWidth,
-      height: controlProp.RowSource !== '' ? '' : controlProp.ColumnHeads ? '40px' : '20px'
+      height: controlProp.RowSource !== '' ? '' : controlProp.ColumnHeads ? '30px' : '15px',
+      border: controlProp.RowSource !== '' ? '1px solid black' : 'none'
     }
   }
 
@@ -970,6 +984,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   left: 0;
   right: 0;
   width: calc(100% + 20px);
+  cursor: context-menu;
 }
 .item {
   color: black;
