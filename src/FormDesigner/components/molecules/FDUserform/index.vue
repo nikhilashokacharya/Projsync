@@ -33,7 +33,7 @@
         ref="containerRef"
         @closeMenu="closeMenu"
         :mouseCursorData="getMouseCursorData"
-        @openMenu="(e, parentID, controlID, type) => showContextMenu(e, parentID, controlID, type)"
+        @openMenu="(e, parentID, controlID, type, mode) => showContextMenu(e, parentID, controlID, type, mode)"
       >
       </Container>
     </div>
@@ -207,8 +207,8 @@ export default class UserForm extends FdContainerVue {
     this.calSelectedAreaStyle(event, this.data)
   }
 
-  showContextMenu (e: MouseEvent, parentID: string, controlID: string, type: string) {
-    this.openMenu(e, parentID, controlID, type)
+  showContextMenu (e: MouseEvent, parentID: string, controlID: string, type: string, mode: boolean) {
+    this.openMenu(e, parentID, controlID, type, mode)
     Vue.nextTick(() => this.containerRef.contextmenu.focus())
   }
   created () {

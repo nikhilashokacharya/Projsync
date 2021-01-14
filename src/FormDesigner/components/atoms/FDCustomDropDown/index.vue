@@ -7,7 +7,7 @@
         :name="propertyName"
         @change="updateAppearance"
         v-if="propertyType==='Boolean'"
-        v-model="propertyValue"
+        :value="propertyValue"
         >
           <option value='true'>True</option>
            <option value='false'>False</option>

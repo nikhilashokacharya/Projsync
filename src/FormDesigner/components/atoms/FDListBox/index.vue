@@ -71,7 +71,7 @@
             class="column-item"
             v-for="(i, index) in item"
             :key="index"
-            :style="updateColumnWidths(index)"
+            :style="[updateColumnWidths(index),styleColumnObj]"
           >
             <template
               v-if="
@@ -214,7 +214,6 @@ export default class FDListBox extends Mixins(FdControlVue) {
   }
 
   getSelectedStyle () {
-    debugger
     if (this.listStyleRef) {
       for (let i = 0; i < this.listStyleRef.length; i++) {
         if (this.listStyleRef[i].style.backgroundColor === 'rgb(59, 122, 231)') {
@@ -299,6 +298,40 @@ export default class FDListBox extends Mixins(FdControlVue) {
     }
   }
 
+  get styleColumnObj () {
+    const controlProp = this.properties
+    const font: font = controlProp.Font
+      ? controlProp.Font
+      : {
+        FontName: 'Arial',
+        FontSize: 10,
+        FontItalic: true,
+        FontBold: true,
+        FontUnderline: true,
+        FontStrikethrough: true
+      }
+    return {
+      fontFamily: font.FontStyle! !== '' ? this.setFontStyle : font.FontName!,
+      fontSize: `${font.FontSize}px`,
+      fontStyle: font.FontItalic || this.isItalic ? 'italic' : '',
+      textDecoration:
+        font.FontStrikethrough === true && font.FontUnderline === true
+          ? 'underline line-through'
+          : font.FontUnderline
+            ? 'underline'
+            : font.FontStrikethrough
+              ? 'line-through'
+              : '',
+      textUnderlinePosition: 'under',
+      fontWeight: font.FontBold
+        ? 'bold'
+        : font.FontStyle !== ''
+          ? this.tempWeight
+          : '',
+      fontStretch: font.FontStyle !== '' ? this.tempStretch : ''
+
+    }
+  }
   /**
    * @description style object is passed to :style attribute in table tag
    * dynamically changing the styles of the component based on properties
@@ -536,7 +569,7 @@ export default class FDListBox extends Mixins(FdControlVue) {
 }
 .tr {
   outline: none;
-  display: -webkit-box;
+  display: flex;
 }
 .ul {
   display: grid;
@@ -613,6 +646,6 @@ export default class FDListBox extends Mixins(FdControlVue) {
   margin: 0;
 }
 .thead {
-  display: -webkit-box;
+  display: flex;
 }
 </style>

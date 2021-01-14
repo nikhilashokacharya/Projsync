@@ -341,6 +341,9 @@ export default class FDTextBox extends Mixins(FdControlVue) {
    */
   textAndValueUpdate (event: InputEvent) {
     const propData = this.properties
+    if (this.properties.AutoSize) {
+      this.updateAutoSize()
+    }
     if (event.target instanceof HTMLTextAreaElement) {
       this.updateDataModel({
         propertyName: 'Value',
@@ -360,9 +363,6 @@ export default class FDTextBox extends Mixins(FdControlVue) {
       }
     } else {
       throw new Error('Expected HTMLTextAreaElement but found different element')
-    }
-    if (this.properties.AutoSize) {
-      this.updateAutoSize()
     }
   }
 

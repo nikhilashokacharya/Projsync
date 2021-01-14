@@ -728,6 +728,8 @@ export default class FdControlVue extends Vue {
    const updateColWidth = controlProp.ColumnWidths!.split(';')
    const colChangeCheck: boolean = controlProp.ColumnCount! - 1 < index
    return {
+     position: 'relative',
+     display: 'inline-block',
      textAlign: controlProp.TextAlign === 0 ? 'left' : controlProp.TextAlign === 2 ? 'right' : 'center',
      width: controlProp.ColumnCount! === -1 ? (updateColWidth[index] ? parseInt(updateColWidth[index]) + 'px' : '100px') : colChangeCheck ? '0px' : ((updateColWidth[index]) ? parseInt(updateColWidth[index]) + 'px' : controlProp.ColumnCount! > index ? '100px' : '0px'),
      overflow: 'hidden',

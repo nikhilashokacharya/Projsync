@@ -40,10 +40,10 @@
           </div>
           <div class="wrapper2Div2"></div>
           <div class="wrapper21">
-            <button class="taborder-buttons" @click="moveControlUp()">
+            <button :disabled="buttonDisabled" class="taborder-buttons" @click="moveControlUp()">
               Move Up
             </button>
-            <button class="taborder-buttons" @click="moveControlDown()">
+            <button :disabled="buttonDisabled" class="taborder-buttons" @click="moveControlDown()">
               Move Down
             </button>
           </div>
@@ -77,6 +77,9 @@ export default class FDUserformTabOrder extends FdDialogDragVue {
   tabOrderList: localTabOrderItem[] = [];
   controlType: string = ''
   containerId: string = ''
+  get buttonDisabled () {
+    return !(this.tabOrderList.length > 1)
+  }
   updateControlData () {
     const controlNum = this.tabOrderList.length
     let propertyName: keyof controlProperties = this.controlType === 'MultiPage' ? 'Index' : 'TabIndex'

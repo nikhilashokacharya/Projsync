@@ -11,7 +11,7 @@
     @keydown.delete.stop.exact="deleteFrame"
     @keydown.enter.exact="setContentEditable($event, true)"
     @click.stop="!isEditMode ? selectedItem : addControlObj($event)"
-    @contextmenu.stop="showContextMenu($event, userFormId, controlId, 'container')"
+    @contextmenu.stop="showContextMenu($event, userFormId, controlId, 'container', isEditMode)"
     @mousedown="frameMouseDown"
     @mouseup="dragSelectorControl($event)"
     @keyup.stop="selectMultipleCtrl($event, false)"
@@ -29,7 +29,7 @@
       :top="top"
       ref="containerRef"
       @closeMenu="closeMenu"
-      @openMenu="(e, parentID, controlID, type) => showContextMenu(e, parentID, controlID, type)"
+      @openMenu="(e, parentID, controlID, type, mode) => showContextMenu(e, parentID, controlID, type, mode)"
     />
   </div>
   </fieldset>
@@ -249,8 +249,8 @@ export default class FDFrame extends FdContainerVue {
     }
   }
 
-  showContextMenu (e: MouseEvent, parentID: string, controlID: string, type: string) {
-    this.openMenu(e, parentID, controlID, type)
+  showContextMenu (e: MouseEvent, parentID: string, controlID: string, type: string, mode: boolean) {
+    this.openMenu(e, parentID, controlID, type, mode)
     Vue.nextTick(() => this.containerRef.contextmenu.focus())
   }
   closeMenu () {

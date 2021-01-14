@@ -1,6 +1,7 @@
 <template>
   <label
     class="label"
+    ref="labelRef"
     :style="cssStyleProperty"
     :name="properties.Name"
     :tabindex="properties.TabIndex"
@@ -27,7 +28,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Watch, Mixins, Emit } from 'vue-property-decorator'
+import { Component, Watch, Mixins, Emit, Ref } from 'vue-property-decorator'
 import FDEditableText from '@/FormDesigner/components/atoms/FDEditableText/index.vue'
 import FdControlVue from '@/api/abstract/FormDesigner/FdControlVue'
 
@@ -39,6 +40,7 @@ import FdControlVue from '@/api/abstract/FormDesigner/FdControlVue'
 })
 export default class FDLabel extends Mixins(FdControlVue) {
   $el!: HTMLLabelElement;
+  @Ref('labelRef') labelRef: HTMLLabelElement
   /**
    * @description style object is passed to :style attribute in label tag
    * dynamically changing the styles of the component based on propControlData
@@ -166,16 +168,19 @@ export default class FDLabel extends Mixins(FdControlVue) {
    */
   updateAutoSize () {
     if (this.properties.AutoSize === true) {
-      this.$nextTick(() => {
-        this.updateDataModel({
-          propertyName: 'Height',
-          value: (this.$el.childNodes[0] as HTMLSpanElement).offsetHeight
+      if (this.labelRef) {
+        this.$nextTick(() => {
+          const a = this.labelRef.children[0] as HTMLSpanElement
+          this.updateDataModel({
+            propertyName: 'Height',
+            value: a.offsetHeight + 10
+          })
+          this.updateDataModel({
+            propertyName: 'Width',
+            value: a.offsetWidth + 5
+          })
         })
-        this.updateDataModel({
-          propertyName: 'Width',
-          value: (this.$el.childNodes[0] as HTMLSpanElement).offsetWidth + 5
-        })
-      })
+      }
     } else {
       return undefined
     }

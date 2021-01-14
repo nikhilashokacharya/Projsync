@@ -30,9 +30,7 @@
         class="group"
         :controlRef="$refs"
         :currentSelectedGroup="filterSelected"
-        @openMenu="
-            (e, parentID, controlID, type) => openContextMenu(e, parentID, controlID, type)
-          "
+        @openMenu="(e, parentID, controlID, type) => openContextMenu(e, parentID, controlID, type)"
       />
       <div
         v-for="control in propControlData.controls"
@@ -43,7 +41,7 @@
           ref="resizeControl"
           :name="control"
           @openMenu="
-            (e, parentID, controlID, type) => openContextMenu(e, parentID, controlID, type)
+            (e, parentID, controlID, type, mode) => openContextMenu(e, parentID, controlID, type, mode)
           "
           :controlId="control"
           :containerId="controlId"
@@ -495,8 +493,8 @@ export default class Container extends FDCommonMethod {
    * @param parentID is the UserFormId in which the control resides
    * @param controlId is the selected control of which context has to be displayed
    */
-  openContextMenu (e: MouseEvent, parentID: string, controlID: string, type: string) {
-    this.$emit('openMenu', e, parentID, controlID, type)
+  openContextMenu (e: MouseEvent, parentID: string, controlID: string, type: string, mode: boolean) {
+    this.$emit('openMenu', e, parentID, controlID, type, mode)
   }
   created () {
     EventBus.$on('handleName', (handler: string) => {

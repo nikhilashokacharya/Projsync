@@ -316,7 +316,11 @@ export default class ContextMenu extends FDCommonMethod {
     }
     let nextSelctedSeries: string[] = []
     let nextHighControlSeries: string[] = []
-    for (const selControl of this.getSelectedControlsDatas!) {
+    const getSelControl = [...this.getSelectedControlsDatas!]
+    getSelControl.sort((a, b) => {
+      return userData[a].extraDatas!.zIndex! - userData[b].extraDatas!.zIndex!
+    })
+    for (const selControl of getSelControl!) {
       const type = userData[selControl].type
       const tempZIndex = userData[selControl].extraDatas!.zIndex!
       const controlIndex = Object.keys(userData).findIndex((val: string, index: number) => {
@@ -325,7 +329,7 @@ export default class ContextMenu extends FDCommonMethod {
       const nextSelectedControl = controlIndex !== -1 ? Object.keys(userData)[controlIndex] : ''
       const nextControlType = userData[nextSelectedControl].type
       if (nextSelectedControl !== '' && !highProrControl.includes(nextSelectedControl)) {
-        if (this.getSelectedControlsDatas!.includes(nextSelectedControl)) {
+        if (getSelControl!.includes(nextSelectedControl)) {
           if (!nextSelctedSeries.includes(selControl)) {
             nextSelctedSeries.push(selControl)
           }
@@ -360,7 +364,7 @@ export default class ContextMenu extends FDCommonMethod {
           }
         }
       } else {
-        if (this.getSelectedControlsDatas!.includes(nextSelectedControl) && (type === 'Frame' || type === 'MultiPage' || type === 'ListBox')) {
+        if (getSelControl!.includes(nextSelectedControl) && (type === 'Frame' || type === 'MultiPage' || type === 'ListBox')) {
           if (!nextHighControlSeries.includes(selControl)) {
             nextHighControlSeries.push(selControl)
           }
@@ -413,7 +417,11 @@ export default class ContextMenu extends FDCommonMethod {
     }
     let nextSelctedSeries: string[] = []
     let nextHighControlSeries: string[] = []
-    for (const selControl of this.getSelectedControlsDatas!) {
+    const getSelControl = [...this.getSelectedControlsDatas!]
+    getSelControl.sort((a, b) => {
+      return userData[a].extraDatas!.zIndex! - userData[b].extraDatas!.zIndex!
+    })
+    for (const selControl of getSelControl) {
       const type = userData[selControl].type
       const tempZIndex = userData[selControl].extraDatas!.zIndex!
       const controlIndex = Object.keys(userData).findIndex((val: string, index: number) => {
@@ -422,7 +430,7 @@ export default class ContextMenu extends FDCommonMethod {
       const nextSelectedControl = controlIndex !== -1 ? Object.keys(userData)[controlIndex] : ''
       const nextControlType = userData[nextSelectedControl].type
       if (nextSelectedControl !== '' && !highProrControl.includes(selControl)) {
-        if (this.getSelectedControlsDatas!.includes(nextSelectedControl)) {
+        if (getSelControl!.includes(nextSelectedControl)) {
           if (!nextSelctedSeries.includes(selControl)) {
             nextSelctedSeries.push(selControl)
           }
@@ -458,7 +466,7 @@ export default class ContextMenu extends FDCommonMethod {
           }
         }
       } else if (!lowProrControl.includes(nextSelectedControl) && (type === 'Frame' || type === 'MultiPage' || type === 'ListBox')) {
-        if (this.getSelectedControlsDatas!.includes(nextSelectedControl)) {
+        if (getSelControl!.includes(nextSelectedControl)) {
           if (!nextHighControlSeries.includes(selControl)) {
             nextHighControlSeries.push(selControl)
           }
@@ -858,7 +866,7 @@ export default class ContextMenu extends FDCommonMethod {
   newPasteControlId (key: string, parentId: string) {
     const userFormData = this.userformData[this.userFormId]
     let lastControlId = 0
-    const type = userFormData[key].type
+    const type = key in userFormData ? userFormData[key].type : ''
     const parentName = parentId !== '' ? parentId.split('MultiPage').pop() : -1
     const selectedControlName: string | undefined =
     type === 'Page'

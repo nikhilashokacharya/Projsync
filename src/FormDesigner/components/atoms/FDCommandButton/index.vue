@@ -96,7 +96,7 @@ export default class FDCommandButton extends Mixins(FdControlVue) {
       this.$nextTick(() => {
         this.updateDataModel({
           propertyName: 'Height',
-          value: (this.$el.childNodes[0] as HTMLSpanElement).offsetHeight + 5
+          value: (this.$el.childNodes[0] as HTMLSpanElement).offsetHeight + 20
         })
         this.updateDataModel({
           propertyName: 'Width',

@@ -160,8 +160,8 @@ export default class ResizeControl extends FdSelectVue {
   get propControlData (): controlData {
     return this.userformData[this.userFormId][this.controlId]
   }
-  openContextMenu (e: MouseEvent, parentID: string, controlID: string, type: string) {
-    this.$emit('openMenu', e, parentID, controlID, type)
+  openContextMenu (e: MouseEvent, parentID: string, controlID: string, type: string, mode: boolean) {
+    this.$emit('openMenu', e, parentID, controlID, type, mode)
   }
   get resizeControlStyle () {
     const userData = this.userformData[this.userFormId]
@@ -172,8 +172,9 @@ export default class ResizeControl extends FdSelectVue {
     const type = this.propControlData.type
     let highestZIndex = -1
     if (this.selectedControlArray.length === 1 && !this.selectedControlArray[0].startsWith('group')) {
-      if (this.selectedControlArray[0] === this.propControlData.properties.ID && (type === 'Frame' || type === 'MultiPage')) {
-        const containerControls = [...userData[this.selectedContainer[0]].controls]
+      const selected = userData[this.selectedControlArray[0]].type === 'Page' ? this.selectedContainer[0] : this.selectedControlArray[0]
+      if (selected === this.propControlData.properties.ID && (type === 'Frame' || type === 'MultiPage')) {
+        const containerControls = [...userData[this.getContainerList(selected)[0]].controls]
         containerControls.sort((a, b) => {
           return userData[b].extraDatas!.zIndex! - userData[a].extraDatas!.zIndex!
         })
@@ -442,7 +443,7 @@ export default class ResizeControl extends FdSelectVue {
     })
   }
   displayContextMenu (event: MouseEvent) {
-    this.openContextMenu(event, this.containerId, this.controlId, 'control')
+    this.openContextMenu(event, this.containerId, this.controlId, 'control', this.isEditMode)
   }
 }
 </script>

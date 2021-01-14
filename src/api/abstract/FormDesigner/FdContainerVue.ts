@@ -387,7 +387,7 @@ export default abstract class FdContainerVue extends FdControlVue {
    * @param  parentID -> controlId
    * @event contextmenu
    */
-  openMenu (e: MouseEvent, parentID: string, controlID: string, type: string) {
+  openMenu (e: MouseEvent, parentID: string, controlID: string, type: string, mode: boolean) {
     e.preventDefault()
     const id = (e.target! as HTMLDivElement).id ? (e.target! as HTMLDivElement).id : ''
     const selected = this.selectedControls[this.userFormId].selected
@@ -437,52 +437,66 @@ export default abstract class FdContainerVue extends FdControlVue {
     const contextMenuData = (type === 'container' && !groupId.startsWith('group') && selected.length <= 1)
       ? this.userformContextMenu
       : this.controlContextMenu
-    for (const val of contextMenuData) {
-      if (val.id === 'ID_SELECTALL') {
-        val.disabled = controlLength === 0
+    if ((controlType === 'SpinButton' || controlType === 'ScrollBar' || controlType === 'ListBox') && mode) {
+      for (const val of contextMenuData) {
+        if (val.id === 'ID_OBJECTPROP') {
+          val.disabled = false
+        } else if (val.id === 'ID_ALIGN' || val.id === 'ID_MAKESAMESIZE') {
+          for (let index = 0; index < val.values.length; index++) {
+            val.values[index].disabled = true
+          }
+        } else {
+          val.disabled = true
+        }
       }
-      if (val.id === 'ID_DELETE' && this.contextMenuType) {
-        val.disabled = !(selected.length === 1 && !selected[0].startsWith('group') &&
-          (userData[controlID].type === 'Frame' || userData[selected[0]].type === 'Page'))
-      }
-      if (val.id === 'ID_PASTE') {
-        val.disabled = Object.keys(this.copiedControl[this.userFormId]).length === 1
-      }
-      if (val.id === 'ID_CUT' || val.id === 'ID_COPY' || val.id === 'ID_OBJECTPROP' || val.id === 'ID_VIEWCODE') {
-        val.disabled = false
-      }
-      if (val.id === 'ID_GROUP' || val.id === 'ID_UNGROUP') {
-        const selected = this.selectedControls[this.userFormId].selected
-        let groupId: boolean = false
-        for (const key of selected) {
-          if (!key.startsWith('group') && !key.startsWith('ID_USERFORM')) {
-            groupId =
-                this.userformData[this.userFormId][key].properties.GroupID === ''
+    } else {
+      for (const val of contextMenuData) {
+        if (val.id === 'ID_SELECTALL') {
+          val.disabled = controlLength === 0
+        }
+        if (val.id === 'ID_DELETE' && this.contextMenuType) {
+          val.disabled = !(selected.length === 1 && !selected[0].startsWith('group') &&
+            (userData[controlID].type === 'Frame' || userData[selected[0]].type === 'Page'))
+        }
+        if (val.id === 'ID_PASTE') {
+          val.disabled = Object.keys(this.copiedControl[this.userFormId]).length === 1
+        }
+        if (val.id === 'ID_CUT' || val.id === 'ID_COPY' || val.id === 'ID_OBJECTPROP' || val.id === 'ID_VIEWCODE') {
+          val.disabled = false
+        }
+        if (val.id === 'ID_GROUP' || val.id === 'ID_UNGROUP') {
+          const selected = this.selectedControls[this.userFormId].selected
+          let groupId: boolean = false
+          for (const key of selected) {
+            if (!key.startsWith('group') && !key.startsWith('ID_USERFORM')) {
+              groupId =
+                  this.userformData[this.userFormId][key].properties.GroupID === ''
+            }
+          }
+          const selectedGroupArray = selected.filter(
+            (val: string) => val.startsWith('group') && val
+          )
+          if (!groupId && selectedGroupArray.length <= 1) {
+            val.text = '<u>U</u>ngroup'
+            val.id = 'ID_UNGROUP'
+          } else {
+            val.text = '<u>G</u>roup'
+            val.id = 'ID_GROUP'
+            val.disabled =
+                this.selectedControls[this.userFormId].selected.length <= 1
           }
         }
-        const selectedGroupArray = selected.filter(
-          (val: string) => val.startsWith('group') && val
-        )
-        if (!groupId && selectedGroupArray.length <= 1) {
-          val.text = '<u>U</u>ngroup'
-          val.id = 'ID_UNGROUP'
-        } else {
-          val.text = '<u>G</u>roup'
-          val.id = 'ID_GROUP'
-          val.disabled =
-              this.selectedControls[this.userFormId].selected.length <= 1
+        if (val.id === 'ID_CONTROLFORWARD' || val.id === 'ID_CONTROLBACKWARD') {
+          const selectedConatiner = this.selectedControls[this.userFormId].container[0]
+          val.disabled = userData[selectedConatiner].controls.length <= 1
         }
-      }
-      if (val.id === 'ID_CONTROLFORWARD' || val.id === 'ID_CONTROLBACKWARD') {
-        const selectedConatiner = this.selectedControls[this.userFormId].container[0]
-        val.disabled = userData[selectedConatiner].controls.length <= 1
-      }
-      if (val.id === 'ID_ALIGN' || val.id === 'ID_MAKESAMESIZE') {
-        for (let index = 0; index < val.values.length; index++) {
-          if (val.values[index].id === 'ID_GRID') {
-            val.values[index].disabled = !(this.selectedControls[this.userFormId].selected.length > 0)
-          } else {
-            val.values[index].disabled = this.selectedControls[this.userFormId].selected.length <= 1
+        if (val.id === 'ID_ALIGN' || val.id === 'ID_MAKESAMESIZE') {
+          for (let index = 0; index < val.values.length; index++) {
+            if (val.values[index].id === 'ID_GRID') {
+              val.values[index].disabled = !(this.selectedControls[this.userFormId].selected.length > 0)
+            } else {
+              val.values[index].disabled = this.selectedControls[this.userFormId].selected.length <= 1
+            }
           }
         }
       }

@@ -255,7 +255,7 @@ export default class FDToggleButton extends Mixins(FdControlVue) {
           propertyName: 'Height',
           value:
             (this.$el.childNodes[0] as HTMLSpanElement)
-              .offsetHeight + 5
+              .offsetHeight + 20
         })
         this.updateDataModel({
           propertyName: 'Width',

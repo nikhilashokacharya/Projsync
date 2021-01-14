@@ -13,7 +13,11 @@
       :tabindex="properties.TabIndex"
       :title="properties.ControlTipText"
     >
-      <div class="pages" :style="styleTabsObj" :title="properties.ControlTipText">
+      <div
+        class="pages"
+        :style="styleTabsObj"
+        :title="properties.ControlTipText"
+      >
         <div class="move" ref="scrolling" :style="styleMoveObj">
           <div
             ref="controlTabsRef"
@@ -22,25 +26,29 @@
             :key="key"
             :style="getTabStyle"
           >
-          <FDControlTabs
-          @setValue="setValue"
-          :tempWidth="tempWidth"
-          @isChecked="isChecked"
-          :getMouseCursorData="getMouseCursorData"
-          :setFontStyle="setFontStyle"
-          :data="data"
-          @tempStretch="tempStretch"
-          :pageValue="value"
-          :indexValue="key"
-          :pageData="value"
-          :isRunMode="isRunMode"
-          :isEditMode="isEditMode"
-          :isItalic="isItalic"
-          :tempStretch="tempStretch"
-          :tempWeight="tempWeight"
-          @deleteMultiPageControl="(event) => {deleteTabControl(event)}"
-          />
-          <div
+            <FDControlTabs
+              @setValue="setValue"
+              :tempWidth="tempWidth"
+              @isChecked="isChecked"
+              :getMouseCursorData="getMouseCursorData"
+              :setFontStyle="setFontStyle"
+              :data="data"
+              @tempStretch="tempStretch"
+              :pageValue="value"
+              :indexValue="key"
+              :pageData="value"
+              :isRunMode="isRunMode"
+              :isEditMode="isEditMode"
+              :isItalic="isItalic"
+              :tempStretch="tempStretch"
+              :tempWeight="tempWeight"
+              @deleteMultiPageControl="
+                (event) => {
+                  deleteTabControl(event);
+                }
+              "
+            />
+            <div
               class="content"
               :style="styleContentObj"
               :title="properties.ControlTipText"
@@ -48,11 +56,17 @@
           </div>
         </div>
         <div></div>
-        <div
-          :style="getScrollButtonStyleObj"
-        >
-          <button class="left-button" :style="scrollButtonStyle" @click="leftmove"></button>
-          <button class="right-button" :style="scrollButtonStyle" @click="rightmove"></button>
+        <div :style="getScrollButtonStyleObj">
+          <button
+            class="left-button"
+            :style="scrollButtonStyle"
+            @click="leftmove"
+          ></button>
+          <button
+            class="right-button"
+            :style="scrollButtonStyle"
+            @click="rightmove"
+          ></button>
         </div>
       </div>
     </div>
@@ -60,7 +74,7 @@
       id="right-click-menu"
       tabindex="0"
       @blur.stop="closeMenu"
-       ref="tabstripContextMenu"
+      ref="tabstripContextMenu"
       :style="{ top: top, left: left, display: viewMenu ? 'block' : 'none' }"
     >
       <ContextMenu
@@ -95,10 +109,10 @@ export default class FDTabStrip extends FdControlVue {
   @State((state) => state.fd.userformData) userformData!: userformData;
   @Prop() isEditMode: boolean;
   @Prop({ required: true, type: String }) public userFormId!: string;
-  @Ref('tabstripContextMenu') tabstripContextMenu: HTMLDivElement
-  @Ref('scrolling') scrolling:HTMLDivElement
+  @Ref('tabstripContextMenu') tabstripContextMenu: HTMLDivElement;
+  @Ref('scrolling') scrolling: HTMLDivElement;
   @Ref('controlTabsRef') controlTabsRef: HTMLDivElement[];
-  $el: HTMLDivElement
+  $el: HTMLDivElement;
 
   // isScroll = true;
   viewMenu: boolean = false;
@@ -161,10 +175,13 @@ export default class FDTabStrip extends FdControlVue {
    */
   leftmove () {
     const scrollRef = this.scrolling
-    if (this.properties.TabOrientation === 0 || this.properties.TabOrientation === 1) {
-    scrollRef.scrollLeft! -= 50
+    if (
+      this.properties.TabOrientation === 0 ||
+      this.properties.TabOrientation === 1
+    ) {
+      scrollRef.scrollLeft! -= 50
     } else {
-    scrollRef.scrollTop! -= 50
+      scrollRef.scrollTop! -= 50
     }
   }
 
@@ -176,8 +193,11 @@ export default class FDTabStrip extends FdControlVue {
   rightmove () {
     const scrollRef = this.scrolling
     let tempScrollTop = scrollRef.scrollTop!
-    if (this.properties.TabOrientation === 0 || this.properties.TabOrientation === 1) {
-    scrollRef.scrollLeft! += 50
+    if (
+      this.properties.TabOrientation === 0 ||
+      this.properties.TabOrientation === 1
+    ) {
+      scrollRef.scrollLeft! += 50
     } else {
       tempScrollTop += 50
       scrollRef.scrollTop = tempScrollTop
@@ -242,11 +262,24 @@ export default class FDTabStrip extends FdControlVue {
       ...bottomTopStyle,
       display: controlProp.Style === 2 ? 'none' : 'inline-block',
       alignSelf: controlProp.TabOrientation === 1 ? 'flex-end' : '',
-      marginTop: controlProp.TabOrientation === 1 ? `${controlProp.Height! - 35}px` : '0px',
+      marginTop:
+        controlProp.TabOrientation === 1
+          ? `${controlProp.Height! - 35}px`
+          : '0px',
       whiteSpace: controlProp.MultiRow === true ? 'break-spaces' : 'nowrap',
       zIndex: controlProp.MultiRow === true ? '100' : '1',
-      height: controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3 ? this.isScrollVisible ? `${controlProp.Height! - 48}px` : `${controlProp.Height}px` : '',
-      width: controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3 ? 'fit-content' : this.isScrollVisible ? `${controlProp.Width! - 62}px` : `${controlProp.Width!}px`,
+      height:
+        controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3
+          ? this.isScrollVisible
+            ? `${controlProp.Height! - 48}px`
+            : `${controlProp.Height}px`
+          : '',
+      width:
+        controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3
+          ? 'fit-content'
+          : this.isScrollVisible
+            ? `${controlProp.Width! - 62}px`
+            : `${controlProp.Width!}px`,
       float: controlProp.TabOrientation === 3 ? 'right' : '',
       overflow: 'hidden'
     }
@@ -260,20 +293,42 @@ export default class FDTabStrip extends FdControlVue {
    */
   protected get getScrollButtonStyleObj (): Partial<CSSStyleDeclaration> {
     const controlProp = this.properties
-    const tabsLength = this.properties.TabFixedWidth! > 0 ? this.extraDatas.Tabs!.length * this.properties.TabFixedWidth! + (10 * this.extraDatas.Tabs!.length) : this.properties.Font!.FontSize! < 36 ? this.properties.Font!.FontSize! * 3.5 * this.extraDatas.Tabs!.length : this.properties.Font!.FontSize! * 2.3 * this.extraDatas.Tabs!.length
-    const tabsHeight = this.properties.TabFixedHeight! > 0 ? this.extraDatas.Tabs!.length * this.properties.TabFixedHeight! + (10 * this.extraDatas.Tabs!.length) : this.properties.Font!.FontSize! * 2.3 * this.extraDatas.Tabs!.length
+    const tabsLength =
+      this.properties.TabFixedWidth! > 0
+        ? this.extraDatas.Tabs!.length * this.properties.TabFixedWidth! +
+          10 * this.extraDatas.Tabs!.length
+        : this.properties.Font!.FontSize! < 36
+          ? this.properties.Font!.FontSize! * 3.5 * this.extraDatas.Tabs!.length
+          : this.properties.Font!.FontSize! * 2.3 * this.extraDatas.Tabs!.length
+    const tabsHeight =
+      this.properties.TabFixedHeight! > 0
+        ? this.extraDatas.Tabs!.length * this.properties.TabFixedHeight! +
+          10 * this.extraDatas.Tabs!.length
+        : this.properties.Font!.FontSize! * 2.3 * this.extraDatas.Tabs!.length
     return {
       position: 'absolute',
       zIndex: '30001',
       marginTop:
         controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3
-          ? `${controlProp.Height! - 20}px` : controlProp.TabOrientation === 1 ? `${controlProp.Height! - 22}px` : '0px',
+          ? `${controlProp.Height! - 20}px`
+          : controlProp.TabOrientation === 1
+            ? `${controlProp.Height! - 22}px`
+            : '0px',
       transform:
         controlProp.TabOrientation === 2
           ? 'rotate(90deg)'
           : this.transformScrollButtonStyle,
-      display: !this.properties.MultiRow ? (this.isScrollVisible ? 'block' : 'none') : 'none',
-      right: controlProp.TabOrientation === 3 ? '0px' : controlProp.TabOrientation === 2 ? `${controlProp.Width! - 40}px` : '0px',
+      display: !this.properties.MultiRow
+        ? this.isScrollVisible
+          ? 'block'
+          : 'none'
+        : 'none',
+      right:
+        controlProp.TabOrientation === 3
+          ? '0px'
+          : controlProp.TabOrientation === 2
+            ? `${controlProp.Width! - 40}px`
+            : '0px',
       top: '0px'
     }
   }
@@ -291,37 +346,38 @@ export default class FDTabStrip extends FdControlVue {
   scrollButtonVerify () {
     this.isScrollVisible = false
     let sum = 0
-    if (this.properties.TabOrientation === 0 || this.properties.TabOrientation === 1) {
-      if (this.scrolling && !this.properties.MultiRow) {
-        for (let i = 0; i < this.scrolling.children.length; i++) {
-          const a = this.scrolling.children[i] as HTMLDivElement
-          sum += a.offsetWidth
+    Vue.nextTick(() => {
+      if (
+        this.properties.TabOrientation === 0 ||
+        this.properties.TabOrientation === 1
+      ) {
+        if (this.scrolling && !this.properties.MultiRow) {
+          for (let i = 0; i < this.scrolling.children.length; i++) {
+            const a = this.scrolling.children[i] as HTMLDivElement
+            sum += a.offsetWidth
+          }
+          const tabsLength = sum
+          if (tabsLength > this.properties.Width!) {
+            this.isScrollVisible = true
+          } else {
+            this.isScrollVisible = false
+          }
         }
-        const tabsLength = sum
-        if (
-          tabsLength > this.properties.Width!
-        ) {
-          this.isScrollVisible = true
-        } else {
-          this.isScrollVisible = false
+      } else {
+        if (this.scrolling && !this.properties.MultiRow) {
+          for (let i = 0; i < this.scrolling.children.length; i++) {
+            const a = this.scrolling.children[i] as HTMLDivElement
+            sum += a.offsetHeight
+          }
+          const tabsHeight = sum
+          if (tabsHeight > this.properties.Height!) {
+            this.isScrollVisible = true
+          } else {
+            this.isScrollVisible = false
+          }
         }
       }
-    } else {
-      if (this.scrolling && !this.properties.MultiRow) {
-        for (let i = 0; i < this.scrolling.children.length; i++) {
-          const a = this.scrolling.children[i] as HTMLDivElement
-          sum += a.offsetHeight
-        }
-        const tabsHeight = sum
-        if (
-          tabsHeight > this.properties.Height!
-        ) {
-          this.isScrollVisible = true
-        } else {
-          this.isScrollVisible = false
-        }
-      }
-    }
+    })
   }
 
   @Watch('properties.Height')
@@ -398,18 +454,57 @@ export default class FDTabStrip extends FdControlVue {
           : controlProp.Width! < 30 || controlProp.Height! < 30
             ? 'none'
             : 'block',
-      top: controlProp.TabOrientation === 0 ? controlProp.MultiRow ? (this.tempHeight + 12) * this.multiRowCount + 'px' : controlProp.TabFixedHeight! > 0 ? (controlProp.TabFixedHeight! + 10) + 'px' : controlProp.TabFixedHeight! === 0 ? (this.tempHeight + 9) + 'px' : '33px' : controlProp.TabOrientation === 1 ? controlProp.MultiRow ? '-' + (this.tempHeight + 12) * (this.multiRowCount - 1) + 'px' : controlProp.TabFixedHeight! > 0 ? '0px' : '0px' : '0px',
-      height: controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1
-        ? controlProp.TabFixedHeight! > 0 ? (controlProp.Height! - controlProp.TabFixedHeight! - 5) + 'px' : controlProp.TabFixedHeight! === 0 ? (controlProp.Height! - controlProp.Font!.FontSize! - 13) + 'px'
+      top:
+        controlProp.TabOrientation === 0
+          ? controlProp.MultiRow
+            ? (this.tempHeight + 12) * this.multiRowCount + 'px'
+            : controlProp.TabFixedHeight! > 0
+              ? controlProp.TabFixedHeight! + 10 + 'px'
+              : controlProp.TabFixedHeight! === 0
+                ? this.tempHeight + 15 + 'px'
+                : '33px'
           : controlProp.TabOrientation === 1
-            ? `${controlProp.Height! - 21}px`
-            : `${controlProp.Height! - 35}px`
-        : `${controlProp.Height! - 3}px`,
+            ? controlProp.MultiRow
+              ? '-' + (this.tempHeight + 12) * (this.multiRowCount - 1) + 'px'
+              : controlProp.TabFixedHeight! > 0
+                ? '0px'
+                : '0px'
+            : '0px',
+      height:
+        controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1
+          ? controlProp.TabFixedHeight! > 0
+            ? controlProp.Height! - controlProp.TabFixedHeight! - 5 + 'px'
+            : controlProp.TabFixedHeight! === 0
+              ? controlProp.Height! - controlProp.Font!.FontSize! - 13 + 'px'
+              : controlProp.TabOrientation === 1
+                ? `${controlProp.Height! - 21}px`
+                : `${controlProp.Height! - 35}px`
+          : `${controlProp.Height! - 3}px`,
       width:
         controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1
           ? `${controlProp.Width! - 3}px`
-          : controlProp.TabFixedWidth! > 0 ? (controlProp.Width! - controlProp.TabFixedWidth! - 15) + 'px' : controlProp.TabFixedWidth! === 0 ? controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3 ? `${controlProp.Width! - this.tempWidth - 13}px` : (controlProp.Width! - controlProp.Font!.FontSize! - 20) + 'px' : `${controlProp.Width! - 34}px`,
-      left: controlProp.TabOrientation === 2 ? controlProp.TabFixedWidth! > 0 ? (controlProp.TabFixedWidth! + 12) + 'px' : controlProp.TabFixedWidth! === 0 ? controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3 ? `${this.tempWidth + 10}px` : (controlProp.Font!.FontSize! + 20) + 'px' : '40px' : controlProp.TabOrientation === 3 ? controlProp.TabFixedWidth! > 0 ? '0px' : '0px' : '0px',
+          : controlProp.TabFixedWidth! > 0
+            ? controlProp.Width! - controlProp.TabFixedWidth! - 15 + 'px'
+            : controlProp.TabFixedWidth! === 0
+              ? controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3
+                ? `${controlProp.Width! - this.tempWidth - 13}px`
+                : controlProp.Width! - controlProp.Font!.FontSize! - 20 + 'px'
+              : `${controlProp.Width! - 34}px`,
+      left:
+        controlProp.TabOrientation === 2
+          ? controlProp.TabFixedWidth! > 0
+            ? controlProp.TabFixedWidth! + 12 + 'px'
+            : controlProp.TabFixedWidth! === 0
+              ? controlProp.TabOrientation === 2 ||
+              controlProp.TabOrientation === 3
+                ? `${this.tempWidth + 10}px`
+                : controlProp.Font!.FontSize! + 20 + 'px'
+              : '40px'
+          : controlProp.TabOrientation === 3
+            ? controlProp.TabFixedWidth! > 0
+              ? '0px'
+              : '0px'
+            : '0px',
       cursor:
         controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''
           ? this.getMouseCursorData
@@ -431,10 +526,10 @@ export default class FDTabStrip extends FdControlVue {
     if (this.properties.MultiRow) {
       const initialLength = this.extraDatas.Tabs!.length!
       const len = (this.tempWidth + 12) * initialLength
-      if ((len - this.properties.Width!) >= 0) {
+      if (len - this.properties.Width! >= 0) {
         const a = Math.floor(len / this.properties.Width!) + 1
         this.multiRowCount = a
-        if (this.properties.Width! <= ((this.tempWidth + 12) * 2)) {
+        if (this.properties.Width! <= (this.tempWidth + 12) * 2) {
           this.multiRowCount = a + 2
         } else if (newVal > oldVal) {
           this.multiRowCount = this.controls.length!
@@ -477,10 +572,14 @@ export default class FDTabStrip extends FdControlVue {
    * @param oldVal previous selectedPageData data
    * @param newVal  new/changed selectedPageData data
    */
-  @Watch('selectedPageData.properties.Caption')
+  @Watch('selectedTabData.Caption')
   captionValue (newVal: string, oldVal: string) {
     this.calculateWidthHeight()
     this.scrollButtonVerify()
+  }
+
+  get selectedTabData () {
+    return this.extraDatas!.Tabs![this.updatedValue]
   }
 
   calculateWidthHeight () {
@@ -491,7 +590,8 @@ export default class FDTabStrip extends FdControlVue {
       let tempHeight = 0
       Vue.nextTick(function () {
         for (let i = 0; i < divElement.length; i++) {
-          const ele = divElement[i].children[0].children[1].children[0] as HTMLInputElement
+          const ele = divElement[i].children[0].children[1]
+            .children[0] as HTMLInputElement
           if (ele.offsetWidth > tempWidth) {
             tempWidth = ele.offsetWidth
           }
@@ -511,7 +611,8 @@ export default class FDTabStrip extends FdControlVue {
   focusPage () {
     if (this.extraDatas!.Tabs!.length > 0) {
       const value: number = this.updatedValue;
-      (this.controlTabsRef[value].children[0].children[1] as HTMLLabelElement).focus()
+      (this.controlTabsRef[value].children[0]
+        .children[1] as HTMLLabelElement).focus()
     } else {
       (this.$el.children[0] as HTMLDivElement).focus()
     }
@@ -522,9 +623,11 @@ export default class FDTabStrip extends FdControlVue {
   }
   eventStoppers () {
     const eventStop = (event: Event) => event.stopPropagation()
-    return this.isEditMode === false ? null : {
-      keydown: eventStop
-    }
+    return this.isEditMode === false
+      ? null
+      : {
+        keydown: eventStop
+      }
   }
   deleteTabControl (event: KeyboardEvent) {
     if (this.isEditMode) {
@@ -532,9 +635,14 @@ export default class FDTabStrip extends FdControlVue {
       const tabControlData = JSON.parse(JSON.stringify(this.extraDatas.Tabs))
       if (tabControlData && tabControlData.length > 0) {
         tabControlData.splice(this.updatedValue, 1)
-        this.updateDataModelExtraData({ propertyName: 'Tabs', value: tabControlData })
+        this.updateDataModelExtraData({
+          propertyName: 'Tabs',
+          value: tabControlData
+        })
         this.updateTabStripValue(this.updatedValue! - 1)
-        Vue.nextTick(() => { this.focusPage() })
+        Vue.nextTick(() => {
+          this.focusPage()
+        })
       }
     }
   }
@@ -774,7 +882,7 @@ export default class FDTabStrip extends FdControlVue {
   text-decoration: underline;
   text-underline-position: under;
 }
-:focus{
+:focus {
   outline: none;
 }
 </style>
