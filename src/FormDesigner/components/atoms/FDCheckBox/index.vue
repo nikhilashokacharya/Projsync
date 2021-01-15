@@ -7,7 +7,11 @@
     @keydown.enter.prevent="setContentEditable($event, true)"
     :tabindex="properties.TabIndex"
   >
-    <label class="control" :style="controlStyleObj" v-if="properties.Alignment === 1">
+    <label
+      class="control"
+      :style="controlStyleObj"
+      v-if="properties.Alignment === 1"
+    >
       <input
         @change="handleChange($event, checkboxInput)"
         ref="checkboxInput"
@@ -70,7 +74,11 @@
         </FDEditableText>
       </div>
     </div>
-    <label class="control" :style="controlStyleObj" v-if="properties.Alignment === 0">
+    <label
+      class="control"
+      :style="controlStyleObj"
+      v-if="properties.Alignment === 0"
+    >
       <input
         @change="handleChange($event, checkboxInput)"
         ref="checkboxInput"
@@ -103,9 +111,9 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
   @Ref('checkboxInput') checkboxInput!: HTMLInputElement;
   @Ref('divAutoSize') autoSizecheckbox!: HTMLDivElement;
   @Ref('spanRef') spanRef!: HTMLSpanElement;
-  @Ref('checkBoxSpanRef') checkBoxSpanRef!: FDEditableText
-  $el: HTMLDivElement
-  alignItem: boolean = false
+  @Ref('checkBoxSpanRef') checkBoxSpanRef!: FDEditableText;
+  $el: HTMLDivElement;
+  alignItem: boolean = false;
 
   get controlStyleObj () {
     const controlProp = this.properties
@@ -286,7 +294,8 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
 
       display: display,
       overflow: 'hidden',
-      gridTemplateColumns: controlProp.Alignment === 1 ? '12px auto' : 'auto 12px',
+      gridTemplateColumns:
+        controlProp.Alignment === 1 ? '12px auto' : 'auto 12px',
       gridTemplateRows: '100%',
       gap: '2px',
       alignItems: font.FontSize! > 17 ? 'center' : '',
@@ -306,6 +315,7 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
     return {
       overflow: 'hidden',
       height: !this.isEditMode ? '100%' : '',
+      width: `${controlProp.Width! - 20}px`,
       display: 'flex',
       justifyContent:
         controlProp.TextAlign === 0
@@ -356,7 +366,10 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
   editableTextVerify () {
     if (this.isEditMode) {
       Vue.nextTick(() => {
-        if (this.isEditMode && this.checkBoxSpanRef.$el.clientHeight > this.properties.Height!) {
+        if (
+          this.isEditMode &&
+          this.checkBoxSpanRef.$el.clientHeight > this.properties.Height!
+        ) {
           this.alignItem = true
         } else {
           this.alignItem = false

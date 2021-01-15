@@ -300,10 +300,10 @@ export class ControlPropertyData {
       Frame: {
         properties: {
           BackColor: '#ffffff',
-          BorderColor: '#ffffff',
+          BorderColor: '#000000',
           BorderStyle: 0,
           Caption: 'Frame1',
-          ControlTipText: 'helptext',
+          ControlTipText: '',
           Cycle: 0,
           Enabled: true,
           Font: {

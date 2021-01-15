@@ -16,9 +16,25 @@
     @mouseup="dragSelectorControl($event)"
     @keyup.stop="selectMultipleCtrl($event, false)"
   >
-    <legend :style="legendCssStyleProperty">{{ properties.Caption }}</legend>
+    <legend ref="fieldsetRef" :style="legendCssStyleProperty">{{ properties.Caption }}</legend>
     <div :style="scrollSize" ref="frame" @scroll="updateScrollingLeftTop">
+      <div v-if="properties.Picture!==''" class="pictureDiv" :style="pictureDivObj">
     <Container
+      :contextMenuType="contextMenuType"
+      :viewMenu="viewMenu"
+      :userFormId="userFormId"
+      :controlId="controlId"
+      :containerId="controlId"
+      :isEditMode="isEditMode"
+      :left="left"
+      :top="top"
+      ref="containerRef"
+      @closeMenu="closeMenu"
+      @openMenu="(e, parentID, controlID, type, mode) => showContextMenu(e, parentID, controlID, type, mode)"
+    />
+    </div>
+    <Container
+      v-else
       :contextMenuType="contextMenuType"
       :viewMenu="viewMenu"
       :userFormId="userFormId"
@@ -55,8 +71,10 @@ import { EventBus } from '@/FormDesigner/event-bus'
 export default class FDFrame extends FdContainerVue {
   @Ref('containerRef') readonly containerRef!: Container;
   @Ref('frame') readonly frame!: HTMLDivElement;
+  @Ref('fieldsetRef') fieldsetRef: HTMLLegendElement;
   @Prop({ required: true, type: Boolean }) public readonly isEditMode: boolean;
   mode: boolean = false;
+  captionHeight: number = 0;
 
   /**
    * @description Returns string value for CSS background style
@@ -81,6 +99,27 @@ export default class FDFrame extends FdContainerVue {
 
   mounted () {
     this.scrollLeftTop(this.data)
+    if (this.fieldsetRef) {
+      this.captionHeight = this.fieldsetRef.offsetHeight!
+    }
+  }
+
+  @Watch('properties.Caption')
+  captionValidate () {
+    Vue.nextTick(() => {
+      if (this.properties.Caption === '') {
+        this.captionHeight = 0
+      } else {
+        this.captionHeight = this.fieldsetRef.offsetHeight!
+      }
+    })
+  }
+
+  @Watch('properties.Font', { deep: true })
+  updateFont () {
+    Vue.nextTick(() => {
+      this.captionHeight = this.fieldsetRef.offsetHeight!
+    })
   }
 
   @Watch('properties.ScrollLeft')
@@ -131,16 +170,6 @@ export default class FDFrame extends FdContainerVue {
       backgroundColor: controlProp.BackColor,
       width: `${controlProp.Width}px`,
       height: `${controlProp.Height}px`,
-      boxShadow: controlProp.SpecialEffect ? this.getSpecialEffectData : 'none',
-      borderLeft: controlProp.BorderStyle
-        ? `0.3px solid ${controlProp.BorderColor}`
-        : '0.3px solid gray',
-      borderRight: controlProp.BorderStyle
-        ? `0.3px solid ${controlProp.BorderColor}`
-        : '0.3px solid gray',
-      borderBottom: controlProp.BorderStyle
-        ? `0.3px solid ${controlProp.BorderColor}`
-        : '0.3px solid gray',
       overflow: 'hidden'
     }
   }
@@ -172,9 +201,8 @@ export default class FDFrame extends FdContainerVue {
     }
     return {
       position: 'relative',
-      width: `${controlProp.Width! - 3}px`,
+      width: `${controlProp.Width! - 4}px`,
       height: `${controlProp.Height}px`,
-      marginLeft: '2px',
       padding: '0px',
       outline: 'none',
       cursor: controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''
@@ -195,14 +223,31 @@ export default class FDFrame extends FdContainerVue {
           ? this.tempWeight
           : '',
       fontStretch: font.FontStyle !== '' ? this.tempStretch : '',
-      borderTop: controlProp.BorderStyle
-        ? `1px solid ${controlProp.BorderColor}`
-        : '1px solid gray',
-      borderLeft: 'none',
-      borderRight: 'none',
-      borderBottom: 'none',
+      borderColor: controlProp.BorderStyle === 1 ? controlProp.BorderColor : '',
+      borderLeft: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 2 ? '2px solid gray' : controlProp.SpecialEffect === 3 ? '1.5px solid gray' : controlProp.SpecialEffect === 4 ? '0.5px solid gray' : 'none',
+      borderRight: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 1 ? '2px solid gray' : controlProp.SpecialEffect === 4 ? '1.5px solid gray' : controlProp.SpecialEffect === 3 ? '0.5px solid gray' : 'none',
+      borderTop: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 2 ? '2px solid gray' : controlProp.SpecialEffect === 3 ? '1.5px solid gray' : controlProp.SpecialEffect === 4 ? '0.5px solid gray' : 'none',
+      borderBottom: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 1 ? '2px solid gray' : controlProp.SpecialEffect === 4 ? '1.5px solid gray' : controlProp.SpecialEffect === 3 ? '0.5px solid gray' : 'none',
+      backgroundImage: this.getSampleDotPattern.backgroundImage,
+      backgroundSize: this.getSampleDotPattern.backgroundSize,
+      backgroundColor: controlProp.BackColor,
+      backgroundRepeat: this.getRepeatData,
+      backgroundPosition: this.getPosition,
+      display: display,
+      zoom: `${controlProp.Zoom}%`,
+      whiteSpace: 'nowrap',
+      textOverflow: 'ellipsis',
+      maxWidth: `${controlProp.Width!}px`
+    }
+  }
+
+  get pictureDivObj () {
+    const controlProp = this.properties
+    return {
+      height: controlProp.ScrollHeight === 0 || controlProp.ScrollHeight! < controlProp.Height! ? controlProp.Height! + 'px' : controlProp.ScrollHeight! + 'px',
+      width: controlProp.ScrollWidth === 0 || controlProp.ScrollWidth! < controlProp.Width! ? controlProp.Width! + 'px' : controlProp.ScrollWidth! + 'px',
       backgroundImage: controlProp.Picture === ''
-        ? this.getSampleDotPattern.backgroundImage
+        ? ''
         : this.createBackgroundString,
       backgroundSize: controlProp.Picture === ''
         ? this.getSampleDotPattern.backgroundSize
@@ -212,11 +257,7 @@ export default class FDFrame extends FdContainerVue {
       backgroundPosition: controlProp.Picture !== ''
         ? this.getPosition
         : this.getSampleDotPattern.backgroundPosition,
-      display: display,
-      zoom: `${controlProp.Zoom}%`,
-      whiteSpace: 'nowrap',
-      textOverflow: 'ellipsis',
-      maxWidth: `${controlProp.Width!}px`
+      opactity: controlProp.Picture === '' ? '0' : '1'
     }
   }
   /**
@@ -236,16 +277,19 @@ export default class FDFrame extends FdContainerVue {
       whiteSpace: 'pre',
       wordBreak: 'normal',
       overflow: 'hidden',
-      maxWidth: `${controlProp.Width! - 20}px`
+      maxWidth: `${controlProp.Width! - 20}px`,
+      zIndex: '1'
     }
   }
-  get scrollSize (): Partial<CSSStyleDeclaration> {
+  get scrollSize () {
     const controlProp = this.data.properties!
     return {
       width: `${controlProp.Width! - 3}px`,
-      height: `${controlProp.Height! - 10}px`,
+      height: this.fieldsetRef ? (controlProp.Height! - (this.captionHeight / 2) - 2) + 'px' : '',
       overflowX: this.getScrollBarX,
-      overflowY: this.getScrollBarY
+      overflowY: this.getScrollBarY,
+      position: 'relative',
+      top: this.fieldsetRef && this.properties.Caption !== '' ? '-' + ((this.captionHeight / 2) - 1) + 'px' : ''
     }
   }
 
