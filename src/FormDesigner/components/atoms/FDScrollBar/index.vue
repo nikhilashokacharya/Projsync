@@ -1,7 +1,7 @@
 <template>
   <div
   v-on="eventStoppers()"
-  @click.stop="selectedItem"
+  @click="scrollBarClick"
   :style="outerScrollBarDivObj"
   :title="properties.ControlTipText"
   @keydown.enter="setContentEditable($event, true)"
@@ -196,6 +196,12 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
     const eventStop = (event: Event) => event.stopPropagation()
     return this.isEditMode === false ? null : {
       keydown: eventStop
+    }
+  }
+  scrollBarClick (event: MouseEvent) {
+    if (this.toolBoxSelectControl === 'Select') {
+      event.stopPropagation()
+      this.selectedItem(event)
     }
   }
 }

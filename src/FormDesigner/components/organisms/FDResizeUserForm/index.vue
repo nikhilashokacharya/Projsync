@@ -64,7 +64,15 @@ export default class ResizeUserForm extends FdSelectVue {
    * @event keydown
    */
   handleKeyDown (event: KeyboardEvent) {
-    this.userFormRef.containerRef.refContextMenu.updateAction(event)
+    const selected = this.selectedControls[this.userFormId].selected
+    let container = this.selectedControls[this.userFormId].container[0]
+    if (selected.length === 1 && !selected[0].startsWith('group')) {
+      const type = this.userformData[this.userFormId][selected[0]].type
+      if (type === 'Frame' || type === 'Page') {
+        container = selected[0]
+      }
+    }
+    EventBus.$emit('handleKeyDown', event, container)
   }
 
   /**
@@ -155,7 +163,6 @@ export default class ResizeUserForm extends FdSelectVue {
               }
             })
           } else if (userData[container].type === 'Page') {
-            console.log('container', container)
             this.selectControl({
               userFormId: this.userFormId,
               select: {
@@ -173,7 +180,6 @@ export default class ResizeUserForm extends FdSelectVue {
               return userData[val].properties!.TabIndex! === selectedTab
             }
           })
-          console.log('nextControlId', nextControlId)
           this.selectControl({
             userFormId: this.userFormId,
             select: {

@@ -1,5 +1,8 @@
 <template>
-  <div id="popup1" class="overlay" :style="tabOrderStyleObj">
+  <div id="popup1" class="overlay" :style="tabOrderStyleObj"
+  tabindex="0"
+  @keydown.enter="updateControlData"
+  @keydown.esc="closeDialog()">
     <div class="outer-taborder-div popup" :style="tabOrderDialogInitialStyle">
       <div class="taborder-header-div" @mousedown.stop="dragTabOrderDialog">
         <div class="taborder-header-innerdiv">
@@ -54,7 +57,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Component, Emit, Prop, Vue } from 'vue-property-decorator'
 import { EventBus } from '@/FormDesigner/event-bus'
 import { State, Action } from 'vuex-class'
 import { IupdateControlExtraData } from '@/storeModules/fd/actions'
@@ -85,13 +88,19 @@ export default class TabStripTabOrderModal extends FdDialogDragVue {
     this.closeDialog()
   }
   closeDialog () {
-    EventBus.$emit('focusUserForm')
     this.isTabOrderOpen = false
+    this.getFocusElement(false)
   }
+  @Emit('getFocusElement')
+  getFocusElement (val: boolean) {
+    return { val: val, dialogType: 'tabstripTabOrder' }
+  }
+
   created () {
     EventBus.$on(
       'tabStripTabOrder',
       (userFormId: string, controlId: string) => {
+        this.getFocusElement(true)
         const tabOrderControlData = this.userformData[userFormId][controlId]
           .extraDatas!.Tabs!
         if (tabOrderControlData.length > 0) {

@@ -11,6 +11,7 @@
 </template>
 
 <script lang="ts">
+import { EventBus } from '@/FormDesigner/event-bus'
 import { Component, Prop, Vue, Ref } from 'vue-property-decorator'
 
 @Component({
@@ -46,8 +47,14 @@ export default class FDEditableText extends Vue {
     }
   }
 
-  onInput (event: KeyboardEvent) {
+  onInput () {
     this.$emit('updateCaption', this.labelArea.innerText)
+  }
+  created () {
+    EventBus.$on('updateText', (updateValue: string) => {
+      this.labelArea.innerText = updateValue
+      this.onInput()
+    })
   }
 }
 </script>

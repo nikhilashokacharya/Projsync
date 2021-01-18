@@ -8,6 +8,7 @@
         @change="updateAppearance"
         v-if="propertyType==='Boolean'"
         :value="propertyValue"
+        v-model="selected"
         >
           <option value='true'>True</option>
            <option value='false'>False</option>

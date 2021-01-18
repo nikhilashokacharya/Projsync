@@ -4,10 +4,11 @@
     :tabindex="tabindex"
     :style="customSelectObj"
     :title="properties.ControlTipText"
-    @click="selectedItem"
+    @click="comBoxClick"
     @keydown.enter="setContentEditable($event, true)"
     @keydown.esc="releaseEditMode"
     v-on="eventStoppers()"
+    @contextmenu="isEditMode ? openTextContextMenu($event): parentConextMenu($event)"
   >
     <div
       class="combobox"
@@ -324,7 +325,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
       paddingBottom: this.data.properties.Font!.FontSize! > 48 ? '10px' : '5px'
     }
   }
-
+  
   @Watch('properties.ColumnWidths')
   columnWidthsValidate () {
     this.updateColumns()
@@ -342,7 +343,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
       width: this.headWidth
     }
   }
-  updateColumns () {
+    updateColumns () {
     if (this.properties.RowSource !== '') {
       if (this.comboRef && this.comboRef.children[1] && this.comboRef.children[1].children[0]) {
         this.headWidth = this.comboRef.children[1].children[0].scrollWidth + 'px'
@@ -1234,6 +1235,12 @@ export default class FDComboBox extends Mixins(FdControlVue) {
         keydown: eventStop
       }
   }
+  comBoxClick (event: MouseEvent) {
+    if (this.toolBoxSelectControl === 'Select') {
+      event.stopPropagation()
+      this.selectedItem(event)
+    }
+  }
 }
 </script>
 
@@ -1315,7 +1322,6 @@ export default class FDComboBox extends Mixins(FdControlVue) {
 .tr {
   outline: none;
   display: inline-flex;
-  /* width: 100%; */
 }
 .tr:hover:not([disabled]) {
   background-color: rgb(59, 122, 231);

@@ -8,7 +8,8 @@
     :title="properties.ControlTipText"
     @mousedown="addEventCustomCallback"
     @keydown.enter.prevent="setContentEditable($event, true)"
-    @click.stop="labelClick"
+    @click="labelClick"
+    @contextmenu="isEditMode ? openTextContextMenu($event): parentConextMenu($event)"
   >
     <span v-if="!syncIsEditMode">
       <span>{{ computedCaption.afterbeginCaption }}</span>
@@ -193,9 +194,12 @@ export default class FDLabel extends Mixins(FdControlVue) {
     this.setContentEditable(event, false)
   }
   labelClick (event: MouseEvent) {
-    this.selectedItem(event)
-    if (this.isEditMode) {
-      (this.$el.children[0] as HTMLSpanElement).focus()
+    if (this.toolBoxSelectControl === 'Select') {
+      event.stopPropagation()
+      this.selectedItem(event)
+      if (this.isEditMode) {
+        (this.$el.children[0] as HTMLSpanElement).focus()
+      }
     }
   }
 }

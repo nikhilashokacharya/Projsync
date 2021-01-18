@@ -170,6 +170,10 @@ export default class FDTable extends Vue {
         return this.updateName(selected[i], arg.value)
       } else if (arg.propertyName === 'Value' && (this.userformData[this.userFormId][selected[i]].type === 'SpinButton' || this.userformData[this.userFormId][selected[i]].type === 'ScrollBar')) {
         return this.updateSpinButtonScrollBarValueProp(selected[i], arg.value)
+      } else if (arg.propertyName === 'Value' && (this.userformData[this.userFormId][selected[i]].type === 'OptionButton') &&
+      (this.userformData[this.userFormId][selected[i]].properties.GroupName !== '') && arg.value === 'True') {
+        const groupName = this.userformData[this.userFormId][selected[i]].properties.GroupName!
+        this.updateValueForCommonGroupName(selected[i], arg.value, groupName)
       } else if (arg.propertyName === 'Min' || arg.propertyName === 'Max') {
         this.updatePropValue(selected[i], arg.propertyName, arg.value)
         this.validateValueProperty(selected[i], arg.value)
@@ -187,6 +191,16 @@ export default class FDTable extends Vue {
       propertyName: propName,
       value: propValue
     })
+  }
+  updateValueForCommonGroupName (id: string, value: string, groupName: string) {
+    const userData = Object.keys(this.userformData[this.userFormId])
+    this.updatePropValue(id, 'Value', 'True')
+    for (let i = 0; i < userData.length; i++) {
+      const controlData = this.userformData[this.userFormId][userData[i]]
+      if (controlData.type === 'OptionButton' && controlData.properties.GroupName === groupName && controlData.properties.ID !== id) {
+        this.updatePropValue(controlData.properties.ID, 'Value', 'False')
+      }
+    }
   }
   validateValueProperty (id: string, value: number) {
     let actualValue = this.userformData[this.userFormId][id].properties.Value! as number
@@ -271,6 +285,16 @@ export default class FDTable extends Vue {
     // should validate the propertyValue
     return true
   }
+  validateTextProperty (propertyValue : string) {
+    const controlData = this.userformData[this.userFormId][this.getSelectedControlsDatas[0]]
+    const rowSourceData = controlData.extraDatas!.RowSourceData!
+    for (let i = 0; i < rowSourceData.length; i++) {
+      if (propertyValue === rowSourceData[i][0]) {
+        return true
+      }
+    }
+    return false
+  }
   updateAppearance (e: Event) {
     const propertyName: keyof controlProperties = (e.target as HTMLInputElement).name as keyof controlProperties
     const inputType = this.tableData[propertyName]!.type
@@ -302,6 +326,19 @@ export default class FDTable extends Vue {
         if (controlType === 'CheckBox' || controlType === 'OptionButton' || controlType === 'ToggleButton') {
           const resultValue = this.validateValuePropertyChboxOpbtnTglbtn(propertyName, propertyValue);
           (e.target as HTMLInputElement).value = resultValue
+        } else {
+          this.emitUpdateProperty(propertyName, propertyValue)
+        }
+      } else if (propertyName === 'Text') {
+        const controlType = this.userformData[this.userFormId][this.getSelectedControlsDatas[0]].type
+        if (controlType === 'ListBox') {
+          const isTextValid = this.validateTextProperty(propertyValue)
+          if (isTextValid) {
+            this.emitUpdateProperty(propertyName, propertyValue)
+          } else {
+            EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property Value`);
+            (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+          }
         } else {
           this.emitUpdateProperty(propertyName, propertyValue)
         }

@@ -64,7 +64,7 @@
 
 <script lang="ts">
 import { IupdateControlExtraData, IupdateControl } from '@/storeModules/fd/actions'
-import { Component, Vue, Ref } from 'vue-property-decorator'
+import { Component, Vue, Ref, Emit, Mixins } from 'vue-property-decorator'
 import { State, Action } from 'vuex-class'
 import { EventBus } from '@/FormDesigner/event-bus'
 import FdDialogDragVue from '@/api/abstract/FormDesigner/FdDialogDragVue'
@@ -72,7 +72,7 @@ import FdDialogDragVue from '@/api/abstract/FormDesigner/FdDialogDragVue'
 @Component({
   name: 'FDRenameMultiPageDialog'
 })
-export default class FDRenameMultiPageDialog extends FdDialogDragVue {
+export default class FDRenameMultiPageDialog extends Mixins(FdDialogDragVue) {
   userFormId: string;
   controlId: string;
   @Action('fd/updateControlExtraData') updateControlExtraData!: (
@@ -144,12 +144,18 @@ export default class FDRenameMultiPageDialog extends FdDialogDragVue {
         value: this.tabOrderList
       })
     }
-    this.isTabOrderOpen = false
+    // this.isTabOrderOpen = false
+    this.closeDialog()
+  }
+  @Emit('getFocusElement')
+  getFocusElement (val: boolean) {
+    return { val: val, dialogType: 'renameDialog' }
   }
   created () {
     EventBus.$on(
       'renamePage',
       (userFormId: string, controlId: string, selectedTab: number, type: string) => {
+        this.getFocusElement(true)
         this.controlType = type
         if (this.controlType === 'Page') {
           const selectedPageData = this.userformData[userFormId][controlId]
@@ -176,6 +182,10 @@ export default class FDRenameMultiPageDialog extends FdDialogDragVue {
   }
   destroyed () {
     EventBus.$off('renamePage')
+  }
+  closeDialog () {
+    this.isTabOrderOpen = false
+    this.getFocusElement(false)
   }
 }
 </script>

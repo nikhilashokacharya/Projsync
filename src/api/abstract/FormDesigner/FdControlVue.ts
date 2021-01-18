@@ -5,7 +5,7 @@ import {
 } from '@/FormDesigner/controls-properties-types'
 import { PropType } from 'vue'
 import { Component, Emit, Prop, PropSync, Vue, Watch } from 'vue-property-decorator'
-
+import { EventBus } from '@/FormDesigner/event-bus'
 @Component({
   name: 'FdControlVue'
 })
@@ -13,6 +13,7 @@ export default class FdControlVue extends Vue {
   @Prop({ required: true, type: Boolean }) public isRunMode!: boolean
   @Prop({ required: true, type: Boolean }) public isEditMode!: boolean
   @PropSync('isEditMode') public syncIsEditMode!: boolean
+  @Prop() toolBoxSelectControl: string
 
   @Prop({ required: true, type: Object as PropType<controlData> }) public data! : controlData
   @Prop({ required: true, type: String }) public controlId! : string
@@ -1350,5 +1351,12 @@ get setFontStyle () {
     this.tempStretch = 'normal'
     return this.properties.Font!.FontName!
   }
+}
+@Emit('parentConextMenu')
+parentConextMenu (event: MouseEvent) {
+  return event
+}
+openTextContextMenu (event: MouseEvent) {
+  EventBus.$emit('openTextContextMenu', event, this.controlId)
 }
 }

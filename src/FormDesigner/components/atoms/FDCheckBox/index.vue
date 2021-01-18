@@ -3,9 +3,10 @@
     :title="properties.ControlTipText"
     class="outer-check"
     :style="cssStyleProperty"
-    @click.stop="checkBoxClick"
+    @click="checkBoxClick"
     @keydown.enter.prevent="setContentEditable($event, true)"
     :tabindex="properties.TabIndex"
+    @contextmenu="isEditMode ? openTextContextMenu($event): parentConextMenu($event)"
   >
     <label
       class="control"
@@ -455,9 +456,12 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
     this.setContentEditable(event, false)
   }
   checkBoxClick (event: MouseEvent) {
-    this.selectedItem(event)
-    if (this.isEditMode) {
-      (this.checkBoxSpanRef.$el as HTMLSpanElement).focus()
+    if (this.toolBoxSelectControl === 'Select') {
+      event.stopPropagation()
+      this.selectedItem(event)
+      if (this.isEditMode) {
+        (this.checkBoxSpanRef.$el as HTMLSpanElement).focus()
+      }
     }
   }
 }

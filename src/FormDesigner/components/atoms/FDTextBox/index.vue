@@ -1,10 +1,11 @@
 <template>
   <div class="resp-textbox"
   v-on="eventStoppers()"
-  @click="selectedItem"
+  @click="textBoxClick"
   @mousedown="controlEditMode"
   :tabindex="properties.TabIndex"
   @keydown.enter="setContentEditable($event, true)"
+  @contextmenu="isEditMode ? openTextContextMenu($event): parentConextMenu($event)"
   >
     <textarea
       data-gramm="false"
@@ -577,6 +578,12 @@ export default class FDTextBox extends Mixins(FdControlVue) {
     const eventStop = (event: Event) => event.stopPropagation()
     return this.isEditMode === false ? null : {
       keydown: eventStop
+    }
+  }
+  textBoxClick (event: MouseEvent) {
+    if (this.toolBoxSelectControl === 'Select') {
+      event.stopPropagation()
+      this.selectedItem(event)
     }
   }
 }

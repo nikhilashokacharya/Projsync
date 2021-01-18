@@ -5,7 +5,7 @@
       class="outer-page"
       :style="pageStyleObj"
       @contextmenu="contextMenuVisible($event, -1)"
-      @click.stop="selectedItem"
+      @click="tabStripClick"
       @mousedown="controlEditMode"
       @keydown.enter="setContentEditable($event, true)"
       @keydown.esc="setContentEditable($event, false)"
@@ -70,21 +70,6 @@
         </div>
       </div>
     </div>
-    <div
-      id="right-click-menu"
-      tabindex="0"
-      @blur.stop="closeMenu"
-      ref="tabstripContextMenu"
-      :style="{ top: top, left: left, display: viewMenu ? 'block' : 'none' }"
-    >
-      <ContextMenu
-        :values="contextMenuValue"
-        :controlId="controlId"
-        :selectedTab="updatedValue"
-        :data="data"
-        :userFormId="userFormId"
-      />
-    </div>
   </div>
 </template>
 
@@ -97,6 +82,7 @@ import { tabsContextMenu } from '../../../models/tabsContextMenu'
 import { controlProperties } from '@/FormDesigner/controls-properties'
 import FDControlTabs from '@/FormDesigner/components/atoms/FDControlTabs/index.vue'
 import Vue from 'vue'
+import { EventBus } from '@/FormDesigner/event-bus'
 
 @Component({
   name: 'FDTabStrip',
@@ -132,31 +118,7 @@ export default class FDTabStrip extends FdControlVue {
   }
 
   contextMenuVisible (e: MouseEvent, selected: number) {
-    if (this.isEditMode) {
-      if (selected !== -1) {
-        this.top = `${e.offsetY}px`
-        this.left = `${e.offsetX}px`
-        // this.isChecked(selected.indexValue)
-      } else {
-        this.top = `${e.offsetY + 30}px`
-        this.left = `${e.offsetX}px`
-      }
-      e.preventDefault()
-      e.stopPropagation()
-      const controlLeft: number = this.userformData['ID_USERFORM1'][this.controlId].properties.Left!
-      const controlTop: number = this.userformData['ID_USERFORM1'][this.controlId].properties.Top!
-      for (const val of this.contextMenuValue) {
-        if (val.id === 'ID_DELETEPAGE' || val.id === 'ID_RENAME') {
-          val.disabled = this.extraDatas.Tabs!.length === 0
-        } else if (val.id === 'ID_MOVE') {
-          val.disabled = this.extraDatas.Tabs!.length <= 1
-        }
-      }
-      this.viewMenu = true
-      Vue.nextTick(() => this.tabstripContextMenu.focus())
-    } else {
-      return undefined
-    }
+    EventBus.$emit('editModeContextMenu', e, this.controlId, this.data, this.isEditMode, this.updatedValue)
   }
 
   /**
@@ -508,7 +470,6 @@ export default class FDTabStrip extends FdControlVue {
    */
   protected get styleContentObj (): Partial<CSSStyleDeclaration> {
     const controlProp = this.properties
-    console.log('this.refs', this.$refs)
     return {
       position: 'absolute',
       zIndex: '10000',
@@ -729,6 +690,20 @@ export default class FDTabStrip extends FdControlVue {
       this.updateDataModel({ propertyName: 'Value', value: -1 })
     }
   }
+  created () {
+    EventBus.$on('focusTabStrip', () => {
+      this.focusPage()
+    })
+  }
+  destroyed () {
+    EventBus.$off('focusTabStrip')
+  }
+  tabStripClick (event: MouseEvent) {
+    if (this.toolBoxSelectControl === 'Select') {
+      event.stopPropagation()
+      this.selectedItem(event)
+    }
+  }
 }
 </script>
 
@@ -917,34 +892,6 @@ export default class FDTabStrip extends FdControlVue {
 }
 .content {
   overflow: auto;
-}
-#right-click-menu {
-  background: #fafafa;
-  border: 1px solid #bdbdbd;
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2),
-    0 1px 5px 0 rgba(0, 0, 0, 0.12);
-  display: block;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  position: absolute;
-  width: 100px;
-  z-index: 999999;
-}
-
-#right-click-menu li {
-  border-bottom: 1px solid #e0e0e0;
-  margin: 0;
-  padding: 5px 5px;
-}
-
-#right-click-menu li:last-child {
-  border-bottom: none;
-}
-
-#right-click-menu li:hover {
-  background: #1e88e5;
-  color: #fafafa;
 }
 
 .spanClass {

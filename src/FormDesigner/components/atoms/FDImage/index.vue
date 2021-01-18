@@ -4,7 +4,7 @@
     :style="cssStyleProperty"
     :title="properties.ControlTipText"
     @keydown.delete="deleteItem"
-    @click.stop="selectedItem"
+    @click="imageClick"
   ></div>
 </template>
 
@@ -103,6 +103,12 @@ export default class FDImage extends Mixins(FdControlVue) {
       backgroundRepeat: this.getRepeatData,
       backgroundPosition: controlProp.Picture === '' ? '' : this.getPosition,
       display: display
+    }
+  }
+  imageClick (event: MouseEvent) {
+    if (this.toolBoxSelectControl === 'Select') {
+      event.stopPropagation()
+      this.selectedItem(event)
     }
   }
 }

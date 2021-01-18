@@ -22,18 +22,12 @@
     >
       <Container
         class="container"
-        :contextMenuType="contextMenuType"
-        :viewMenu="viewMenu"
         :userFormId="userFormId"
         :controlId="controlId"
         :containerId="controlId"
-        :left="left"
-        :top="top"
         :isEditMode="true"
         ref="containerRef"
-        @closeMenu="closeMenu"
         :mouseCursorData="getMouseCursorData"
-        @openMenu="(e, parentID, controlID, type, mode) => showContextMenu(e, parentID, controlID, type, mode)"
       >
       </Container>
     </div>
@@ -65,11 +59,6 @@ export default class UserForm extends FdContainerVue {
   innerWindowFocus (value: boolean) {
     this.innerWindowFocused = value
   }
-
-  closeMenu () {
-    this.viewMenu = false
-  }
-
   mounted () {
     this.scrollLeftTop(this.data)
   }
@@ -208,8 +197,7 @@ export default class UserForm extends FdContainerVue {
   }
 
   showContextMenu (e: MouseEvent, parentID: string, controlID: string, type: string, mode: boolean) {
-    this.openMenu(e, parentID, controlID, type, mode)
-    Vue.nextTick(() => this.containerRef.contextmenu.focus())
+    EventBus.$emit('contextMenuDisplay', event, parentID, controlID, type, mode)
   }
   created () {
     EventBus.$on('selectMultipleCtrl', (val: boolean) => {

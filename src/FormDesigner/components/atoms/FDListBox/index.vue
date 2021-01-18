@@ -3,7 +3,7 @@
     class="listStyle"
     :style="listStyleObj"
     :title="properties.ControlTipText"
-    @click.stop="listBoxClick"
+    @click="listBoxClick"
     @mousedown="controlEditMode"
     :tabindex="properties.TabIndex"
     @keydown="forMatchEntry"
@@ -44,8 +44,8 @@
           @keydown.esc="releaseEditMode"
           @blur.stop="clearMatchEntry"
           @keydown.stop="handleExtendArrowKeySelect"
-          @mousedown.stop="
-            isRunMode || isEditMode ? handleMousedown($event) : ''
+          @mousedown="
+            isRunMode || isEditMode ? handleMousedown($event) : stopMousedown($event)
           "
         >
           <div
@@ -106,106 +106,110 @@ export default class FDListBox extends Mixins(FdControlVue) {
   @Ref('listStyleRef') listStyleRef: HTMLDivElement[];
   @Ref('listBoxTableRef') listBoxTableRef!: HTMLDivElement;
   @Prop() isActivated: boolean;
+  @Prop() toolBoxSelect: string
   checkedvalue: boolean;
   $el: HTMLDivElement;
   handleMousedown (e: MouseEvent) {
-    if (this.properties.RowSource !== '') {
-      if (
-        e.target instanceof HTMLDivElement ||
+    if (this.toolBoxSelect === 'Select') {
+      e.stopPropagation()
+      if (this.properties.RowSource !== '') {
+        if (
+          e.target instanceof HTMLDivElement ||
       e.target instanceof HTMLTableRowElement ||
       e.target instanceof HTMLInputElement
-      ) {
-        this.tempListBoxComboBoxEvent = e
-        const targetElement = e.target
-        const tempData = targetElement!.parentElement!
-          .children[0] as HTMLDivElement
-        const tempDataOption = targetElement.parentElement!
-          .children[1] as HTMLDivElement
-        const tempPath = e.composedPath()
-        targetElement.focus()
-        let data = targetElement.innerText
-        let splitData = data.replace(/\t/g, ' ').split(' ')
+        ) {
+          this.tempListBoxComboBoxEvent = e
+          const targetElement = e.target
+          const tempData = targetElement!.parentElement!
+            .children[0] as HTMLDivElement
+          const tempDataOption = targetElement.parentElement!
+            .children[1] as HTMLDivElement
+          const tempPath = e.composedPath()
+          targetElement.focus()
+          let data = targetElement.innerText
+          let splitData = data.replace(/\t/g, ' ').split(' ')
 
-        targetElement.focus()
-        if (this.properties.Enabled && this.properties.Locked === false) {
-          if (this.properties.MultiSelect === 0) {
-            this.clearOptionBGColorAndChecked(e)
-            this.setOptionBGColorAndChecked(e)
-          } else if (this.properties.MultiSelect === 1) {
-            this.setOptionBGColorAndChecked(e)
-          } else if (this.properties.MultiSelect === 2) {
-            if (e.ctrlKey === true) {
-              if (targetElement.tagName === 'INPUT') {
-                this.setOptionBGColorAndChecked(e)
-              } else {
-                this.setOptionBGColorAndChecked(e)
-              }
-            } else if (e.shiftKey === true && this.properties.Value !== '') {
-              let startPoint = 0
-              let endPoint = 0
-              for (let i = 0; i < tempPath.length; i++) {
-                const ele = tempPath[i] as HTMLDivElement
-                if (ele.className === 'table-body') {
-                // extend points start and end
-                  for (let j = 0; j < ele.childNodes.length; j++) {
-                    const cd = ele.childNodes[j] as HTMLDivElement
-                    if (cd.innerText === this.properties.Value) {
-                      startPoint = j + 1
+          targetElement.focus()
+          if (this.properties.Enabled && this.properties.Locked === false) {
+            if (this.properties.MultiSelect === 0) {
+              this.clearOptionBGColorAndChecked(e)
+              this.setOptionBGColorAndChecked(e)
+            } else if (this.properties.MultiSelect === 1) {
+              this.setOptionBGColorAndChecked(e)
+            } else if (this.properties.MultiSelect === 2) {
+              if (e.ctrlKey === true) {
+                if (targetElement.tagName === 'INPUT') {
+                  this.setOptionBGColorAndChecked(e)
+                } else {
+                  this.setOptionBGColorAndChecked(e)
+                }
+              } else if (e.shiftKey === true && this.properties.Value !== '') {
+                let startPoint = 0
+                let endPoint = 0
+                for (let i = 0; i < tempPath.length; i++) {
+                  const ele = tempPath[i] as HTMLDivElement
+                  if (ele.className === 'table-body') {
+                    // extend points start and end
+                    for (let j = 0; j < ele.childNodes.length; j++) {
+                      const cd = ele.childNodes[j] as HTMLDivElement
+                      if (cd.innerText === this.properties.Value) {
+                        startPoint = j + 1
+                      }
+                      if (cd.innerText === targetElement.innerText) {
+                        endPoint = j
+                      }
                     }
-                    if (cd.innerText === targetElement.innerText) {
-                      endPoint = j
+                    // upward selection start and end swap
+                    if (startPoint > endPoint) {
+                      let temp = startPoint
+                      startPoint = endPoint
+                      endPoint = temp
                     }
-                  }
-                  // upward selection start and end swap
-                  if (startPoint > endPoint) {
-                    let temp = startPoint
-                    startPoint = endPoint
-                    endPoint = temp
-                  }
-                  // setting selection
-                  for (let k = startPoint; k <= endPoint; k++) {
-                    const node = ele.childNodes[k] as HTMLDivElement
-                    const tempNode = node.childNodes[0]
-                      .childNodes[0] as HTMLInputElement
-                    node.style.backgroundColor = 'rgb(59, 122, 231)'
-                    if (this.properties.ListStyle === 1 && !tempNode.checked) {
-                    // tempNode.checked = !tempNode.checked
-                      tempNode.checked = true
+                    // setting selection
+                    for (let k = startPoint; k <= endPoint; k++) {
+                      const node = ele.childNodes[k] as HTMLDivElement
+                      const tempNode = node.childNodes[0]
+                        .childNodes[0] as HTMLInputElement
+                      node.style.backgroundColor = 'rgb(59, 122, 231)'
+                      if (this.properties.ListStyle === 1 && !tempNode.checked) {
+                        // tempNode.checked = !tempNode.checked
+                        tempNode.checked = true
+                      }
                     }
+                    break
                   }
-                  break
                 }
               }
-            }
 
-            if (this.properties.ControlSource !== '') {
-              this.updateDataModel({
-                propertyName: 'Text',
-                value: this.selectionData[0]
-              })
-              this.updateDataModel({
-                propertyName: 'Value',
-                value: this.selectionData[0]
-              })
-            }
-            this.clearOptionBGColorAndChecked(e)
-            this.setOptionBGColorAndChecked(e)
-          }
-        }
-        if (this.properties.MultiSelect === 0) {
-          for (let i = 0; i < this.extraDatas.RowSourceData!.length; i++) {
-            if (this.listStyleRef[i].style.backgroundColor !== '') {
-              const text = this.extraDatas.RowSourceData![i][0]
-              this.updateDataModel({ propertyName: 'Text', value: text })
-              const x = this.extraDatas.RowSourceData![i][this.properties.BoundColumn! - 1]
-              this.updateDataModel({ propertyName: 'Value', value: x })
+              if (this.properties.ControlSource !== '') {
+                this.updateDataModel({
+                  propertyName: 'Text',
+                  value: this.selectionData[0]
+                })
+                this.updateDataModel({
+                  propertyName: 'Value',
+                  value: this.selectionData[0]
+                })
+              }
+              this.clearOptionBGColorAndChecked(e)
+              this.setOptionBGColorAndChecked(e)
             }
           }
-        } else {
-          this.updateDataModel({ propertyName: 'Text', value: '' })
-          this.updateDataModel({ propertyName: 'Value', value: '' })
+          if (this.properties.MultiSelect === 0) {
+            for (let i = 0; i < this.extraDatas.RowSourceData!.length; i++) {
+              if (this.listStyleRef[i].style.backgroundColor !== '') {
+                const text = this.extraDatas.RowSourceData![i][0]
+                this.updateDataModel({ propertyName: 'Text', value: text })
+                const x = this.extraDatas.RowSourceData![i][this.properties.BoundColumn! - 1]
+                this.updateDataModel({ propertyName: 'Value', value: x })
+              }
+            }
+          } else {
+            this.updateDataModel({ propertyName: 'Text', value: '' })
+            this.updateDataModel({ propertyName: 'Value', value: '' })
+          }
+          this.getSelectedStyle()
         }
-        this.getSelectedStyle()
       }
     }
   }
@@ -542,9 +546,17 @@ export default class FDListBox extends Mixins(FdControlVue) {
       }
   }
   listBoxClick (e: MouseEvent) {
-    this.selectedItem(e)
-    if (!this.isActivated) {
-      EventBus.$emit('focusUserForm')
+    if (this.toolBoxSelect === 'Select') {
+      e.stopPropagation()
+      this.selectedItem(e)
+      if (!this.isActivated) {
+        EventBus.$emit('focusUserForm')
+      }
+    }
+  }
+  stopMousedown (event: MouseEvent) {
+    if (this.toolBoxSelect === 'Select') {
+      event.stopPropagation()
     }
   }
 }

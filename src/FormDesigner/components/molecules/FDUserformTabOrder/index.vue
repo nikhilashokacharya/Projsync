@@ -1,5 +1,9 @@
 <template>
-  <div id="popup1" class="overlay" :style="tabOrderStyleObj">
+  <div id="popup1" class="overlay" :style="tabOrderStyleObj"
+  tabindex="0"
+  @keydown.enter="updateControlData"
+  @keydown.esc="closeDialog()"
+  >
     <div class="outer-taborder-div popup" :style="tabOrderDialogInitialStyle">
       <div class="taborder-header-div" @mousedown.stop="dragTabOrderDialog">
         <div class="taborder-header-innerdiv">
@@ -54,7 +58,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Ref } from 'vue-property-decorator'
+import { Component, Prop, Vue, Ref, Emit } from 'vue-property-decorator'
 import { EventBus } from '@/FormDesigner/event-bus'
 import { State, Action } from 'vuex-class'
 import { IupdateControl, IsetChildControls } from '@/storeModules/fd/actions'
@@ -104,10 +108,19 @@ export default class FDUserformTabOrder extends FdDialogDragVue {
     }
     this.closeDialog()
   }
+  closeDialog () {
+    this.isTabOrderOpen = false
+    this.getFocusElement(false)
+  }
+  @Emit('getFocusElement')
+  getFocusElement (val: boolean) {
+    return { val: val, dialogType: 'userformTaborder' }
+  }
   created () {
     EventBus.$on(
       'userFormTabOrder',
       (userFormId: string, controlId: string, type: string) => {
+        this.getFocusElement(true)
         this.controlType = type
         const tabOrderControlData = JSON.parse(JSON.stringify(this.userformData[userFormId][controlId]))
         const tabOrderControls = tabOrderControlData.controls.filter((val: string) => {

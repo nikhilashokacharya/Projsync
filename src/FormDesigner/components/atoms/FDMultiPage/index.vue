@@ -69,28 +69,19 @@
             @keydown.ctrl.stop="handleKeyDown"
             @keydown.enter.exact="setContentEditable($event, true)"
             @keydown.shift.exact.stop="selectMultipleCtrl($event, true)"
-            @contextmenu.stop="
-              showContextMenu($event, userFormId, controlId, 'container', isEditMode)
+             @contextmenu.stop="
+              showContextMenu($event, controlId, selectedPageID, 'container', isEditMode)
             "
           >
             <Container
-              :contextMenuType="contextMenuType"
-              :viewMenu="viewMenu"
               :userFormId="userFormId"
               :controlId="selectedPageID"
               :containerId="selectedPageID"
               :isEditMode="isEditMode"
               :title="properties.ControlTipText"
-              :left="left"
-              :top="top"
               :width="properties.Width"
               :height="properties.Height"
               ref="containerRef"
-              @closeMenu="closeMenu"
-              @openMenu="
-                (e, parentID, controlID, type, mode) =>
-                  showContextMenu(e, parentID, controlID, type, mode)
-              "
             />
           </div>
         </div>
@@ -100,25 +91,6 @@
           <button class="right-button" @click="rightmove"></button>
         </div>
       </div>
-    </div>
-    <div
-      id="right-click-menu"
-      ref="multipage"
-      :tabindex="0"
-      @blur.stop="closeContextMenu"
-      :style="{
-        top: top,
-        left: left,
-        display: multiPageContextMenu ? 'block' : 'none',
-      }"
-    >
-      <ContextMenu
-        :values="contextMenuValue"
-        :controlId="controlId"
-        :selectedTab="updatedValue"
-        :data="data"
-        :userFormId="userFormId"
-      />
     </div>
   </div>
 </template>
@@ -172,10 +144,6 @@ export default class FDMultiPage extends FdContainerVue {
   tempHeight: number = 0;
   multiRowCount: number = 1;
   isScrollVisible = false;
-
-  closeMenu () {
-    this.viewMenu = false
-  }
 
   @Watch('selectedPageData.properties.ScrollLeft')
   updateScrollLeft () {
@@ -891,15 +859,13 @@ export default class FDMultiPage extends FdContainerVue {
   ) {
     e.preventDefault()
     const selected = this.selectedControls[this.userFormId].selected
-    if (selected[0] === this.controlId && this.controls.length > 0) {
+    if (selected.length === 1 && selected[0] === this.controlId && this.controls.length > 0) {
       this.changeSelect(this.controls[0])
     }
-    this.multiPageContextMenu = false
-    this.openMenu(e, parentID, controlID, type, mode)
-    Vue.nextTick(() => this.containerRef.contextmenu.focus())
+    EventBus.$emit('contextMenuDisplay', event, parentID, controlID, type, mode)
   }
   handleKeyDown (event: KeyboardEvent) {
-    this.containerRef.refContextMenu.updateAction(event)
+    EventBus.$emit('handleKeyDown', event, this.selectedPageID)
   }
   changeSelect (control: string) {
     this.selectControl({
@@ -911,23 +877,7 @@ export default class FDMultiPage extends FdContainerVue {
     })
   }
   handleContextMenu (e: MouseEvent) {
-    e.preventDefault()
-    const userData = this.userformData[this.userFormId]
-    let selectedPage = -1
-    this.top = `${e.offsetY}px`
-    this.left = `${e.offsetX}px`
-    if (this.isEditMode) {
-      for (const val of this.contextMenuValue) {
-        if (val.id === 'ID_DELETEPAGE' || val.id === 'ID_RENAME') {
-          val.disabled = this.controls.length === 0
-        } else if (val.id === 'ID_MOVE') {
-          val.disabled = this.controls.length <= 1
-        }
-      }
-      this.multiPageContextMenu = true
-      Vue.nextTick(() => this.multipage.focus())
-      this.viewMenu = false
-    }
+    EventBus.$emit('editModeContextMenu', e, this.controlId, this.data, this.isEditMode, this.updatedValue)
   }
   deleteMultiPage (event: KeyboardEvent) {
     if (this.controlId === this.selectedControls[this.userFormId].selected[0]) {
@@ -963,9 +913,13 @@ export default class FDMultiPage extends FdContainerVue {
 
   created () {
     EventBus.$on('updateMultiPageValue', this.updateValue)
+    EventBus.$on('focusTabStrip', () => {
+      this.focusPage()
+    })
   }
   destroyed () {
     EventBus.$off('updateMultiPageValue')
+    EventBus.$off('focusTabStrip')
   }
   updateValue () {
     {
@@ -1161,35 +1115,6 @@ export default class FDMultiPage extends FdContainerVue {
 .content {
   overflow: auto;
 }
-#right-click-menu {
-  background: #fafafa;
-  border: 1px solid #bdbdbd;
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2),
-    0 1px 5px 0 rgba(0, 0, 0, 0.12);
-  display: block;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  position: absolute;
-  width: 100px;
-  z-index: 999999;
-}
-
-#right-click-menu li {
-  border-bottom: 1px solid #e0e0e0;
-  margin: 0;
-  padding: 5px 5px;
-}
-
-#right-click-menu li:last-child {
-  border-bottom: none;
-}
-
-#right-click-menu li:hover {
-  background: #1e88e5;
-  color: #fafafa;
-}
-
 .spanClass {
   text-decoration: underline;
   text-underline-position: under;

@@ -1,23 +1,5 @@
 <template>
   <div @mouseup="onMouseUp">
-    <div
-      id="right-click-menu"
-      :style="contextMenuStyle"
-      ref="contextmenu"
-      tabindex="0"
-      @blur.stop="closeMenu"
-    >
-      <ContextMenu
-        ref="refContextMenu"
-        :userFormId="userFormId"
-        :containerId="containerId"
-        :controlId="controlId"
-        :values="contextMenuType ? userformContextMenu : controlContextMenu"
-        @createGroup="createGroup"
-        @closeMenu="closeMenu"
-        :groupStyleArray="groupStyleArray"
-      />
-    </div>
     <drag-selector
       :class="[!isEditMode ? 'dragSelector' : '']"
       ref="dragSelector"
@@ -40,9 +22,6 @@
         <ResizeControl
           ref="resizeControl"
           :name="control"
-          @openMenu="
-            (e, parentID, controlID, type, mode) => openContextMenu(e, parentID, controlID, type, mode)
-          "
           :controlId="control"
           :containerId="controlId"
           :userFormId="userFormId"
@@ -109,10 +88,6 @@ export default class Container extends FDCommonMethod {
   ) => void;
   @Action('fd/selectControl') selectControl!: (payload: IselectControl) => void;
 
-  @Prop({ required: true, type: Boolean }) viewMenu: boolean;
-  @Prop({ required: true, type: Boolean }) contextMenuType: boolean;
-  @Prop({ required: true, type: String }) top: string;
-  @Prop({ required: true, type: String }) left: string;
   @Prop() isEditMode: boolean;
   @Prop() width: number
   @Prop() height: number
@@ -417,23 +392,11 @@ export default class Container extends FDCommonMethod {
     }
   }
 
-  @Emit('closeMenu')
-  closeMenu () {
-    return 0
-  }
-
   /**
    * @description style object to dynamically changing the styles of  the contextMenu component based on propControlData
    * @function styleObject
    *
    */
-  get contextMenuStyle () {
-    return {
-      top: this.top,
-      left: this.left,
-      display: this.viewMenu ? 'block' : 'none'
-    }
-  }
   get filterSelected () {
     const result =
       this.currentSelectedGroup === ''
@@ -494,7 +457,7 @@ export default class Container extends FDCommonMethod {
    * @param controlId is the selected control of which context has to be displayed
    */
   openContextMenu (e: MouseEvent, parentID: string, controlID: string, type: string, mode: boolean) {
-    this.$emit('openMenu', e, parentID, controlID, type, mode)
+    EventBus.$emit('contextMenuDisplay', event, parentID, controlID, type, mode)
   }
   created () {
     EventBus.$on('handleName', (handler: string) => {
@@ -502,6 +465,9 @@ export default class Container extends FDCommonMethod {
     })
     EventBus.$on('groupDrag', (handler: string) => {
       this.grouphandler = handler
+    })
+    EventBus.$on('createGroup', (groupId: string) => {
+      this.createGroup(groupId)
     })
   }
   // destroyed () {
@@ -511,6 +477,7 @@ export default class Container extends FDCommonMethod {
   @Watch('selectedControls', { deep: true })
   updateGroupStyle () {
     if (this.selectedContainer === this.containerId) {
+      EventBus.$emit('groupArray', this.groupRef.divStyleArray)
       this.groupStyleArray = [...this.groupRef.divStyleArray]
     }
   }
@@ -518,34 +485,6 @@ export default class Container extends FDCommonMethod {
 </script>
 
 <style scoped>
-#right-click-menu {
-  background: #fafafa;
-  border: 1px solid #bdbdbd;
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2),
-    0 1px 5px 0 rgba(0, 0, 0, 0.12);
-  display: block;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  position: absolute;
-  width: 100px;
-  z-index: 999999;
-}
-
-#right-click-menu li {
-  border-bottom: 1px solid #e0e0e0;
-  margin: 0;
-  padding: 5px 5px;
-}
-
-#right-click-menu li:last-child {
-  border-bottom: none;
-}
-
-#right-click-menu li:hover {
-  background: #1e88e5;
-  color: #fafafa;
-}
 :focus {
   outline: none;
 }

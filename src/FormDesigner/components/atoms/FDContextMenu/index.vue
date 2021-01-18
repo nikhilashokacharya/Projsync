@@ -12,7 +12,7 @@
             'padding-top': value.text === 'none' ? '0px' : '',
             outline: value.text === 'none' ? 'none' : '',
           }"
-          @mousedown.stop="value.disabled === false ? controlAction(value.id) : controlDisable($event)"
+          @mousedown.stop="value.disabled === false ? controlAction($event,value.id) : controlDisable($event)"
         >
           <div>
             <FDSVGImage v-if="value.icon" :name="value.icon" />
@@ -45,7 +45,7 @@
                     'padding-top': subVal.text === 'none' ? '0px' : '',
                     outline: subVal.text === 'none' ? 'none' : '',
                   }"
-                  @mousedown.stop="subVal.disabled === false ? controlAction(value.id, subVal.id): controlDisable($event)"
+                  @mousedown.stop="subVal.disabled === false ? controlAction($event,value.id, subVal.id): controlDisable($event)"
                 >
                   <div>
                     <FDSVGImage v-if="subVal.icon" :name="subVal.icon" />
@@ -108,6 +108,10 @@ export default class ContextMenu extends FDCommonMethod {
   @Prop() selectedTab: number;
   @Prop() data: controlData;
   @Prop() groupStyleArray: Array<IGroupStyle>
+  @Prop() contextMenutype: string
+  @Prop() editTextRef: HTMLSpanElement | HTMLTextAreaElement
+  @Prop() copiedText: string
+  @Prop() textMenu: boolean
 
   @State((state) => state.fd.selectedControls)
   selectedControls!: fdState['selectedControls'];
@@ -139,56 +143,109 @@ export default class ContextMenu extends FDCommonMethod {
   @Action('fd/addChildControls') addChildControls!: (
     payload: IaddChildControls
   ) => void;
-  controlAction (controlActionName: string, subVal: string) {
-    if (controlActionName === 'ID_COPY') {
-      this.copyControl('copy')
-    } else if (controlActionName === 'ID_DELETE') {
-      this.clickDelete()
-    } else if (controlActionName === 'ID_PASTE') {
-      this.pasteControl()
-    } else if (controlActionName === 'ID_CUT') {
-      this.cutControl()
-    } else if (controlActionName === 'ID_SELECTALL') {
-      this.selectAll()
-    } else if (controlActionName === 'ID_GROUP') {
-      this.groupControl()
-    } else if (controlActionName === 'ID_UNGROUP') {
-      this.unGroupControl()
-    } else if (controlActionName === 'ID_NEWPAGE') {
-      this.addNewPage()
-    } else if (controlActionName === 'ID_DELETEPAGE') {
-      this.deleteCurrentPage()
-    } else if (controlActionName === 'ID_CONTROLFORWARD') {
-      this.bringForward()
-    } else if (controlActionName === 'ID_CONTROLBACKWARD') {
-      this.bringBackward()
-    } else if (controlActionName === 'ID_OBJECTPROP') {
-      this.displayProp()
-    } else if (controlActionName === 'ID_RENAME') {
-      const selectedPageID = this.selectedControls[this.userFormId].selected[0]
-      EventBus.$emit(
-        'renamePage',
-        this.userFormId,
-        selectedPageID,
-        this.selectedTab,
-        this.userformData[this.userFormId][selectedPageID].type
-      )
-    } else if (controlActionName === 'ID_MOVE') {
-      const type = this.userformData[this.userFormId][this.controlId].type
-      if (type === 'MultiPage') {
-        EventBus.$emit('userFormTabOrder', this.userFormId, this.controlId, type)
-      } else {
-        EventBus.$emit('tabStripTabOrder', this.userFormId, this.controlId, type)
-      }
-    } else if (controlActionName === 'ID_TABORDER') {
-      EventBus.$emit('userFormTabOrder', this.userFormId, this.containerId, '')
-    } else if (
-      controlActionName === 'ID_ALIGN' ||
+  controlAction (event: Event, controlActionName: string, subVal: string) {
+    if (this.textMenu === false) {
+      if (controlActionName === 'ID_COPY') {
+        this.copyControl('copy')
+      } else if (controlActionName === 'ID_DELETE') {
+        this.clickDelete()
+      } else if (controlActionName === 'ID_PASTE') {
+        this.pasteControl()
+      } else if (controlActionName === 'ID_CUT') {
+        this.cutControl()
+      } else if (controlActionName === 'ID_SELECTALL') {
+        this.selectAll()
+      } else if (controlActionName === 'ID_GROUP') {
+        this.groupControl()
+      } else if (controlActionName === 'ID_UNGROUP') {
+        this.unGroupControl()
+      } else if (controlActionName === 'ID_NEWPAGE') {
+        this.addNewPage()
+      } else if (controlActionName === 'ID_DELETEPAGE') {
+        this.deleteCurrentPage()
+      } else if (controlActionName === 'ID_CONTROLFORWARD') {
+        this.bringForward()
+      } else if (controlActionName === 'ID_CONTROLBACKWARD') {
+        this.bringBackward()
+      } else if (controlActionName === 'ID_OBJECTPROP') {
+        this.displayProp()
+      } else if (controlActionName === 'ID_RENAME') {
+        const selectedPageID = this.selectedControls[this.userFormId].selected[0]
+        EventBus.$emit(
+          'renamePage',
+          this.userFormId,
+          selectedPageID,
+          this.selectedTab,
+          this.userformData[this.userFormId][selectedPageID].type
+        )
+      } else if (controlActionName === 'ID_MOVE') {
+        const type = this.userformData[this.userFormId][this.controlId].type
+        if (type === 'MultiPage') {
+          EventBus.$emit('userFormTabOrder', this.userFormId, this.controlId, type)
+        } else {
+          EventBus.$emit('tabStripTabOrder', this.userFormId, this.controlId, type)
+        }
+      } else if (controlActionName === 'ID_TABORDER') {
+        EventBus.$emit('userFormTabOrder', this.userFormId, this.containerId, '')
+      } else if (
+        controlActionName === 'ID_ALIGN' ||
       controlActionName === 'ID_MAKESAMESIZE'
-    ) {
-      this.controlAlignMent(subVal)
+      ) {
+        this.controlAlignMent(subVal)
+      }
+    } else {
+      if (controlActionName === 'ID_COPY') {
+        this.copyText()
+      } else if (controlActionName === 'ID_DELETE') {
+        this.deleteText()
+      } else if (controlActionName === 'ID_PASTE') {
+        if (event instanceof MouseEvent) {
+          this.pasteText(event)
+        }
+      } else if (controlActionName === 'ID_CUT') {
+        this.cutText()
+      } else if (controlActionName === 'ID_OBJECTPROP') {
+        this.displayProp()
+      }
     }
     this.closeMenu()
+  }
+  cutText () {
+    document.execCommand('cut')
+  }
+  deleteText () {
+    document.execCommand('delete')
+  }
+  copyText () {
+    document.execCommand('copy')
+  }
+  pasteText (event: MouseEvent) {
+    const controlType = this.userformData[this.userFormId][this.controlId].type
+    const position = this.getCursorPos(event)
+    const length = position.endPosition - position.startPosition
+    let baseValue = this.editTextRef.innerHTML.split('')
+    baseValue.splice(position.startPosition, length)
+    const updateValue = baseValue.slice(0, position.startPosition).join('') + this.copiedText + baseValue.slice(position.startPosition).join('')
+    EventBus.$emit('updateText', updateValue)
+  }
+  getCursorPos (event: MouseEvent) {
+    let startPosition = 0
+    let endPosition = 0
+    const isSupported = typeof window.getSelection !== 'undefined'
+    if (isSupported) {
+      const selection = window.getSelection()!
+      if (selection.anchorOffset > selection.focusOffset) {
+        startPosition = selection.focusOffset
+        endPosition = selection.anchorOffset
+      } else if (selection.anchorOffset === selection.focusOffset) {
+        startPosition = selection.focusOffset
+        endPosition = selection.focusOffset
+      } else {
+        startPosition = selection.anchorOffset
+        endPosition = selection.focusOffset
+      }
+    }
+    return { startPosition: startPosition, endPosition: endPosition }
   }
   created () {
     EventBus.$on('groupControl', (value: string) => {
@@ -439,7 +496,6 @@ export default class ContextMenu extends FDCommonMethod {
           }
         } else {
           if (Object.keys(nextSelctedSeries).length !== 0) {
-            console.log('nextSelctedSeries', nextSelctedSeries)
             const tempExchageIndex = userData[nextSelctedSeries[0]].extraDatas!.zIndex!
             const swapTabIndex = userData[nextSelectedControl].extraDatas!.zIndex!
             if (swapTabIndex <= userData[container].controls.length && swapTabIndex > 0) {
@@ -731,6 +787,7 @@ export default class ContextMenu extends FDCommonMethod {
    * @function selectAll
    */
   selectAll () {
+    // const selecetedContainer = this.selectedControls[this.userFormId].container[0]
     const controlObjectList = [
       ...this.userformData[this.userFormId][this.containerId].controls
     ]
@@ -1175,7 +1232,7 @@ export default class ContextMenu extends FDCommonMethod {
     } else if (event.keyCode && event.code === 'KeyX') {
       controlActionName = 'ID_CUT'
     }
-    this.controlAction(controlActionName, '')
+    this.controlAction(event, controlActionName, '')
   }
   updatePropVal (propName: string, propValue: number) {
     const ctrlSel = this.selectedControls[this.userFormId].selected

@@ -28,26 +28,12 @@ export default abstract class FdContainerVue extends FdControlVue {
   @Action('fd/updateControl') updateControl!: (payload: IupdateControl) => void;
   @Action('fd/updateControlExtraData') updateControlExtraData!: (payload: IupdateControlExtraData) => void;
 
-  contextMenuType: boolean = false;
-  viewMenu: boolean = false
-  top: string = '0px'
-  left: string = '0px'
-
   controlContextMenu: Array<IcontextMenu> = controlContextMenu;
   userformContextMenu: Array<IcontextMenu> = userformContextMenu;
   selectedControlArray: Array<string> = [];
   selectedAreaStyle: ISelectedArea | undefined
   selMultipleCtrl: boolean = false
   activateCtrl: boolean = false
-  /**
- * @description  close the contextMenu
- * @function closeMenu
- * @param this  - container Vue Component
- * @event click
- */
-  closeMenu (this: this) {
-    this.viewMenu = false
-  }
 
   get selConatiner () {
     return this.selectedControls[this.userFormId].container
@@ -227,8 +213,8 @@ export default abstract class FdContainerVue extends FdControlVue {
       const sw = parseInt(this.selectedAreaStyle!.width!)
       const sh = parseInt(this.selectedAreaStyle!.height)
 
-      item.properties.Left = (isNaN(sw!) || sw! === 0) ? e.offsetX : parseInt(this.selectedAreaStyle!.left)
-      item.properties.Top = (isNaN(sh!) || sh! === 0) ? e.offsetY : parseInt(this.selectedAreaStyle!.top)
+      item.properties.Left = parseInt(this.selectedAreaStyle!.left)
+      item.properties.Top = parseInt(this.selectedAreaStyle!.top)
       item.properties.Width = (isNaN(sw!) || sw! === 0) ? item.properties.Width : sw
       item.properties.Height = (isNaN(sh!) || sh! === 0) ? item.properties.Height : sh
       const controls = item.controls
@@ -376,130 +362,6 @@ export default abstract class FdContainerVue extends FdControlVue {
         userFormId: this.userFormId,
         select: { container: controlType === 'Userform' ? [this.controlId] : this.getContainerList(this.controlId), selected: [this.controlId] }
       })
-    }
-  }
-
-  /**
-   * @description  open the contextMenu
-   * @function openMenu
-   * @param  e -> it is of type MouseEvent
-   * @param  parentID -> ContainerId
-   * @param  parentID -> controlId
-   * @event contextmenu
-   */
-  openMenu (e: MouseEvent, parentID: string, controlID: string, type: string, mode: boolean) {
-    e.preventDefault()
-    const id = (e.target! as HTMLDivElement).id ? (e.target! as HTMLDivElement).id : ''
-    const selected = this.selectedControls[this.userFormId].selected
-    const userData = this.userformData[this.userFormId]
-    let groupId = ''
-    if (!selected.includes(controlID)) {
-      groupId = userData[controlID].type === 'MultiPage' ? selected[0] : controlID
-      if ('GroupID' in userData[controlID].properties && userData[controlID].properties.GroupID !== '') {
-        groupId = this.userformData[this.userFormId][controlID].properties.GroupID!
-      }
-      if (groupId && !selected.includes(groupId)) {
-        this.selectControl({
-          userFormId: this.userFormId,
-          select: { container: this.getContainerList(groupId), selected: [groupId] }
-        })
-      }
-    }
-    const controlType = this.userformData[this.userFormId][controlID].type
-    const containerType = this.userformData[this.userFormId][this.containerId].type
-    if (type === 'container' && !groupId.startsWith('group') && selected.length <= 1) {
-      this.contextMenuType = true
-    } else {
-      this.contextMenuType = false
-    }
-    const targetElement = (e.target! as HTMLDivElement).style
-    const controlLeft: number | undefined = this.userformData[this.userFormId][controlID].properties.Left!
-    const controlTop: number | undefined = this.userformData[this.userFormId][controlID].properties.Top!
-    this.top = controlType === 'Frame' || controlType === 'MultiPage'
-      ? (type === 'container'
-        ? (id.startsWith('group') ? `${parseInt(targetElement.top) + e.offsetY}px` : `${e.offsetY}px`)
-        : `${e.offsetY + controlTop! + 30}px`)
-      : (containerType === 'Frame' || containerType === 'MultiPage')
-        ? `${e.offsetY + controlTop!}px`
-        : id.startsWith('group')
-          ? `${parseInt(targetElement.top) + e.offsetY}px`
-          : `${e.offsetY + controlTop! + 30}px`
-    this.left =
-    controlType === 'Frame' || controlType === 'MultiPage'
-      ? (type === 'container'
-        ? (id.startsWith('group') ? `${parseInt(targetElement.left) + e.offsetX}px` : `${e.offsetX}px`)
-        : `${e.offsetX + controlLeft!}px`)
-      : id.startsWith('group')
-        ? `${parseInt(targetElement.left) + e.offsetX}px`
-        : `${e.offsetX + controlLeft!}px`
-    this.viewMenu = true
-    const controlLength = selected[0].startsWith('group') ? this.userformData[this.userFormId][this.controlId].controls.length : this.userformData[this.userFormId][selected[0]].controls.length
-    const contextMenuData = (type === 'container' && !groupId.startsWith('group') && selected.length <= 1)
-      ? this.userformContextMenu
-      : this.controlContextMenu
-    if ((controlType === 'SpinButton' || controlType === 'ScrollBar' || controlType === 'ListBox') && mode) {
-      for (const val of contextMenuData) {
-        if (val.id === 'ID_OBJECTPROP') {
-          val.disabled = false
-        } else if (val.id === 'ID_ALIGN' || val.id === 'ID_MAKESAMESIZE') {
-          for (let index = 0; index < val.values.length; index++) {
-            val.values[index].disabled = true
-          }
-        } else {
-          val.disabled = true
-        }
-      }
-    } else {
-      for (const val of contextMenuData) {
-        if (val.id === 'ID_SELECTALL') {
-          val.disabled = controlLength === 0
-        }
-        if (val.id === 'ID_DELETE' && this.contextMenuType) {
-          val.disabled = !(selected.length === 1 && !selected[0].startsWith('group') &&
-            (userData[controlID].type === 'Frame' || userData[selected[0]].type === 'Page'))
-        }
-        if (val.id === 'ID_PASTE') {
-          val.disabled = Object.keys(this.copiedControl[this.userFormId]).length === 1
-        }
-        if (val.id === 'ID_CUT' || val.id === 'ID_COPY' || val.id === 'ID_OBJECTPROP' || val.id === 'ID_VIEWCODE') {
-          val.disabled = false
-        }
-        if (val.id === 'ID_GROUP' || val.id === 'ID_UNGROUP') {
-          const selected = this.selectedControls[this.userFormId].selected
-          let groupId: boolean = false
-          for (const key of selected) {
-            if (!key.startsWith('group') && !key.startsWith('ID_USERFORM')) {
-              groupId =
-                  this.userformData[this.userFormId][key].properties.GroupID === ''
-            }
-          }
-          const selectedGroupArray = selected.filter(
-            (val: string) => val.startsWith('group') && val
-          )
-          if (!groupId && selectedGroupArray.length <= 1) {
-            val.text = '<u>U</u>ngroup'
-            val.id = 'ID_UNGROUP'
-          } else {
-            val.text = '<u>G</u>roup'
-            val.id = 'ID_GROUP'
-            val.disabled =
-                this.selectedControls[this.userFormId].selected.length <= 1
-          }
-        }
-        if (val.id === 'ID_CONTROLFORWARD' || val.id === 'ID_CONTROLBACKWARD') {
-          const selectedConatiner = this.selectedControls[this.userFormId].container[0]
-          val.disabled = userData[selectedConatiner].controls.length <= 1
-        }
-        if (val.id === 'ID_ALIGN' || val.id === 'ID_MAKESAMESIZE') {
-          for (let index = 0; index < val.values.length; index++) {
-            if (val.values[index].id === 'ID_GRID') {
-              val.values[index].disabled = !(this.selectedControls[this.userFormId].selected.length > 0)
-            } else {
-              val.values[index].disabled = this.selectedControls[this.userFormId].selected.length <= 1
-            }
-          }
-        }
-      }
     }
   }
 

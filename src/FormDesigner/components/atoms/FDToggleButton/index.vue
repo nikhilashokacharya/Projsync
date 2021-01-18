@@ -14,7 +14,8 @@
         isFocus = false;
       }
     "
-    @click.stop="toggleButtonClick"
+    @click="toggleButtonClick"
+    @contextmenu="isEditMode ? openTextContextMenu($event): parentConextMenu($event)"
   >
     <span v-if="!syncIsEditMode || isRunMode">
       <span>{{ computedCaption.afterbeginCaption }}</span>
@@ -72,31 +73,34 @@ export default class FDToggleButton extends Mixins(FdControlVue) {
    * @param MouseEvent
    */
   toggleButtonClick (e: MouseEvent) {
-    if (this.isRunMode) {
-      this.clickCount = this.clickCount + 1
-      if (this.properties.Locked === false) {
-        this.isFocus = true
-        this.isClicked = !this.isClicked
-        if (this.properties.TripleState) {
-          if (this.clickCount % 3 === 0) {
-            this.updateDataModel({ propertyName: 'Value', value: '' })
+    if (this.toolBoxSelectControl === 'Select') {
+      e.stopPropagation()
+      if (this.isRunMode) {
+        this.clickCount = this.clickCount + 1
+        if (this.properties.Locked === false) {
+          this.isFocus = true
+          this.isClicked = !this.isClicked
+          if (this.properties.TripleState) {
+            if (this.clickCount % 3 === 0) {
+              this.updateDataModel({ propertyName: 'Value', value: '' })
+            } else if (this.isClicked) {
+              this.updateDataModel({ propertyName: 'Value', value: 'True' })
+            } else {
+              this.updateDataModel({ propertyName: 'Value', value: 'False' })
+            }
           } else if (this.isClicked) {
             this.updateDataModel({ propertyName: 'Value', value: 'True' })
           } else {
             this.updateDataModel({ propertyName: 'Value', value: 'False' })
           }
-        } else if (this.isClicked) {
-          this.updateDataModel({ propertyName: 'Value', value: 'True' })
         } else {
-          this.updateDataModel({ propertyName: 'Value', value: 'False' })
+          this.isClicked = false
         }
-      } else {
-        this.isClicked = false
       }
-    }
-    this.selectedItem(e)
-    if (this.isEditMode) {
-      (this.$el.children[0] as HTMLSpanElement).focus()
+      this.selectedItem(e)
+      if (this.isEditMode) {
+        (this.$el.children[0] as HTMLSpanElement).focus()
+      }
     }
   }
 

@@ -11,7 +11,7 @@
       :class="classStyle"
       :style="styleObj"
       :title="properties.ControlTipText"
-      @click="selectedItem"
+      @click="spinButtonClick"
     >
       <div
         @click="
@@ -265,6 +265,12 @@ export default class FDSpinButton extends Mixins(FdControlVue) {
     const eventStop = (event: Event) => event.stopPropagation()
     return this.isEditMode === false ? null : {
       keydown: eventStop
+    }
+  }
+  spinButtonClick (event: MouseEvent) {
+    if (this.toolBoxSelectControl === 'Select') {
+      event.stopPropagation()
+      this.selectedItem(event)
     }
   }
 }

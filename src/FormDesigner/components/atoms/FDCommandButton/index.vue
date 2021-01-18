@@ -13,7 +13,8 @@
     "
     @mousedown="controlEditMode"
     @keydown.enter.prevent="setContentEditable($event, true)"
-    @click.stop="commandButtonClick"
+    @click="commandButtonClick"
+    @contextmenu="isEditMode ? openTextContextMenu($event): parentConextMenu($event)"
   >
     <span v-if="!syncIsEditMode || isRunMode">
       <span>{{ computedCaption.afterbeginCaption }}</span>
@@ -70,18 +71,21 @@ export default class FDCommandButton extends Mixins(FdControlVue) {
    *
    */
   commandButtonClick (e: Event) {
-    if (!this.isRunMode) {
-      this.selectedItem(e)
-    }
-    if (this.isActivated) {
-      if (this.properties.Locked) {
-        this.isClicked = false
-      } else {
-        this.isClicked = true
+    if (this.toolBoxSelectControl === 'Select') {
+      e.stopPropagation()
+      if (!this.isRunMode) {
+        this.selectedItem(e)
       }
-    }
-    if (this.isEditMode) {
-      (this.$el.children[0] as HTMLSpanElement).focus()
+      if (this.isActivated) {
+        if (this.properties.Locked) {
+          this.isClicked = false
+        } else {
+          this.isClicked = true
+        }
+      }
+      if (this.isEditMode) {
+        (this.$el.children[0] as HTMLSpanElement).focus()
+      }
     }
   }
 

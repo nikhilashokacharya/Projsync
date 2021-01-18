@@ -3,9 +3,10 @@
     :title="properties.ControlTipText"
     class="outer-check"
     :style="cssStyleProperty"
-    @click.stop="optionBtnClick"
+    @click="optionBtnClick"
     :tabindex="properties.TabIndex"
     @keydown.enter.prevent="setContentEditable($event, true)"
+    @contextmenu="isEditMode ? openTextContextMenu($event): parentConextMenu($event)"
   >
     <label
       class="control"
@@ -461,9 +462,12 @@ export default class FDOptionButton extends Mixins(FdControlVue) {
     this.setContentEditable(event, false)
   }
   optionBtnClick (event: MouseEvent) {
-    this.selectedItem(event)
-    if (this.isEditMode) {
-      (this.optionBtnSpanRef.$el as HTMLSpanElement).focus()
+    if (this.toolBoxSelectControl === 'Select') {
+      event.stopPropagation()
+      this.selectedItem(event)
+      if (this.isEditMode) {
+        (this.optionBtnSpanRef.$el as HTMLSpanElement).focus()
+      }
     }
   }
 }

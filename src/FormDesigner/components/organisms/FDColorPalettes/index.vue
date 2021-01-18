@@ -19,7 +19,7 @@
     <div class="grid-design1">
       <div></div>
       <div class="outer-border">
-        <div
+        <div :style="colorPallete"
           class="tabs"
           ref="colorPalleteRef"
           tabindex="1"
@@ -99,11 +99,15 @@ export default class FDColorPalettes extends Vue {
   @Prop() name: string;
   @Ref('colorPalleteRef') readonly colorPalleteRef!: HTMLDivElement;
   private isVisible = false;
+  top: number = 0
+  left: number = 0
   colors: Array<IColors> = colors;
   colorSystem: Array<ISelectedValue> = colorSystem;
   selectedValue: ISelectedValue
 
-  openColorPalette () {
+  openColorPalette (event: MouseEvent) {
+    this.top = event.y
+    this.left = event.x
     if (this.isVisible === true) {
       this.isVisible = false
     } else if (this.isVisible === false) {
@@ -146,6 +150,16 @@ export default class FDColorPalettes extends Vue {
       marginLeft: '-2px'
     }
   }
+  get colorPallete () {
+    debugger
+    const height = 174
+    const colorPalleteTop = window.innerHeight > (this.top + height + 12) ? this.top + 12 : this.top - height - 12
+    const colorPaletteLeft = (this.left - 195) > 0 ? this.left - 195 : 0
+    return {
+      top: `${colorPalleteTop}px`,
+      left: `${colorPaletteLeft}px`
+    }
+  }
 }
 </script>
 
@@ -156,10 +170,11 @@ export default class FDColorPalettes extends Vue {
   width: 100%;
   height: 17px;
 }
-grid-design1 {
+.grid-design1 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   background-color: rgb(238, 238, 238);
+  position: relative;
 }
 .color-input {
   border: none;
@@ -168,19 +183,13 @@ grid-design1 {
   width: calc(100% - 20px);
 }
 .tabs {
-  position: absolute;
+  position: fixed;
   min-height: 174px;
   width: 204px;
-  top: 18px;
   border: 1px solid gray;
   background-color: rgb(240, 240, 240);
   clear: both;
-  align-self: right;
   z-index: 400;
-  right: 0px;
-  margin: 0px 0px;
-  float: right;
-  margin-right: 0px;
   outline: none;
 }
 .tab {
