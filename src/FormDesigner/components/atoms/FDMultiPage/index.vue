@@ -95,7 +95,7 @@
           </div>
         </div>
         <div></div>
-        <div :style="getScrollButtonStyleObj">
+        <div :style="getScrollButtonStyleObj" ref="buttonStyleRef">
           <button class="left-button" @click="leftmove"></button>
           <button class="right-button" @click="rightmove"></button>
         </div>
@@ -159,6 +159,7 @@ export default class FDMultiPage extends FdContainerVue {
   @Ref('multipage') multipage: HTMLDivElement;
   @Ref('controlTabsRef') controlTabsRef: HTMLDivElement[];
   @Ref('controlTab') controlTab: FDControlTabs[];
+  @Ref('buttonStyleRef') buttonStyleRef: HTMLDivElement;
 
   viewMenu: boolean = false;
   top: string = '0px';
@@ -318,8 +319,7 @@ export default class FDMultiPage extends FdContainerVue {
         ? this.selectedPageData.properties.Zoom! / 100
         : ''
       return {
-        height: '100%',
-        width: '100%',
+        width: 'fit-content',
         position: 'relative',
         backgroundImage: `url(${this.selectedPageData.properties.Picture})`,
         backgroundSize:
@@ -453,8 +453,36 @@ export default class FDMultiPage extends FdContainerVue {
       this.properties.TabOrientation === 1
     ) {
       scrollRef.scrollLeft! -= 50
+      if (this.scrolling) {
+        const rightButton = this.buttonStyleRef.children[1] as HTMLButtonElement
+        const leftButton = this.buttonStyleRef.children[0] as HTMLButtonElement
+        if (this.scrolling.scrollLeft >= (this.scrolling.scrollWidth - this.scrolling.clientWidth)) {
+          rightButton.style.opacity = '0.4'
+          leftButton.style.opacity = '1'
+        } else if (this.scrolling.scrollLeft === 0) {
+          leftButton.style.opacity = '0.4'
+          rightButton.style.opacity = '1'
+        } else {
+          leftButton.style.opacity = '1'
+          rightButton.style.opacity = '1'
+        }
+      }
     } else {
       scrollRef.scrollTop! -= 50
+      if (this.scrolling) {
+        const rightButton = this.buttonStyleRef.children[1] as HTMLButtonElement
+        const leftButton = this.buttonStyleRef.children[0] as HTMLButtonElement
+        if (this.scrolling.scrollTop >= (this.scrolling.scrollHeight - this.scrolling.clientHeight)) {
+          rightButton.style.opacity = '0.4'
+          leftButton.style.opacity = '1'
+        } else if (this.scrolling.scrollTop === 0) {
+          leftButton.style.opacity = '0.4'
+          rightButton.style.opacity = '1'
+        } else {
+          leftButton.style.opacity = '1'
+          rightButton.style.opacity = '1'
+        }
+      }
     }
   }
 
@@ -471,9 +499,37 @@ export default class FDMultiPage extends FdContainerVue {
       this.properties.TabOrientation === 1
     ) {
       scrollRef.scrollLeft! += 50
+      if (this.scrolling) {
+        const rightButton = this.buttonStyleRef.children[1] as HTMLButtonElement
+        const leftButton = this.buttonStyleRef.children[0] as HTMLButtonElement
+        if (this.scrolling.scrollLeft >= (this.scrolling.scrollWidth - this.scrolling.clientWidth - 1)) {
+          rightButton.style.opacity = '0.4'
+          leftButton.style.opacity = '1'
+        } else if (this.scrolling.scrollLeft === 0) {
+          leftButton.style.opacity = '0.4'
+          rightButton.style.opacity = '1'
+        } else {
+          leftButton.style.opacity = '1'
+          rightButton.style.opacity = '1'
+        }
+      }
     } else {
       tempScrollTop += 50
       scrollRef.scrollTop = tempScrollTop
+      if (this.scrolling) {
+        const rightButton = this.buttonStyleRef.children[1] as HTMLButtonElement
+        const leftButton = this.buttonStyleRef.children[0] as HTMLButtonElement
+        if (this.scrolling.scrollTop >= (this.scrolling.scrollHeight - this.scrolling.clientHeight - 1)) {
+          rightButton.style.opacity = '0.4'
+          leftButton.style.opacity = '1'
+        } else if (this.scrolling.scrollTop === 0) {
+          leftButton.style.opacity = '0.4'
+          rightButton.style.opacity = '1'
+        } else {
+          leftButton.style.opacity = '1'
+          rightButton.style.opacity = '1'
+        }
+      }
     }
   }
 
