@@ -25,16 +25,19 @@
       :containerId="controlId"
       :isEditMode="isEditMode"
       ref="containerRef"
+      :getSampleDotPattern="getSampleDotPattern"
     />
-    </div>
-    <Container
-      v-else
+      </div>
+      <div  v-else :style="scrollStyle">
+      <Container
       :userFormId="userFormId"
       :controlId="controlId"
       :containerId="controlId"
       :isEditMode="isEditMode"
+      :getSampleDotPattern="getSampleDotPattern"
       ref="containerRef"
-    />
+      />
+      </div>
   </div>
   </fieldset>
 </div>
@@ -216,10 +219,7 @@ export default class FDFrame extends FdContainerVue {
       borderRight: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 1 ? '2px solid gray' : controlProp.SpecialEffect === 4 ? '1.5px solid gray' : controlProp.SpecialEffect === 3 ? '0.5px solid gray' : 'none',
       borderTop: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 2 ? '2px solid gray' : controlProp.SpecialEffect === 3 ? '1.5px solid gray' : controlProp.SpecialEffect === 4 ? '0.5px solid gray' : 'none',
       borderBottom: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 1 ? '2px solid gray' : controlProp.SpecialEffect === 4 ? '1.5px solid gray' : controlProp.SpecialEffect === 3 ? '0.5px solid gray' : 'none',
-      backgroundImage: this.getSampleDotPattern.backgroundImage,
-      backgroundSize: this.getSampleDotPattern.backgroundSize,
       backgroundColor: controlProp.BackColor,
-      backgroundRepeat: this.getRepeatData,
       backgroundPosition: this.getPosition,
       display: display,
       zoom: `${controlProp.Zoom}%`,
@@ -273,11 +273,18 @@ export default class FDFrame extends FdContainerVue {
     const controlProp = this.data.properties!
     return {
       width: `${controlProp.Width! - 3}px`,
-      height: this.fieldsetRef ? (controlProp.Height! - (this.captionHeight / 2) - 2) + 'px' : '',
+      height: this.fieldsetRef ? (controlProp.Height! - (this.captionHeight / 2) - 2) + 'px' : '100%',
       overflowX: this.getScrollBarX,
       overflowY: this.getScrollBarY,
       position: 'relative',
       top: this.fieldsetRef && this.properties.Caption !== '' ? '-' + ((this.captionHeight / 2) - 1) + 'px' : ''
+    }
+  }
+  get scrollStyle () {
+    const controlProp = this.data.properties!
+    return {
+      height: controlProp.ScrollHeight + 'px',
+      width: controlProp.ScrollWidth + 'px'
     }
   }
 

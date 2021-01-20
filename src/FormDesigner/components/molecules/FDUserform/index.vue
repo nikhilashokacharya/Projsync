@@ -10,6 +10,7 @@
         </button>
       </div>
     </div>
+    <div :style="innerWindowBody">
     <div
       class="inner-window-content"
       :style="innerWindowBodyStyle"
@@ -28,8 +29,10 @@
         :isEditMode="true"
         ref="containerRef"
         :mouseCursorData="getMouseCursorData"
+        :getSampleDotPattern="getSampleDotPattern"
       >
       </Container>
+    </div>
     </div>
   </div>
 </template>
@@ -121,6 +124,16 @@ export default class UserForm extends FdContainerVue {
       top: `${this.properties.Top}px`
     }
   }
+  protected get innerWindowBody (): Partial<CSSStyleDeclaration> {
+    return {
+      position: 'relative',
+      width: '100%',
+      height: '100%',
+      backgroundColor: this.properties.BackColor,
+      overflowX: this.getScrollBarX,
+      overflowY: this.getScrollBarY
+    }
+  }
   protected get innerWindowBodyStyle (): Partial<CSSStyleDeclaration> {
     const font: font = this.properties.Font
       ? this.properties.Font
@@ -129,8 +142,10 @@ export default class UserForm extends FdContainerVue {
         FontSize: 10
       }
     const scale = (this.properties.Zoom! * 10) / 100
+    const controlProp = this.properties
     return {
-      ...this.getSampleDotPattern,
+      height: controlProp.ScrollHeight === 0 || controlProp.ScrollHeight! < controlProp.Height! ? (controlProp.Height! - 30) + 'px' : (controlProp.ScrollHeight! - 30) + 'px',
+      width: controlProp.ScrollWidth === 0 || controlProp.ScrollWidth! < controlProp.Width! ? controlProp.Width! + 'px' : controlProp.ScrollWidth! + 'px',
       borderLeft: this.data.properties.BorderStyle === 1 ? '1px solid ' + this.data.properties.BorderColor : this.data.properties.SpecialEffect === 2 ? '2px solid gray' : this.data.properties.SpecialEffect === 3 ? '1.5px solid gray' : this.data.properties.SpecialEffect === 4 ? '0.5px solid gray' : '',
       borderRight: this.data.properties.BorderStyle === 1 ? '1px solid ' + this.data.properties.BorderColor : this.data.properties.SpecialEffect === 1 ? '2px solid gray' : this.data.properties.SpecialEffect === 4 ? '1.5px solid gray' : this.data.properties.SpecialEffect === 3 ? '0.5px solid gray' : '',
       borderTop: this.data.properties.BorderStyle === 1 ? '1px solid ' + this.data.properties.BorderColor : this.data.properties.SpecialEffect === 2 ? '2px solid gray' : this.data.properties.SpecialEffect === 3 ? '1.5px solid gray' : this.data.properties.SpecialEffect === 4 ? '0.5px solid gray' : '',
@@ -152,24 +167,10 @@ export default class UserForm extends FdContainerVue {
               : '',
       fontWeight: font.FontBold ? 'bold' : '',
       borderColor: this.data.properties.BorderStyle === 1 ? this.data.properties.BorderColor : '',
-      backgroundImage:
-        this.properties.Picture === ''
-          ? this.getSampleDotPattern.backgroundImage
-          : this.createBackgroundString,
-      backgroundSize:
-        this.properties.Picture === ''
-          ? this.getSampleDotPattern.backgroundSize
-          : this.getSizeMode,
-      backgroundColor: this.properties.BackColor,
+      backgroundImage: this.createBackgroundString,
+      backgroundSize: this.getSizeMode,
       backgroundRepeat: this.getRepeatData,
-      backgroundPosition:
-        this.properties.Picture !== ''
-          ? this.getPosition
-          : this.getSampleDotPattern.backgroundPosition,
-      // backgroundPositionX: this.getPositionX,
-      // backgroundPositionY: this.getPositionY,
-      overflowX: this.getScrollBarX,
-      overflowY: this.getScrollBarY
+      backgroundPosition: this.getPosition
     }
   }
 
@@ -257,7 +258,6 @@ export default class UserForm extends FdContainerVue {
 .inner-window-content {
   flex: 1;
   left: 0px;
-  overflow: hidden;
   background-position: 9px 9px;
 }
 .inner-window-content:focus {

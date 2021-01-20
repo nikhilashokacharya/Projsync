@@ -144,6 +144,7 @@ export default class ResizeControl extends FdSelectVue {
 
   dragGroupControl (event: MouseEvent) {
     if (this.toolBoxSelect === 'Select') {
+      event.stopPropagation()
       if (this.selectedControls[this.userFormId].selected.length > 1 && this.selMultipleCtrl === false) {
         if (event.which !== 3 && this.isMoveWhenMouseDown) {
           this.selectedItem(event)
@@ -294,11 +295,13 @@ export default class ResizeControl extends FdSelectVue {
           this.syncCurrentSelectedGroup = currentGroup
         }
       }
-      if ((this.propControlData.type === 'Frame' || this.propControlData.type === 'MultiPage' || this.propControlData.type === 'ListBox') && currentSelect.length === 1) {
-        if (this.propControlData.type !== 'ListBox') {
+      if ((this.propControlData.type === 'Frame' || this.propControlData.type === 'MultiPage')) {
+        const selected = this.selectedControls[this.userFormId].selected
+        const container = this.selectedControls[this.userFormId].container[0]
+        if ((selected.length === 1 && !selected[0].startsWith('group')) || (selected.length > 1 && container === this.propControlData.properties.ID)) {
+          e.stopPropagation()
           this.isMoving = true
           this.isEditMode = true
-          e.stopPropagation()
         }
       }
     } else if (this.keyType === 'shiftKey') {

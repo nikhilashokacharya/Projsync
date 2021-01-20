@@ -828,12 +828,16 @@ export default class ContextMenu extends FDCommonMethod {
    * @function copyControl
    */
   copyControl (type: string) {
-    for (let i = 0; i < this.copiedControl[this.userFormId][this.userFormId].controls.length; i++) {
-      this.deleteCopiedControl({
-        userFormId: this.userFormId,
-        parentId: this.userFormId,
-        targetId: this.copiedControl[this.userFormId][this.userFormId].controls[i]
-      })
+    if (this.copiedControl[this.userFormId][this.userFormId].controls.length > 0) {
+      const lengthCount = this.copiedControl[this.userFormId][this.userFormId].controls.length
+      const controls = [...this.copiedControl[this.userFormId][this.userFormId].controls]
+      for (let i = 0; i < lengthCount; i++) {
+        this.deleteCopiedControl({
+          userFormId: this.userFormId,
+          parentId: this.userFormId,
+          targetId: controls[i]
+        })
+      }
     }
     const userFormData = this.userformData[this.userFormId]
     const selContainer = this.selectedControls[this.userFormId].container[0]
@@ -953,6 +957,58 @@ export default class ContextMenu extends FDCommonMethod {
       targetControls: removeControl
     })
   }
+  getPasteControlSize () {
+    const usrFrmData = this.userformData[this.userFormId]
+    const pasteControls = [...this.getSelectedControlsDatas!]
+    const pasteContainer = this.selectedControls[this.userFormId].container[0]
+    const leftArray = [...pasteControls]
+    const topArray = [...pasteControls]
+    const rightArray = [...pasteControls]
+    const bottomArray = [...pasteControls]
+    leftArray.sort((a, b) => {
+      return usrFrmData[a].properties.Left! - usrFrmData[b].properties.Left!
+    })
+    topArray.sort((a, b) => {
+      return usrFrmData[a].properties.Top! - usrFrmData[b].properties.Top!
+    })
+    rightArray.sort((a, b) => {
+      return (usrFrmData[b].properties.Left! + usrFrmData[b].properties.Width!) -
+       (usrFrmData[a].properties.Left! + usrFrmData[a].properties.Width!)
+    })
+    bottomArray.sort((a, b) => {
+      return (usrFrmData[b].properties.Top! + usrFrmData[b].properties.Height!) -
+       (usrFrmData[a].properties.Top! + usrFrmData[a].properties.Height!)
+    })
+    const groupRectLeft = usrFrmData[leftArray[0]].properties.Left!
+    const groupRectTop = usrFrmData[topArray[0]].properties.Top!
+    const groupRectBottom = usrFrmData[bottomArray[0]].properties.Top! + usrFrmData[bottomArray[0]].properties.Height!
+    const groupRectRight = usrFrmData[rightArray[0]].properties.Left! + usrFrmData[rightArray[0]].properties.Width!
+
+    const deltaTop = (groupRectBottom - groupRectTop) / 2
+    const deltaLeft = (groupRectRight - groupRectLeft) / 2
+
+    const type = this.userformData[this.userFormId][pasteContainer].type
+    const container = type === 'Page' ? this.userformData[this.userFormId][this.getContainerList(pasteContainer)[0]].properties : this.userformData[this.userFormId][pasteContainer].properties
+    const containerHeight = type === 'Userform' ? container.Height! - 37 : container.Height!
+    const targetTop = ((containerHeight) / 2) - deltaTop
+    const targetLeft = (container.Width! / 2) - deltaLeft
+
+    const diffTop = targetTop - usrFrmData[topArray[0]].properties.Top!
+    const diffLeft = targetLeft - usrFrmData[leftArray[0]].properties.Left!
+
+    for (let i = 0; i < leftArray.length; i++) {
+      let left = usrFrmData[leftArray[i]].properties.Left! + diffLeft
+      if (!isNaN(left)) {
+        this.updateControlProperty('Left', Math.abs(left), leftArray[i])
+      }
+    }
+    for (let i = 0; i < topArray.length; i++) {
+      let top = usrFrmData[topArray[i]].properties.Top! + diffTop
+      if (!isNaN(top)) {
+        this.updateControlProperty('Top', Math.abs(top), topArray[i])
+      }
+    }
+  }
   /**
    * @description To paste controls in respective container present in respective userform
    * @function pasteControl
@@ -988,7 +1044,7 @@ export default class ContextMenu extends FDCommonMethod {
 
       const recCopyControl = (daTarget: string) => {
         const daTargetControls = userFormData[daTarget].controls
-        if (daTargetControls.length > 0) {
+        if (daTargetControls && daTargetControls.length > 0) {
           for (let i = 0, limit = daTargetControls.length; i < limit; i++) {
             const key = daTargetControls[i]
             const Name = this.newPasteControlId(key, daTarget)
@@ -1031,8 +1087,6 @@ export default class ContextMenu extends FDCommonMethod {
             properties: {
               ...controlObj.properties,
               ID: controlID!,
-              Left: controlObj.properties.Left! + 10,
-              Top: controlObj.properties.Top! + 10,
               GroupID: groupIdIndex !== -1 ? newGroupId[groupIdIndex] : '',
               Name: Name
             }
@@ -1058,8 +1112,6 @@ export default class ContextMenu extends FDCommonMethod {
                   properties: {
                     ...controlObj.properties,
                     ID: controlID!,
-                    Left: controlObj.properties.Left! + 10,
-                    Top: controlObj.properties.Top! + 10,
                     GroupID: groupIdIndex !== -1 ? newGroupId[groupIdIndex] : '',
                     Name: Name
                   }
@@ -1154,6 +1206,13 @@ export default class ContextMenu extends FDCommonMethod {
         targetId: selSelected,
         type: 'copy'
       })
+    }
+    this.getPasteControlSize()
+    const selSelected = this.selectedControls[this.userFormId].selected
+    for (const control of selSelected) {
+      if (control.startsWith('group')) {
+        this.createGroup(control)
+      }
     }
   }
 

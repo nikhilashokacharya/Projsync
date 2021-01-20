@@ -1,9 +1,9 @@
 <template>
   <div @mouseup="onMouseUp">
     <drag-selector
-      :class="[!isEditMode ? 'dragSelector' : '']"
       ref="dragSelector"
       :style="dragSelectorStyle"
+      :class="getDragSelector"
     >
       <GroupControl
         :containerId="containerId"
@@ -70,6 +70,7 @@ export default class Container extends FDCommonMethod {
   @Prop({ required: true, type: String }) userFormId!: string;
   @Prop({ required: true, type: String }) containerId!: string;
   @Prop() mouseCursorData: string;
+  @Prop() getSampleDotPattern: { backgroundImage: string; backgroundSize: string; backgroundPosition: string }
 
   @State((state) => state.fd.selectedControls)
   selectedControls!: fdState['selectedControls'];
@@ -423,14 +424,28 @@ export default class Container extends FDCommonMethod {
    *
    */
   get dragSelectorStyle () {
+    const controlProp = this.propControlData.properties
     const type = this.propControlData.type
     const ph = type && type === 'Page' ? this.height! : this.propControlData.properties.Height!
     const pw = type && type === 'Page' ? this.width! : this.propControlData.properties.Width!
     const sh = this.propControlData.properties.ScrollHeight!
     const sw = this.propControlData.properties.ScrollWidth!
+    let backgroundStyle = {}
+    if (controlProp.Picture !== '' && controlProp.ScrollBars! > 0) {
+      backgroundStyle = {}
+    } else {
+      backgroundStyle = {
+        backgroundImage: this.getSampleDotPattern.backgroundImage,
+        backgroundSize: this.getSampleDotPattern.backgroundSize,
+        backgroundRepeat: 'repeat',
+        backgroundPosition: this.getSampleDotPattern.backgroundPosition
+      }
+    }
     return {
-      height: type === 'Frame' ? (ph > sh ? `${ph - 50}px` : `${sh! - 27}px`) : ph > sh ? `${ph - 50}px` : `${sh! - 50}px`,
-      width: pw > sw ? `${pw - 20}px` : `${sw! - 20}px`,
+      ...backgroundStyle,
+      height: '100%',
+      width: '100%',
+      position: 'absolute',
       cursor: type && type === 'Page' ? 'default !important'
         : this.propControlData.properties.MousePointer !== 0 ||
         this.propControlData.properties.MouseIcon !== ''
@@ -447,6 +462,16 @@ export default class Container extends FDCommonMethod {
    */
   get propControlData (): controlData {
     return this.userformData[this.userFormId][this.controlId]
+  }
+
+  get getDragSelector () {
+    console.log('this.isEditMode', this.isEditMode)
+    console.log('sleected ', this.selectedControls[this.userFormId].selected.length)
+    if (this.isEditMode === false && this.selectedControls[this.userFormId].selected.length > 1) {
+      return 'dragSelector'
+    } else {
+      return ''
+    }
   }
 
   /**

@@ -69,14 +69,8 @@
             @keydown.ctrl.stop="handleKeyDown"
             @keydown.enter.exact="setContentEditable($event, true)"
             @keydown.shift.exact.stop="selectMultipleCtrl($event, true)"
-            @contextmenu.stop="
-              showContextMenu(
-                $event,
-                controlId,
-                selectedPageID,
-                'container',
-                isEditMode
-              )
+             @contextmenu.stop="
+              showContextMenu($event, controlId, selectedPageID, 'container', isEditMode)
             "
           >
             <Container
@@ -87,6 +81,7 @@
               :title="properties.ControlTipText"
               :width="properties.Width"
               :height="properties.Height"
+              :getSampleDotPattern="getSampleDotPattern"
               ref="containerRef"
             />
           </div>
@@ -358,18 +353,11 @@ export default class FDMultiPage extends FdContainerVue {
   }
 
   scrollDisabledValidate () {
-    if (
-      this.properties.TabOrientation === 0 ||
-      this.properties.TabOrientation === 1
-    ) {
+    if (this.properties.TabOrientation === 0 || this.properties.TabOrientation === 1) {
       if (this.scrolling) {
-        const rightButton = this.buttonStyleRef
-          .children[1] as HTMLButtonElement
+        const rightButton = this.buttonStyleRef.children[1] as HTMLButtonElement
         const leftButton = this.buttonStyleRef.children[0] as HTMLButtonElement
-        if (
-          this.scrolling.scrollLeft >=
-          this.scrolling.scrollWidth - this.scrolling.clientWidth - 30
-        ) {
+        if (this.scrolling.scrollLeft >= (this.scrolling.scrollWidth - this.scrolling.clientWidth - 30)) {
           rightButton.style.opacity = '0.4'
           leftButton.style.opacity = '1'
         } else if (this.scrolling.scrollLeft === 0) {
@@ -382,13 +370,9 @@ export default class FDMultiPage extends FdContainerVue {
       }
     } else {
       if (this.scrolling) {
-        const rightButton = this.buttonStyleRef
-          .children[1] as HTMLButtonElement
+        const rightButton = this.buttonStyleRef.children[1] as HTMLButtonElement
         const leftButton = this.buttonStyleRef.children[0] as HTMLButtonElement
-        if (
-          this.scrolling.scrollTop >=
-          this.scrolling.scrollHeight - this.scrolling.clientHeight
-        ) {
+        if (this.scrolling.scrollTop >= (this.scrolling.scrollHeight - this.scrolling.clientHeight)) {
           rightButton.style.opacity = '0.4'
           leftButton.style.opacity = '1'
         } else if (this.scrolling.scrollTop === 0) {
@@ -473,13 +457,9 @@ export default class FDMultiPage extends FdContainerVue {
     ) {
       scrollRef.scrollLeft! -= 50
       if (this.scrolling) {
-        const rightButton = this.buttonStyleRef
-          .children[1] as HTMLButtonElement
+        const rightButton = this.buttonStyleRef.children[1] as HTMLButtonElement
         const leftButton = this.buttonStyleRef.children[0] as HTMLButtonElement
-        if (
-          this.scrolling.scrollLeft >=
-          this.scrolling.scrollWidth - this.scrolling.clientWidth
-        ) {
+        if (this.scrolling.scrollLeft >= (this.scrolling.scrollWidth - this.scrolling.clientWidth)) {
           rightButton.style.opacity = '0.4'
           leftButton.style.opacity = '1'
         } else if (this.scrolling.scrollLeft === 0) {
@@ -493,13 +473,9 @@ export default class FDMultiPage extends FdContainerVue {
     } else {
       scrollRef.scrollTop! -= 50
       if (this.scrolling) {
-        const rightButton = this.buttonStyleRef
-          .children[1] as HTMLButtonElement
+        const rightButton = this.buttonStyleRef.children[1] as HTMLButtonElement
         const leftButton = this.buttonStyleRef.children[0] as HTMLButtonElement
-        if (
-          this.scrolling.scrollTop >=
-          this.scrolling.scrollHeight - this.scrolling.clientHeight
-        ) {
+        if (this.scrolling.scrollTop >= (this.scrolling.scrollHeight - this.scrolling.clientHeight)) {
           rightButton.style.opacity = '0.4'
           leftButton.style.opacity = '1'
         } else if (this.scrolling.scrollTop === 0) {
@@ -527,13 +503,9 @@ export default class FDMultiPage extends FdContainerVue {
     ) {
       scrollRef.scrollLeft! += 50
       if (this.scrolling) {
-        const rightButton = this.buttonStyleRef
-          .children[1] as HTMLButtonElement
+        const rightButton = this.buttonStyleRef.children[1] as HTMLButtonElement
         const leftButton = this.buttonStyleRef.children[0] as HTMLButtonElement
-        if (
-          this.scrolling.scrollLeft >=
-          this.scrolling.scrollWidth - this.scrolling.clientWidth - 1
-        ) {
+        if (this.scrolling.scrollLeft >= (this.scrolling.scrollWidth - this.scrolling.clientWidth - 1)) {
           rightButton.style.opacity = '0.4'
           leftButton.style.opacity = '1'
         } else if (this.scrolling.scrollLeft === 0) {
@@ -548,13 +520,9 @@ export default class FDMultiPage extends FdContainerVue {
       tempScrollTop += 50
       scrollRef.scrollTop = tempScrollTop
       if (this.scrolling) {
-        const rightButton = this.buttonStyleRef
-          .children[1] as HTMLButtonElement
+        const rightButton = this.buttonStyleRef.children[1] as HTMLButtonElement
         const leftButton = this.buttonStyleRef.children[0] as HTMLButtonElement
-        if (
-          this.scrolling.scrollTop >=
-          this.scrolling.scrollHeight - this.scrolling.clientHeight - 1
-        ) {
+        if (this.scrolling.scrollTop >= (this.scrolling.scrollHeight - this.scrolling.clientHeight - 1)) {
           rightButton.style.opacity = '0.4'
           leftButton.style.opacity = '1'
         } else if (this.scrolling.scrollTop === 0) {
@@ -742,6 +710,19 @@ export default class FDMultiPage extends FdContainerVue {
       backgroundSize: '9px 10px',
       boxShadow:
         controlProp.TabOrientation === 0 ? '1px 0px gray' : '1px 1px gray'
+    }
+  }
+  /**
+   * @description Returns string value for CSS background style for dotted patten
+   * @function getSampleDotPattern
+   */
+  protected get getSampleDotPattern () {
+    const dotSize = 1
+    const dotSpace = 10
+    return {
+      backgroundPosition: `7px 7px`,
+      backgroundImage: `radial-gradient(${this.properties.ForeColor} 11%, transparent 10%)`,
+      backgroundSize: `${dotSpace}px ${dotSpace}px`
     }
   }
 
@@ -971,21 +952,10 @@ export default class FDMultiPage extends FdContainerVue {
   ) {
     e.preventDefault()
     const selected = this.selectedControls[this.userFormId].selected
-    if (
-      selected.length === 1 &&
-      selected[0] === this.controlId &&
-      this.controls.length > 0
-    ) {
+    if (selected.length === 1 && selected[0] === this.controlId && this.controls.length > 0) {
       this.changeSelect(this.controls[0])
     }
-    EventBus.$emit(
-      'contextMenuDisplay',
-      event,
-      parentID,
-      controlID,
-      type,
-      mode
-    )
+    EventBus.$emit('contextMenuDisplay', event, parentID, controlID, type, mode)
   }
   handleKeyDown (event: KeyboardEvent) {
     EventBus.$emit('handleKeyDown', event, this.selectedPageID)
@@ -1000,14 +970,7 @@ export default class FDMultiPage extends FdContainerVue {
     })
   }
   handleContextMenu (e: MouseEvent) {
-    EventBus.$emit(
-      'editModeContextMenu',
-      e,
-      this.controlId,
-      this.data,
-      this.isEditMode,
-      this.updatedValue
-    )
+    EventBus.$emit('editModeContextMenu', e, this.controlId, this.data, this.isEditMode, this.updatedValue)
   }
   deleteMultiPage (event: KeyboardEvent) {
     if (this.controlId === this.selectedControls[this.userFormId].selected[0]) {
@@ -1082,12 +1045,10 @@ export default class FDMultiPage extends FdContainerVue {
 
   @Watch('properties.Value')
   valueValidate () {
+    this.focusPage()
     let sum = 0
     Vue.nextTick(() => {
-      if (
-        this.properties.TabOrientation === 0 ||
-        this.properties.TabOrientation === 1
-      ) {
+      if (this.properties.TabOrientation === 0 || this.properties.TabOrientation === 1) {
         for (let i = 0; i < this.properties.Value!; i++) {
           sum += this.controlTabsRef[i].clientWidth
         }
@@ -1103,14 +1064,9 @@ export default class FDMultiPage extends FdContainerVue {
           }
         }
         if (this.scrolling) {
-          const rightButton = this.buttonStyleRef
-            .children[1] as HTMLButtonElement
-          const leftButton = this.buttonStyleRef
-            .children[0] as HTMLButtonElement
-          if (
-            this.scrolling.scrollLeft >=
-            this.scrolling.scrollWidth - this.scrolling.clientWidth - 30
-          ) {
+          const rightButton = this.buttonStyleRef.children[1] as HTMLButtonElement
+          const leftButton = this.buttonStyleRef.children[0] as HTMLButtonElement
+          if (this.scrolling.scrollLeft >= (this.scrolling.scrollWidth - this.scrolling.clientWidth - 30)) {
             rightButton.style.opacity = '0.4'
             leftButton.style.opacity = '1'
           } else if (this.scrolling.scrollLeft === 0) {
@@ -1137,14 +1093,9 @@ export default class FDMultiPage extends FdContainerVue {
           }
         }
         if (this.scrolling) {
-          const rightButton = this.buttonStyleRef
-            .children[1] as HTMLButtonElement
-          const leftButton = this.buttonStyleRef
-            .children[0] as HTMLButtonElement
-          if (
-            this.scrolling.scrollTop >=
-            this.scrolling.scrollHeight - this.scrolling.clientHeight
-          ) {
+          const rightButton = this.buttonStyleRef.children[1] as HTMLButtonElement
+          const leftButton = this.buttonStyleRef.children[0] as HTMLButtonElement
+          if (this.scrolling.scrollTop >= (this.scrolling.scrollHeight - this.scrolling.clientHeight)) {
             rightButton.style.opacity = '0.4'
             leftButton.style.opacity = '1'
           } else if (this.scrolling.scrollTop === 0) {
@@ -1156,6 +1107,7 @@ export default class FDMultiPage extends FdContainerVue {
           }
         }
       }
+      this.focusPage()
     })
   }
 }

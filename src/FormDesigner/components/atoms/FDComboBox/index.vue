@@ -190,7 +190,7 @@
                       properties.ColumnCount === -1
                     "
                     :key="columnIndex"
-                    :style="updateColHeads(columnIndex)"
+                    :style="updateColumnHeads(columnIndex)"
                     class="colHeadsClass"
                   >
                     {{ a }}
@@ -207,7 +207,7 @@
                   <span v-if="a>1" class="bar" :key="i">|</span>
                 </div>
                 </div>
-                <hr v-if="properties.ColumnHeads" class="hrStyle" />
+                <hr v-if="properties.ColumnHeads" class="hrStyle"/>
               </div>
             </div>
             <div v-else></div>
@@ -308,8 +308,15 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     this.open = true
   }
 
+  updateColumnHeads (index: number) {
+    const controlProp = this.properties
+    return {
+      textAlign: controlProp.TextAlign === 0 ? 'left' : controlProp.TextAlign === 2 ? 'right' : 'center',
+      borderRight: (index < controlProp.ColumnCount! - 1) ? '1px solid' : controlProp.ColumnCount === -1 ? (index < this.extraDatas.RowSourceData![0].length - 1) ? '1px solid' : '' : '',
+      overflow: 'hidden'
+    }
+  }
   columnItemObj (index: number) {
-    // debugger
     const controlProp = this.properties
     let updateColWidth = controlProp.ColumnWidths!.split(';')
     let colChangeCheck = controlProp.ColumnCount! - 1 < index
@@ -326,6 +333,15 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     }
   }
 
+  @Watch('open')
+  openValidate () {
+    if (this.open && this.properties.RowSource !== '') {
+      Vue.nextTick(() => {
+        this.headWidth = this.comboRef.children[1].children[0].scrollWidth + 'px'
+      })
+    }
+  }
+
   @Watch('properties.ColumnWidths')
   columnWidthsValidate () {
     this.updateColumns()
@@ -335,28 +351,69 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     this.updateColumns()
   }
   get tHeadStyleObj () {
-    // this.updateColumns()
-    if (this.comboRef && this.comboRef.children[1] && this.comboRef.children[1].children[0]) {
-      this.headWidth = this.comboRef.children[1].children[0].scrollWidth + 'px'
-    }
     return {
       width: this.headWidth
     }
   }
+
   updateColumns () {
     if (this.properties.RowSource !== '') {
-      if (this.comboRef && this.comboRef.children[1] && this.comboRef.children[1].children[0]) {
-        this.headWidth = this.comboRef.children[1].children[0].scrollWidth + 'px'
+      let finalWidths:Array<number> = []
+      if (this.comboRef && this.comboRef.children[0]) {
+        if (this.comboRef.children[0].children[0]) {
+          for (let j = 0; j < this.comboRef.children[0].children[0].children.length; j++) {
+            const headWidth = this.comboRef.children[0].children[0].children[j] as HTMLDivElement
+            if (this.properties.ColumnCount! === -1) {
+              if (j >= 0 && j < this.extraDatas.RowSourceData!.length) {
+                headWidth.style.minWidth = '100px'
+              }
+            }
+          }
+        }
       }
       if (this.properties.ColumnWidths === '' && this.itemsRef && this.comboRef.children[1]) {
         if (this.comboRef.children[1].children[0]) {
+          let tempWidth
+          if (this.properties.ColumnCount! <= this.extraDatas.RowSourceData![0].length) {
+            if (this.properties.Width! > 100) {
+              if (this.properties.ColumnCount! === -1) {
+                tempWidth = this.properties.Width! / this.extraDatas.RowSourceData![0].length
+              } else {
+                tempWidth = this.properties.Width! / this.properties.ColumnCount!
+              }
+            } else {
+              tempWidth = 100
+            }
+          } else {
+            if (this.properties.Width! > 100) {
+              tempWidth = this.properties.Width! / this.extraDatas.RowSourceData![0].length
+            } else {
+              tempWidth = 100
+            }
+          }
           for (let i = 0; i < this.comboRef.children[1].children.length; i++) {
             if (this.properties.ListStyle === 0) {
+              Vue.nextTick(() => {
+                if (this.comboRef && this.comboRef.children[0] && this.comboRef.children[0].children[0]) {
+                  for (let j = 0; j < this.comboRef.children[0].children[0].children.length; j++) {
+                    if (this.comboRef && this.comboRef.children[0] && this.comboRef.children[0].children[0] && this.comboRef.children[0].children[0].children[j]) {
+                      const headWidth = this.comboRef.children[0].children[0].children[j] as HTMLDivElement
+                      if (this.properties.ColumnCount !== -1) {
+                        if (j === this.comboRef.children[0].children[0].children.length - 1) {
+                          headWidth.style.width = finalWidths[j] + 'px'
+                        } else {
+                          headWidth.style.width = '100px'
+                        }
+                      }
+                    }
+                  }
+                }
+              })
               for (let j = 0; j < this.comboRef.children[1].children[i].children.length; j++) {
                 const width = this.comboRef.children[1].children[i].children[j] as HTMLDivElement
                 if (this.properties.ColumnCount! === -1) {
                   if (j >= 0 && j < this.extraDatas.RowSourceData!.length) {
-                    width.style.width = '100px'
+                    width.style.width = tempWidth + 'px'
                   }
                 } else if (j + 1 > this.properties.ColumnCount!) {
                   width.style.minWidth = '0px'
@@ -364,11 +421,27 @@ export default class FDComboBox extends Mixins(FdControlVue) {
                 } else {
                   if (j < this.extraDatas.RowSourceData!.length) {
                     width.style.minWidth = '100px'
-                    width.style.width = (parseInt(this.itemsRef.style.width) / this.properties.ColumnCount!) + 'px'
+                    width.style.width = tempWidth + 'px'
                   }
                 }
               }
             } else {
+              Vue.nextTick(() => {
+                if (this.comboRef && this.comboRef.children[0] && this.comboRef.children[0].children[0]) {
+                  for (let j = 0; j < this.comboRef.children[0].children[0].children.length; j++) {
+                    if (this.comboRef && this.comboRef.children[0] && this.comboRef.children[0].children[0] && this.comboRef.children[0].children[0].children[j]) {
+                      const headWidth = this.comboRef.children[0].children[0].children[j] as HTMLDivElement
+                      if (this.properties.ColumnCount !== -1) {
+                        if (j === this.comboRef.children[0].children[0].children.length - 1) {
+                          headWidth.style.width = finalWidths[j] + 'px'
+                        } else {
+                          headWidth.style.width = '100px'
+                        }
+                      }
+                    }
+                  }
+                }
+              })
               for (let j = 0; j < this.comboRef.children[1].children[i].children.length; j++) {
                 const width = this.comboRef.children[1].children[i].children[j] as HTMLDivElement
                 if (this.properties.ColumnCount! === -1) {
@@ -391,97 +464,87 @@ export default class FDComboBox extends Mixins(FdControlVue) {
           }
         }
       } else if (this.itemsRef && this.comboRef.children[1]) {
+        finalWidths = this.calculateColumnWidths()
         if (this.comboRef.children[1].children[0]) {
-          let a = (this.properties.ColumnWidths!.split(';'))
-          let b = []
-          let temp = 0
-          let totalWidth = this.properties.Width!
-          let totalColumnWidths = 0
-          let colWidths = this.properties.ColumnWidths!
-          let columnWidthCount = colWidths.split(';').length
-          let totalColumnCount = this.properties.ColumnCount! < this.extraDatas.RowSourceData![0].length ? this.properties.ColumnCount! : this.extraDatas.RowSourceData![0].length
-          let widths = []
-          if (columnWidthCount >= totalColumnCount) {
-            for (let i = 0; i < totalColumnCount; i++) {
-              if (i < this.properties.ColumnCount!) {
-                let tempWidth = parseInt(colWidths.split(';')[i], 10)
-                totalColumnWidths += tempWidth
-                widths.push(tempWidth)
-              }
-            }
-          } else {
-            let count = 0
-            let colWidthCalculatedCount = 0
-            let colWidth = 0
-            for (let i = 0; i < totalColumnCount; i++) {
-              if (i < columnWidthCount) {
-                widths.push(parseInt(colWidths.split(';')[i], 10))
-                count = count + 1
-                totalColumnWidths += parseInt(colWidths.split(';')[i], 10)
-              } else {
-                if (totalWidth > totalColumnWidths) {
-                  colWidthCalculatedCount = colWidthCalculatedCount + 1
-                  if (colWidthCalculatedCount === 1) {
-                    colWidth = ((totalWidth - totalColumnWidths) / (totalColumnCount - count))
-                  // totalColumnWidths += colWidth
-                  }
-                  widths.push(colWidth)
-                  totalColumnWidths += colWidth
-                } else {
-                  widths.push(100)
-                }
-              }
-            }
-          }
-          let finalWidths = []
-          let lastColumWidth = 0
-          if (totalWidth > totalColumnWidths) {
-            for (let i = 0; i < widths.length; i++) {
-              if (widths.length - 1 !== i) {
-                lastColumWidth = totalWidth - widths[i]!
-                finalWidths.push(widths[i])
-                totalWidth = lastColumWidth
-              } else {
-                finalWidths.push(lastColumWidth)
-              }
-            }
-          } else if (totalWidth <= totalColumnWidths) {
-            for (let j = 0; j < widths.length; j++) {
-              finalWidths.push(widths[j])
-            }
-          }
           for (let i = 0; i < this.comboRef.children[1].children.length; i++) {
             if (this.properties.ListStyle === 0) {
               for (let j = 0; j < this.comboRef.children[1].children[i].children.length; j++) {
                 const width = this.comboRef.children[1].children[i].children[j] as HTMLDivElement
-                if (j >= this.properties.ColumnCount!) {
+                if (j >= this.properties.ColumnCount! && this.properties.ColumnCount !== -1) {
                   width.style.display = 'none'
                 } else {
                   width.style.display = 'inline-block'
                   if (this.properties.ColumnCount === 1) {
-                    width.style.width = this.properties.Width! + 'px'
+                    if (this.properties.Width! > finalWidths[0]) {
+                      width.style.width = this.properties.Width! + 'px'
+                    } else {
+                      width.style.width = finalWidths[0] + 'px'
+                    }
                   } else {
                     width.style.minWidth = '0px'
                     width.style.width = finalWidths[j] + 'px'
+                  }
+                }
+                if (this.comboRef && this.comboRef.children[0] && this.comboRef.children[0].children[0] && this.comboRef.children[0].children[0].children[j]) {
+                  const headWidth = this.comboRef.children[0].children[0].children[j] as HTMLDivElement
+                  if (this.properties.ColumnCount === -1) {
+                    headWidth.style.display = 'inline-block'
+                    headWidth.style.minWidth = '0px'
+                    headWidth.style.width = finalWidths[j] + 'px'
+                  } else if (j >= this.properties.ColumnCount!) {
+                    headWidth.style.display = 'none'
+                  } else {
+                    headWidth.style.display = 'inline-block'
+                    if (this.properties.ColumnCount === 1) {
+                      if (this.properties.Width! > finalWidths[0]) {
+                        headWidth.style.width = this.properties.Width! + 'px'
+                      } else {
+                        headWidth.style.width = finalWidths[0] + 'px'
+                      }
+                    } else {
+                      headWidth.style.width = finalWidths[j] + 'px'
+                    }
                   }
                 }
               }
             } else {
               for (let j = 0; j < this.comboRef.children[1].children[i].children.length; j++) {
                 const width = this.comboRef.children[1].children[i].children[j] as HTMLDivElement
-                if (j + 1 === 1 && this.properties.ColumnCount! === 1) {
-                  width.style.width = this.properties.Width + 'px'
-                }
                 if (j > 0) {
                   if (j > this.properties.ColumnCount! && j > this.extraDatas.RowSourceData!.length - 1) {
                     width.style.display = 'none'
                   } else {
                     width.style.display = 'inline-block'
                     if (this.properties.ColumnCount === 1) {
-                      width.style.width = this.properties.Width! + 'px'
+                      if (this.properties.Width! > finalWidths[0]) {
+                        width.style.width = this.properties.Width! + 'px'
+                      } else {
+                        width.style.width = finalWidths[0] + 'px'
+                      }
                     } else {
                       width.style.minWidth = '0px'
                       width.style.width = finalWidths[j - 1] + 'px'
+                    }
+                  }
+                  if (this.comboRef && this.comboRef.children[0] && this.comboRef.children[0].children[0] && this.comboRef.children[0].children[0].children[j]) {
+                    const headWidth = this.comboRef.children[0].children[0].children[j] as HTMLDivElement
+                    if (this.properties.ColumnCount === -1) {
+                      headWidth.style.display = 'inline-block'
+                      headWidth.style.minWidth = '0px'
+                      headWidth.style.width = finalWidths[j] + 'px'
+                    } else if (j >= this.properties.ColumnCount!) {
+                      headWidth.style.display = 'none'
+                    } else {
+                      headWidth.style.display = 'inline-block'
+                      if (this.properties.ColumnCount === 1) {
+                        if (this.properties.Width! > finalWidths[0]) {
+                          headWidth.style.width = this.properties.Width! + 'px'
+                        } else {
+                          headWidth.style.width = finalWidths[0] + 'px'
+                        }
+                      } else {
+                        headWidth.style.width = finalWidths[j] + 'px'
+                      }
                     }
                   }
                 }
@@ -495,6 +558,115 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     }
   }
 
+  calculateColumnWidths () {
+    let a = (this.properties.ColumnWidths!.split(';'))
+    let b = []
+    let temp = 0
+    let totalWidth = this.properties.Width!
+    let totalColumnWidths = 0
+    let colWidths = this.properties.ColumnWidths!
+    let columnWidthCount = colWidths.split(';').length
+    let totalColumnCount = this.properties.ColumnCount! < this.extraDatas.RowSourceData![0].length ? this.properties.ColumnCount! : this.extraDatas.RowSourceData![0].length
+    let widths = []
+    let finalWidths:Array<number> = []
+    let lastColumWidth = 0
+    if (this.properties.ColumnCount === -1) {
+      if (columnWidthCount >= this.extraDatas.RowSourceData![0].length) {
+        for (let i = 0; i < this.extraDatas.RowSourceData![0].length; i++) {
+          if (i < this.extraDatas.RowSourceData![0].length) {
+            let tempWidth = parseInt(colWidths.split(';')[i], 10)
+            totalColumnWidths += tempWidth
+            widths.push(tempWidth)
+          }
+        }
+      } else {
+        let count = 0
+        let colWidthCalculatedCount = 0
+        let colWidth = 0
+        for (let i = 0; i < this.extraDatas.RowSourceData![0].length; i++) {
+          if (i < columnWidthCount) {
+            widths.push(parseInt(colWidths.split(';')[i], 10))
+            count = count + 1
+            totalColumnWidths += parseInt(colWidths.split(';')[i], 10)
+          } else {
+            if (totalWidth > totalColumnWidths) {
+              colWidthCalculatedCount = colWidthCalculatedCount + 1
+              if (colWidthCalculatedCount === 1) {
+                colWidth = ((totalWidth - totalColumnWidths) / (this.extraDatas.RowSourceData![0].length - count))
+              }
+              widths.push(colWidth)
+              totalColumnWidths += colWidth
+            } else {
+              widths.push(100)
+            }
+          }
+        }
+      }
+      if (totalWidth > totalColumnWidths) {
+        for (let i = 0; i < widths.length; i++) {
+          if (widths.length - 1 !== i) {
+            lastColumWidth = totalWidth - widths[i]!
+            finalWidths.push(widths[i])
+            totalWidth = lastColumWidth
+          } else {
+            finalWidths.push(lastColumWidth)
+          }
+        }
+      } else if (totalWidth <= totalColumnWidths) {
+        for (let j = 0; j < widths.length; j++) {
+          finalWidths.push(widths[j])
+        }
+      }
+    } else {
+      if (columnWidthCount >= totalColumnCount) {
+        for (let i = 0; i < totalColumnCount; i++) {
+          if (i < this.properties.ColumnCount!) {
+            let tempWidth = parseInt(colWidths.split(';')[i], 10)
+            totalColumnWidths += tempWidth
+            widths.push(tempWidth)
+          }
+        }
+      } else {
+        let count = 0
+        let colWidthCalculatedCount = 0
+        let colWidth = 0
+        for (let i = 0; i < totalColumnCount; i++) {
+          if (i < columnWidthCount) {
+            widths.push(parseInt(colWidths.split(';')[i], 10))
+            count = count + 1
+            totalColumnWidths += parseInt(colWidths.split(';')[i], 10)
+          } else {
+            if (totalWidth > totalColumnWidths) {
+              colWidthCalculatedCount = colWidthCalculatedCount + 1
+              if (colWidthCalculatedCount === 1) {
+                colWidth = ((totalWidth - totalColumnWidths) / (totalColumnCount - count))
+              }
+              widths.push(colWidth)
+              totalColumnWidths += colWidth
+            } else {
+              widths.push(100)
+            }
+          }
+        }
+      }
+      if (totalWidth > totalColumnWidths) {
+        for (let i = 0; i < widths.length; i++) {
+          if (widths.length - 1 !== i) {
+            lastColumWidth = totalWidth - widths[i]!
+            finalWidths.push(widths[i])
+            totalWidth = lastColumWidth
+          } else {
+            finalWidths.push(lastColumWidth)
+          }
+        }
+      } else if (totalWidth <= totalColumnWidths) {
+        for (let j = 0; j < widths.length; j++) {
+          finalWidths.push(widths[j])
+        }
+      }
+    }
+    return finalWidths
+  }
   get getDisableValue () {
     if (this.isRunMode || this.isEditMode) {
       return this.properties.Enabled === false || this.properties.Locked
@@ -886,9 +1058,6 @@ export default class FDComboBox extends Mixins(FdControlVue) {
           : '',
       fontStretch: font.FontStyle !== '' ? this.tempStretch : '',
       width: 'calc(100% - 2px)',
-      // controlProp.ColumnWidths === ''
-      //   ? 'calc(100% - 2px)'
-      //   : 'calc(100% - 2px)' + parseInt(controlProp.ColumnWidths!) + 'px',
       outline: 'none'
     }
   }
@@ -982,7 +1151,6 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     return {
       display: display,
       zIndex: '0'
-      // overflow: 'hidden'
     }
   }
   protected get tdStyleObj (): Partial<CSSStyleDeclaration> {
@@ -1126,7 +1294,6 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     const controlProp = this.properties
     return {
       borderColor: controlProp.BorderStyle === 1 ? controlProp.BorderColor : '',
-      // borderLeft: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 2 ? '2px solid gray' : controlProp.SpecialEffect === 3 ? '1.5px solid gray' : controlProp.SpecialEffect === 4 ? '0.5px solid gray' : '',
       borderRight:
         controlProp.BorderStyle === 1
           ? '1px solid ' + controlProp.BorderColor
@@ -1137,7 +1304,6 @@ export default class FDComboBox extends Mixins(FdControlVue) {
               : controlProp.SpecialEffect === 3
                 ? '0.5px solid gray'
                 : '',
-      // borderTop: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 2 ? '2px solid gray' : controlProp.SpecialEffect === 3 ? '1.5px solid gray' : controlProp.SpecialEffect === 4 ? '0.5px solid gray' : '',
       borderBottom:
         controlProp.BorderStyle === 1
           ? '1px solid ' + controlProp.BorderColor
@@ -1419,7 +1585,9 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   margin: 0;
 }
 .hrStyle {
+  display: block !important;
   margin: 0px;
+  width: 100% !important;
 }
 .forPlain {
   background-image: none;
