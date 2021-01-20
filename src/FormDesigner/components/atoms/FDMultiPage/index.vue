@@ -69,8 +69,14 @@
             @keydown.ctrl.stop="handleKeyDown"
             @keydown.enter.exact="setContentEditable($event, true)"
             @keydown.shift.exact.stop="selectMultipleCtrl($event, true)"
-             @contextmenu.stop="
-              showContextMenu($event, controlId, selectedPageID, 'container', isEditMode)
+            @contextmenu.stop="
+              showContextMenu(
+                $event,
+                controlId,
+                selectedPageID,
+                'container',
+                isEditMode
+              )
             "
           >
             <Container
@@ -351,10 +357,55 @@ export default class FDMultiPage extends FdContainerVue {
     }
   }
 
+  scrollDisabledValidate () {
+    if (
+      this.properties.TabOrientation === 0 ||
+      this.properties.TabOrientation === 1
+    ) {
+      if (this.scrolling) {
+        const rightButton = this.buttonStyleRef
+          .children[1] as HTMLButtonElement
+        const leftButton = this.buttonStyleRef.children[0] as HTMLButtonElement
+        if (
+          this.scrolling.scrollLeft >=
+          this.scrolling.scrollWidth - this.scrolling.clientWidth - 30
+        ) {
+          rightButton.style.opacity = '0.4'
+          leftButton.style.opacity = '1'
+        } else if (this.scrolling.scrollLeft === 0) {
+          leftButton.style.opacity = '0.4'
+          rightButton.style.opacity = '1'
+        } else {
+          leftButton.style.opacity = '1'
+          rightButton.style.opacity = '1'
+        }
+      }
+    } else {
+      if (this.scrolling) {
+        const rightButton = this.buttonStyleRef
+          .children[1] as HTMLButtonElement
+        const leftButton = this.buttonStyleRef.children[0] as HTMLButtonElement
+        if (
+          this.scrolling.scrollTop >=
+          this.scrolling.scrollHeight - this.scrolling.clientHeight
+        ) {
+          rightButton.style.opacity = '0.4'
+          leftButton.style.opacity = '1'
+        } else if (this.scrolling.scrollTop === 0) {
+          leftButton.style.opacity = '0.4'
+          rightButton.style.opacity = '1'
+        } else {
+          leftButton.style.opacity = '1'
+          rightButton.style.opacity = '1'
+        }
+      }
+    }
+  }
+
   scrollButtonVerify () {
-    this.isScrollVisible = false
     let sum = 0
     Vue.nextTick(() => {
+      this.isScrollVisible = false
       if (
         this.properties.TabOrientation === 0 ||
         this.properties.TabOrientation === 1
@@ -422,9 +473,13 @@ export default class FDMultiPage extends FdContainerVue {
     ) {
       scrollRef.scrollLeft! -= 50
       if (this.scrolling) {
-        const rightButton = this.buttonStyleRef.children[1] as HTMLButtonElement
+        const rightButton = this.buttonStyleRef
+          .children[1] as HTMLButtonElement
         const leftButton = this.buttonStyleRef.children[0] as HTMLButtonElement
-        if (this.scrolling.scrollLeft >= (this.scrolling.scrollWidth - this.scrolling.clientWidth)) {
+        if (
+          this.scrolling.scrollLeft >=
+          this.scrolling.scrollWidth - this.scrolling.clientWidth
+        ) {
           rightButton.style.opacity = '0.4'
           leftButton.style.opacity = '1'
         } else if (this.scrolling.scrollLeft === 0) {
@@ -438,9 +493,13 @@ export default class FDMultiPage extends FdContainerVue {
     } else {
       scrollRef.scrollTop! -= 50
       if (this.scrolling) {
-        const rightButton = this.buttonStyleRef.children[1] as HTMLButtonElement
+        const rightButton = this.buttonStyleRef
+          .children[1] as HTMLButtonElement
         const leftButton = this.buttonStyleRef.children[0] as HTMLButtonElement
-        if (this.scrolling.scrollTop >= (this.scrolling.scrollHeight - this.scrolling.clientHeight)) {
+        if (
+          this.scrolling.scrollTop >=
+          this.scrolling.scrollHeight - this.scrolling.clientHeight
+        ) {
           rightButton.style.opacity = '0.4'
           leftButton.style.opacity = '1'
         } else if (this.scrolling.scrollTop === 0) {
@@ -468,9 +527,13 @@ export default class FDMultiPage extends FdContainerVue {
     ) {
       scrollRef.scrollLeft! += 50
       if (this.scrolling) {
-        const rightButton = this.buttonStyleRef.children[1] as HTMLButtonElement
+        const rightButton = this.buttonStyleRef
+          .children[1] as HTMLButtonElement
         const leftButton = this.buttonStyleRef.children[0] as HTMLButtonElement
-        if (this.scrolling.scrollLeft >= (this.scrolling.scrollWidth - this.scrolling.clientWidth - 1)) {
+        if (
+          this.scrolling.scrollLeft >=
+          this.scrolling.scrollWidth - this.scrolling.clientWidth - 1
+        ) {
           rightButton.style.opacity = '0.4'
           leftButton.style.opacity = '1'
         } else if (this.scrolling.scrollLeft === 0) {
@@ -485,9 +548,13 @@ export default class FDMultiPage extends FdContainerVue {
       tempScrollTop += 50
       scrollRef.scrollTop = tempScrollTop
       if (this.scrolling) {
-        const rightButton = this.buttonStyleRef.children[1] as HTMLButtonElement
+        const rightButton = this.buttonStyleRef
+          .children[1] as HTMLButtonElement
         const leftButton = this.buttonStyleRef.children[0] as HTMLButtonElement
-        if (this.scrolling.scrollTop >= (this.scrolling.scrollHeight - this.scrolling.clientHeight - 1)) {
+        if (
+          this.scrolling.scrollTop >=
+          this.scrolling.scrollHeight - this.scrolling.clientHeight - 1
+        ) {
           rightButton.style.opacity = '0.4'
           leftButton.style.opacity = '1'
         } else if (this.scrolling.scrollTop === 0) {
@@ -571,61 +638,99 @@ export default class FDMultiPage extends FdContainerVue {
               : 'block',
       top:
         controlProp.Style !== 2
-          ? controlProp.TabOrientation === 0
-            ? controlProp.MultiRow
-              ? (this.tempHeight + 12) * this.multiRowCount + 'px'
-              : controlProp.TabFixedHeight! > 0
-                ? controlProp.TabFixedHeight! + 10 + 'px'
-                : controlProp.TabFixedHeight! === 0
-                  ? this.tempHeight + 16 + 'px'
-                  : '33px'
-            : '0px'
+          ? controlProp.Style === 1
+            ? controlProp.TabOrientation === 0
+              ? controlProp.MultiRow
+                ? (this.tempHeight + 15) * this.multiRowCount + 'px'
+                : controlProp.TabFixedHeight! > 0
+                  ? controlProp.TabFixedHeight! + 13 + 'px'
+                  : controlProp.TabFixedHeight! === 0
+                    ? this.tempHeight + 19 + 'px'
+                    : '36px'
+              : '3px'
+            : controlProp.TabOrientation === 0
+              ? controlProp.MultiRow
+                ? (this.tempHeight + 12) * this.multiRowCount + 'px'
+                : controlProp.TabFixedHeight! > 0
+                  ? controlProp.TabFixedHeight! + 10 + 'px'
+                  : controlProp.TabFixedHeight! === 0
+                    ? this.tempHeight + 16 + 'px'
+                    : '33px'
+              : '0px'
           : '0px',
       height:
         controlProp.Style !== 2
-          ? controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1
+          ? controlProp.Style === 1 ? controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1
             ? controlProp.MultiRow
               ? controlProp.Height! -
-                (this.tempHeight + 12) * this.multiRowCount +
+                (this.tempHeight + 3) * this.multiRowCount +
                 'px'
               : controlProp.TabFixedHeight! > 0
                 ? controlProp.TabOrientation === 0
-                  ? controlProp.Height! - controlProp.TabFixedHeight! - 10 + 'px'
-                  : controlProp.Height! - controlProp.TabFixedHeight! - 5 + 'px'
+                  ? controlProp.Height! - controlProp.TabFixedHeight! - 19 + 'px'
+                  : controlProp.Height! - controlProp.TabFixedHeight! - 14 + 'px'
                 : controlProp.TabFixedHeight! === 0
                   ? controlProp.Font!.FontSize! === 72
-                    ? controlProp.Height! - controlProp.Font!.FontSize! - 18 + 'px'
-                    : controlProp.Height! - controlProp.Font!.FontSize! - 16 + 'px'
+                    ? controlProp.Height! - controlProp.Font!.FontSize! - 27 + 'px'
+                    : controlProp.Height! - controlProp.Font!.FontSize! - 25 + 'px'
                   : controlProp.TabOrientation === 1
-                    ? `${controlProp.Height! - 21}px`
-                    : `${controlProp.Height! - 35}px`
-            : `${controlProp.Height! - 1}px`
+                    ? `${controlProp.Height! - 30}px`
+                    : `${controlProp.Height! - 44}px`
+            : `${controlProp.Height! - 10}px`
+            : controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1
+              ? controlProp.MultiRow
+                ? controlProp.Height! -
+                (this.tempHeight + 12) * this.multiRowCount +
+                'px'
+                : controlProp.TabFixedHeight! > 0
+                  ? controlProp.TabOrientation === 0
+                    ? controlProp.Height! - controlProp.TabFixedHeight! - 10 + 'px'
+                    : controlProp.Height! - controlProp.TabFixedHeight! - 5 + 'px'
+                  : controlProp.TabFixedHeight! === 0
+                    ? controlProp.Font!.FontSize! === 72
+                      ? controlProp.Height! - controlProp.Font!.FontSize! - 18 + 'px'
+                      : controlProp.Height! - controlProp.Font!.FontSize! - 16 + 'px'
+                    : controlProp.TabOrientation === 1
+                      ? `${controlProp.Height! - 21}px`
+                      : `${controlProp.Height! - 35}px`
+              : `${controlProp.Height! - 1}px`
           : `${controlProp.Height! - 1}px`,
       width:
         controlProp.Style !== 2
-          ? controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1
-            ? `${controlProp.Width! - 3}px`
-            : controlProp.TabFixedWidth! > 0
-              ? controlProp.Width! - controlProp.TabFixedWidth! - 10 + 'px'
-              : controlProp.TabFixedWidth! === 0
-                ? controlProp.TabOrientation === 2 ||
+          ? controlProp.Style === 1 ? controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1 ? `${controlProp.Width! - 9}px` : controlProp.TabFixedWidth! > 0 ? controlProp.Width! - controlProp.TabFixedWidth! - 16 + 'px' : controlProp.TabFixedWidth! === 0 ? controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3 ? `${controlProp.Width! - this.tempWidth - 19}px` : controlProp.Width! - controlProp.Font!.FontSize! - 26 + 'px' : 'calc(100% - 50px)'
+            : controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1
+              ? `${controlProp.Width! - 3}px`
+              : controlProp.TabFixedWidth! > 0
+                ? controlProp.Width! - controlProp.TabFixedWidth! - 10 + 'px'
+                : controlProp.TabFixedWidth! === 0
+                  ? controlProp.TabOrientation === 2 ||
               controlProp.TabOrientation === 3
-                  ? `${controlProp.Width! - this.tempWidth - 13}px`
-                  : controlProp.Width! - controlProp.Font!.FontSize! - 20 + 'px'
-                : 'calc(100% - 44px)'
+                    ? `${controlProp.Width! - this.tempWidth - 13}px`
+                    : controlProp.Width! - controlProp.Font!.FontSize! - 20 + 'px'
+                  : 'calc(100% - 44px)'
           : `${controlProp.Width! - 3}px`,
       left:
         controlProp.Style !== 2
-          ? controlProp.TabOrientation === 2
+          ? controlProp.Style === 1 ? controlProp.TabOrientation === 2
             ? controlProp.TabFixedWidth! > 0
-              ? controlProp.TabFixedWidth! + 12 + 'px'
+              ? controlProp.TabFixedWidth! + 13 + 'px'
               : controlProp.TabFixedWidth! === 0
                 ? controlProp.TabOrientation === 2 ||
                 controlProp.TabOrientation === 3
-                  ? `${this.tempWidth + 12}px`
-                  : controlProp.Font!.FontSize! + 20 + 'px'
-                : '40px'
-            : '0px'
+                  ? `${this.tempWidth + 13}px`
+                  : controlProp.Font!.FontSize! + 23 + 'px'
+                : '43px'
+            : '3px'
+            : controlProp.TabOrientation === 2
+              ? controlProp.TabFixedWidth! > 0
+                ? controlProp.TabFixedWidth! + 12 + 'px'
+                : controlProp.TabFixedWidth! === 0
+                  ? controlProp.TabOrientation === 2 ||
+                controlProp.TabOrientation === 3
+                    ? `${this.tempWidth + 12}px`
+                    : controlProp.Font!.FontSize! + 20 + 'px'
+                  : '40px'
+              : '0px'
           : '0px',
       padding: '0px',
       overflow: 'hidden',
@@ -714,6 +819,7 @@ export default class FDMultiPage extends FdContainerVue {
    */
   @Watch('properties.Width')
   isScrollUsed (newVal: number, oldVal: number) {
+    this.scrollDisabledValidate()
     if (this.properties.MultiRow) {
       const initialLength = this.controls.length!
       const len = (this.tempWidth + 12) * initialLength
@@ -740,21 +846,25 @@ export default class FDMultiPage extends FdContainerVue {
   @Watch('properties.TabOrientation')
   orientValidate () {
     this.scrollButtonVerify()
+    this.scrollDisabledValidate()
   }
 
   @Watch('properties.Height')
   heightValidate () {
     this.scrollButtonVerify()
+    this.scrollDisabledValidate()
   }
 
   @Watch('properties.TabFixedWidth')
   tabFixedWidthValidate () {
     this.scrollButtonVerify()
+    this.scrollDisabledValidate()
   }
 
-  @Watch('properties.TabFixedWidth')
+  @Watch('properties.TabFixedHeight')
   tabFixedHeightValidate () {
     this.scrollButtonVerify()
+    this.scrollDisabledValidate()
   }
 
   /**
@@ -767,6 +877,7 @@ export default class FDMultiPage extends FdContainerVue {
   checkFontValue (newVal: number, oldVal: number) {
     this.calculateWidthHeight()
     this.scrollButtonVerify()
+    this.scrollDisabledValidate()
   }
 
   /**
@@ -779,6 +890,7 @@ export default class FDMultiPage extends FdContainerVue {
   captionValue (newVal: string, oldVal: string) {
     this.calculateWidthHeight()
     this.scrollButtonVerify()
+    this.scrollDisabledValidate()
   }
 
   calculateWidthHeight () {
@@ -859,10 +971,21 @@ export default class FDMultiPage extends FdContainerVue {
   ) {
     e.preventDefault()
     const selected = this.selectedControls[this.userFormId].selected
-    if (selected.length === 1 && selected[0] === this.controlId && this.controls.length > 0) {
+    if (
+      selected.length === 1 &&
+      selected[0] === this.controlId &&
+      this.controls.length > 0
+    ) {
       this.changeSelect(this.controls[0])
     }
-    EventBus.$emit('contextMenuDisplay', event, parentID, controlID, type, mode)
+    EventBus.$emit(
+      'contextMenuDisplay',
+      event,
+      parentID,
+      controlID,
+      type,
+      mode
+    )
   }
   handleKeyDown (event: KeyboardEvent) {
     EventBus.$emit('handleKeyDown', event, this.selectedPageID)
@@ -877,7 +1000,14 @@ export default class FDMultiPage extends FdContainerVue {
     })
   }
   handleContextMenu (e: MouseEvent) {
-    EventBus.$emit('editModeContextMenu', e, this.controlId, this.data, this.isEditMode, this.updatedValue)
+    EventBus.$emit(
+      'editModeContextMenu',
+      e,
+      this.controlId,
+      this.data,
+      this.isEditMode,
+      this.updatedValue
+    )
   }
   deleteMultiPage (event: KeyboardEvent) {
     if (this.controlId === this.selectedControls[this.userFormId].selected[0]) {
@@ -948,6 +1078,85 @@ export default class FDMultiPage extends FdContainerVue {
       event.stopPropagation()
       this.deleteItem(event)
     }
+  }
+
+  @Watch('properties.Value')
+  valueValidate () {
+    let sum = 0
+    Vue.nextTick(() => {
+      if (
+        this.properties.TabOrientation === 0 ||
+        this.properties.TabOrientation === 1
+      ) {
+        for (let i = 0; i < this.properties.Value!; i++) {
+          sum += this.controlTabsRef[i].clientWidth
+        }
+        if (this.properties.Width! - this.scrolling.offsetWidth > sum) {
+          this.scrolling.scrollLeft = sum
+        } else {
+          const valueAsNumber = this.properties.Value! as number
+          if (sum > this.controlTabsRef[valueAsNumber].clientWidth) {
+            const sL = sum - this.controlTabsRef[valueAsNumber].clientWidth
+            this.scrolling.scrollLeft = sL
+          } else {
+            this.scrolling.scrollLeft = sum
+          }
+        }
+        if (this.scrolling) {
+          const rightButton = this.buttonStyleRef
+            .children[1] as HTMLButtonElement
+          const leftButton = this.buttonStyleRef
+            .children[0] as HTMLButtonElement
+          if (
+            this.scrolling.scrollLeft >=
+            this.scrolling.scrollWidth - this.scrolling.clientWidth - 30
+          ) {
+            rightButton.style.opacity = '0.4'
+            leftButton.style.opacity = '1'
+          } else if (this.scrolling.scrollLeft === 0) {
+            leftButton.style.opacity = '0.4'
+            rightButton.style.opacity = '1'
+          } else {
+            leftButton.style.opacity = '1'
+            rightButton.style.opacity = '1'
+          }
+        }
+      } else {
+        for (let i = 0; i < this.properties.Value!; i++) {
+          sum += this.controlTabsRef[i].clientHeight
+        }
+        if (this.properties.Height! - this.scrolling.offsetHeight > sum) {
+          this.scrolling.scrollTop = sum
+        } else {
+          const valueAsNumber = this.properties.Value! as number
+          if (sum > this.controlTabsRef[valueAsNumber].clientHeight) {
+            const sL = sum - this.controlTabsRef[valueAsNumber].clientHeight
+            this.scrolling.scrollTop = sL
+          } else {
+            this.scrolling.scrollTop = sum
+          }
+        }
+        if (this.scrolling) {
+          const rightButton = this.buttonStyleRef
+            .children[1] as HTMLButtonElement
+          const leftButton = this.buttonStyleRef
+            .children[0] as HTMLButtonElement
+          if (
+            this.scrolling.scrollTop >=
+            this.scrolling.scrollHeight - this.scrolling.clientHeight
+          ) {
+            rightButton.style.opacity = '0.4'
+            leftButton.style.opacity = '1'
+          } else if (this.scrolling.scrollTop === 0) {
+            leftButton.style.opacity = '0.4'
+            rightButton.style.opacity = '1'
+          } else {
+            leftButton.style.opacity = '1'
+            rightButton.style.opacity = '1'
+          }
+        }
+      }
+    })
   }
 }
 </script>

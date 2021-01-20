@@ -743,7 +743,7 @@ export default class FdControlVue extends Vue {
    return {
      textAlign: controlProp.TextAlign === 0 ? 'left' : controlProp.TextAlign === 2 ? 'right' : 'center',
      borderRight: (index < controlProp.ColumnCount! - 1) ? '1px solid' : '',
-     width: controlProp.ColumnCount! === -1 ? parseInt(updateColWidth[index]) + 'px' : (updateColWidth[index]) ? parseInt(updateColWidth[index]) + 'px' : '100px',
+     //  width: controlProp.ColumnCount! === -1 ? parseInt(updateColWidth[index]) + 'px' : (updateColWidth[index]) ? parseInt(updateColWidth[index]) + 'px' : '100px',
      overflow: 'hidden'
    }
  }
