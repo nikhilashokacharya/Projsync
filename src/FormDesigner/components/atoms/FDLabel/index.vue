@@ -11,27 +11,33 @@
     @click="labelClick"
     @contextmenu="isEditMode ? openTextContextMenu($event): parentConextMenu($event)"
   >
-    <span v-if="!syncIsEditMode">
-      <span>{{ computedCaption.afterbeginCaption }}</span>
-      <span class="spanClass">{{ computedCaption.acceleratorCaption }}</span>
-      <span>{{ computedCaption.beforeendCaption }}</span>
-    </span>
+    <div id="logo" :style="reverseStyle">
+    <img v-if="properties.Picture" id="img" :src="properties.Picture" :style="imageProperty">
+    <div v-if="!syncIsEditMode" id="label" :style="labelStyle">
+       <span :style="spanStyleObj">{{ computedCaption.afterbeginCaption }}</span>
+          <span class="spanStyle" :style="spanStyleObj">{{
+            computedCaption.acceleratorCaption
+          }}</span>
+          <span :style="spanStyleObj">{{ computedCaption.beforeendCaption }}</span>
+    </div>
     <FDEditableText
       v-else
+      id="label"
       :editable="isRunMode === false && syncIsEditMode"
-      :style="editCssObj"
+      :style="labelStyle"
       :caption="properties.Caption"
       @updateCaption="updateCaption"
       @releaseEditMode="releaseEditMode"
     >
     </FDEditableText>
+    </div>
   </label>
 </template>
-
 <script lang="ts">
 import { Component, Watch, Mixins, Emit, Ref } from 'vue-property-decorator'
 import FDEditableText from '@/FormDesigner/components/atoms/FDEditableText/index.vue'
 import FdControlVue from '@/api/abstract/FormDesigner/FdControlVue'
+import Vue from 'vue'
 
 @Component({
   name: 'FDLabel',
@@ -42,6 +48,7 @@ import FdControlVue from '@/api/abstract/FormDesigner/FdControlVue'
 export default class FDLabel extends Mixins(FdControlVue) {
   $el!: HTMLLabelElement;
   @Ref('labelRef') labelRef: HTMLLabelElement
+
   /**
    * @description style object is passed to :style attribute in label tag
    * dynamically changing the styles of the component based on propControlData
@@ -50,6 +57,14 @@ export default class FDLabel extends Mixins(FdControlVue) {
    */
   protected get cssStyleProperty (): Partial<CSSStyleDeclaration> {
     const controlProp = this.properties
+    this.pictureSize()
+    this.reverseStyle.justifyContent = 'center'
+    if (!controlProp.Picture) {
+      this.reverseStyle.justifyContent =
+    controlProp.TextAlign === 0 ? 'flex-start' : controlProp.TextAlign === 1 ? 'center' : 'flex-end'
+    } else {
+      this.positionLogo(controlProp.PicturePosition)
+    }
     const font: font = controlProp.Font
       ? controlProp.Font
       : {
@@ -65,6 +80,14 @@ export default class FDLabel extends Mixins(FdControlVue) {
       display = controlProp.Visible ? 'inline-block' : 'none'
     } else {
       display = 'inline-block'
+    }
+    let alignItems = 'normal'
+    if (controlProp.Picture) {
+      display = 'flex'
+      let labelStyle = document.getElementById('logo')
+      if (this.properties.Height! > labelStyle!.clientHeight) {
+        alignItems = 'center'
+      }
     }
     return {
       ...(!controlProp.AutoSize && this.renderSize),
@@ -93,7 +116,6 @@ export default class FDLabel extends Mixins(FdControlVue) {
         controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''
           ? this.getMouseCursorData
           : 'default',
-      // Fix Font.FontSize, Font.FontItalic ...
       fontFamily: (font.FontStyle! !== '') ? this.setFontStyle : font.FontName!,
       fontSize: `${font.FontSize}px`,
       fontStyle: font.FontItalic || this.isItalic ? 'italic' : '',
@@ -108,25 +130,8 @@ export default class FDLabel extends Mixins(FdControlVue) {
       textUnderlinePosition: 'under',
       fontWeight: font.FontBold ? 'bold' : (font.FontStyle !== '') ? this.tempWeight : '',
       fontStretch: (font.FontStyle !== '') ? this.tempStretch : '',
-      //  position: 'relative',
-      backgroundImage: `url(${controlProp.Picture})`,
-      backgroundRepeat: this.getRepeat,
-      backgroundPosition: this.getPosition,
-      backgroundPositionX: this.getPositionX,
-      backgroundPositionY: this.getPositionY,
-      display: display
-    }
-  }
-  /**
-   * @description style object is passed to :style attribute in tag
-   * dynamically changing the styles of the component based on properties
-   * @function editCssObj
-   *
-   */
-  protected get editCssObj (): Partial<CSSStyleDeclaration> {
-    const controlProp = this.properties
-    return {
-      backgroundImage: 'none'
+      display: display,
+      alignItems: alignItems
     }
   }
 
@@ -170,6 +175,14 @@ export default class FDLabel extends Mixins(FdControlVue) {
   updateAutoSize () {
     if (this.properties.AutoSize === true) {
       if (this.labelRef) {
+        const imgStyle = {
+          width: 'fit-content',
+          height: 'fit-content'
+        }
+        this.imageProperty = imgStyle
+        if (this.properties.Picture) {
+          this.positionLogo(this.properties.PicturePosition)
+        }
         this.$nextTick(() => {
           const a = this.labelRef.children[0] as HTMLSpanElement
           this.updateDataModel({
@@ -216,9 +229,16 @@ export default class FDLabel extends Mixins(FdControlVue) {
   height: 0px;
   left: 0px;
   top: 0px;
+  align-items: center;
+  justify-content: center;
 }
 .spanClass {
   text-decoration: underline;
   text-underline-position: under;
 }
+#logo{
+ display: inline-flex;
+ justify-content: center;
+}
+
 </style>

@@ -17,20 +17,25 @@
     @click="toggleButtonClick"
     @contextmenu="isEditMode ? openTextContextMenu($event): parentConextMenu($event)"
   >
-    <span v-if="!syncIsEditMode || isRunMode">
-      <span>{{ computedCaption.afterbeginCaption }}</span>
-      <span class="spanClass">{{ computedCaption.acceleratorCaption }}</span>
-      <span>{{ computedCaption.beforeendCaption }}</span>
-    </span>
+    <div id="logo" :style="reverseStyle">
+    <img v-if="properties.Picture" id="img" :src="properties.Picture" :style="imageProperty">
+    <div v-if="!syncIsEditMode || isRunMode" :style="labelStyle">
+      <span :style="spanStyleObj">{{ computedCaption.afterbeginCaption }}</span>
+          <span class="spanStyle" :style="spanStyleObj">{{
+            computedCaption.acceleratorCaption
+          }}</span>
+          <span :style="spanStyleObj">{{ computedCaption.beforeendCaption }}</span>
+    </div>
     <FDEditableText
       v-else
       :editable="isRunMode === false && syncIsEditMode"
-      :style="editCssObj"
+      :style="labelStyle"
       :caption="properties.Caption"
       @updateCaption="updateCaption"
       @releaseEditMode="releaseEditMode"
     >
     </FDEditableText>
+    </div>
   </button>
 </template>
 
@@ -38,6 +43,7 @@
 import { Component, Mixins, Watch } from 'vue-property-decorator'
 import FdControlVue from '@/api/abstract/FormDesigner/FdControlVue'
 import FDEditableText from '@/FormDesigner/components/atoms/FDEditableText/index.vue'
+import Vue from 'vue'
 
 @Component({
   name: 'FDToggleButton',
@@ -50,7 +56,6 @@ export default class FDToggleButton extends Mixins(FdControlVue) {
   isClicked: boolean = true;
   isFocus: boolean = false;
   clickCount: number = 0;
-
   /**
    * @description getDisableValue checks for the RunMode of the control and then returns after checking for the Enabled
    * and the Locked property
@@ -112,6 +117,14 @@ export default class FDToggleButton extends Mixins(FdControlVue) {
    */
   protected get styleObj (): Partial<CSSStyleDeclaration> {
     const controlProp = this.properties
+    this.pictureSize()
+    this.reverseStyle.justifyContent = 'center'
+    if (!controlProp.Picture) {
+      this.reverseStyle.justifyContent =
+    controlProp.TextAlign === 0 ? 'flex-start' : controlProp.TextAlign === 1 ? 'center' : 'flex-end'
+    } else {
+      this.positionLogo(controlProp.PicturePosition)
+    }
     const font: font = controlProp.Font
       ? controlProp.Font
       : {
@@ -127,6 +140,14 @@ export default class FDToggleButton extends Mixins(FdControlVue) {
       display = controlProp.Visible ? 'inline-block' : 'none'
     } else {
       display = 'inline-block'
+    }
+    let alignItems = 'normal'
+    if (controlProp.Picture) {
+      display = 'flex'
+      let labelStyle = document.getElementById('logo')
+      if (this.properties.Height! > labelStyle!.clientHeight) {
+        alignItems = 'center'
+      }
     }
     return {
       left: `${controlProp.Left}px`,
@@ -184,11 +205,6 @@ export default class FDToggleButton extends Mixins(FdControlVue) {
           : controlProp.TextAlign === 1
             ? 'center'
             : 'right',
-      backgroundImage: `url(${controlProp.Picture})`,
-      backgroundRepeat: this.getRepeat,
-      backgroundPosition: controlProp.Picture ? this.getPosition : '',
-      backgroundPositionX: controlProp.Picture ? this.getPositionX : '',
-      backgroundPositionY: controlProp.Picture ? this.getPositionY : '',
       borderLeft: controlProp.Value !== 'True' ? '1px solid' : '',
       borderTop: controlProp.Value !== 'True' ? '1px solid' : '',
       borderRight: controlProp.Value === 'True' ? '1px solid' : '',
@@ -196,20 +212,8 @@ export default class FDToggleButton extends Mixins(FdControlVue) {
       borderTopColor: controlProp.Value !== 'True' ? 'white !important' : '',
       borderLeftColor: controlProp.Value !== 'True' ? 'white !important' : '',
       borderBottomColor: controlProp.Value === 'True' ? 'white !important' : '',
-      borderRightColor: controlProp.Value === 'True' ? 'white !important' : ''
-    }
-  }
-
-  /**
-   * @description style object is passed to :style attribute in tag
-   * dynamically changing the styles of the component based on properties
-   * @function editCssObj
-   *
-   */
-  protected get editCssObj (): Partial<CSSStyleDeclaration> {
-    const controlProp = this.properties
-    return {
-      backgroundImage: 'none'
+      borderRightColor: controlProp.Value === 'True' ? 'white !important' : '',
+      alignItems: alignItems
     }
   }
 
@@ -254,6 +258,14 @@ export default class FDToggleButton extends Mixins(FdControlVue) {
    */
   updateAutoSize () {
     if (this.properties.AutoSize === true) {
+      const imgStyle = {
+        width: 'fit-content',
+        height: 'fit-content'
+      }
+      this.imageProperty = imgStyle
+      if (this.properties.Picture) {
+        this.positionLogo(this.properties.PicturePosition)
+      }
       this.$nextTick(() => {
         this.updateDataModel({
           propertyName: 'Height',
@@ -296,5 +308,11 @@ export default class FDToggleButton extends Mixins(FdControlVue) {
   overflow: hidden;
   outline: none;
   box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+}
+#logo{
+ display: inline-flex;
+ justify-content: center;
 }
 </style>
