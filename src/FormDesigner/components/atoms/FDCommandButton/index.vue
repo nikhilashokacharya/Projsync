@@ -17,7 +17,7 @@
     @contextmenu="isEditMode ? openTextContextMenu($event): parentConextMenu($event)"
   >
   <div id="logo" :style="reverseStyle">
-    <img v-if="properties.Picture" id="img" :src="properties.Picture" :style="imageProperty">
+    <img v-if="properties.Picture" id="img" :src="properties.Picture" :style="imageProperty" ref="imageRef">
     <div v-if="!syncIsEditMode || isRunMode" :style="labelStyle">
       <span :style="spanStyleObj">{{ computedCaption.afterbeginCaption }}</span>
           <span class="spanStyle" :style="spanStyleObj">{{
@@ -29,6 +29,7 @@
       v-else
       :editable="isRunMode === false && syncIsEditMode"
       :style="labelStyle"
+      ref="commandButtonSpanRef"
       :caption="properties.Caption"
       @updateCaption="updateCaption"
       @releaseEditMode="releaseEditMode"
@@ -39,7 +40,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Emit, Mixins, Prop, Watch } from 'vue-property-decorator'
+import { Component, Emit, Mixins, Prop, Watch, Ref } from 'vue-property-decorator'
 import FdControlVue from '@/api/abstract/FormDesigner/FdControlVue'
 import FDEditableText from '@/FormDesigner/components/atoms/FDEditableText/index.vue'
 import Vue from 'vue'
@@ -54,6 +55,9 @@ export default class FDCommandButton extends Mixins(FdControlVue) {
   $el!: HTMLButtonElement;
   isClicked: boolean = false;
   isContentEditable: boolean = false;
+  @Ref('commandButtonSpanRef') commandButtonSpanRef!: FDEditableText
+  @Ref('imageRef') imageRef: HTMLImageElement
+
   /**
    * @description getDisableValue checks for the RunMode of the control and then returns after checking for the Enabled
    * and the Locked property
@@ -89,7 +93,7 @@ export default class FDCommandButton extends Mixins(FdControlVue) {
         }
       }
       if (this.isEditMode) {
-        (this.$el.children[0] as HTMLSpanElement).focus()
+        (this.commandButtonSpanRef.$el as HTMLSpanElement).focus()
       }
     }
   }
@@ -235,6 +239,12 @@ export default class FDCommandButton extends Mixins(FdControlVue) {
   autoSizeValidateOnCaptionChange () {
     if (this.properties.AutoSize) {
       this.updateAutoSize()
+    }
+  }
+  @Watch('properties.Picture')
+  setPictureSize () {
+    if (this.properties.Picture) {
+      this.onPictureLoad()
     }
   }
   /**

@@ -229,8 +229,9 @@ export default abstract class FdContainerVue extends FdControlVue {
           const parentId = item.properties.ID.split('MultiPage').pop()
           const controlName = `Page${parentId}_`
           const pageObj = this.generateControlId(controlName)
-          pageObj.properties.Caption = `Page${i + 1}`
-          pageObj.properties.Name = `Page${i + 1}`
+          const count = this.getPageCount(item.properties.ID)
+          pageObj.properties.Caption = `Page${count + i}`
+          pageObj.properties.Name = `Page${count + i}`
           pageObj.properties.Index = i
           this.updateNewControl(item.properties.ID, pageObj.properties.ID, pageObj)
         }
@@ -347,6 +348,33 @@ export default abstract class FdContainerVue extends FdControlVue {
         }
       }
     }
+  }
+  createPageName (pageList: string[]) {
+    let lastControlId = 0
+    for (let i of pageList) {
+      if (i.indexOf('Page') !== -1) {
+        const IdNum = i.split('Page').pop() || '-1'
+        const pasreId = parseInt(IdNum, 10)
+        if (!isNaN(pasreId) && lastControlId < pasreId) {
+          lastControlId = pasreId
+        }
+      }
+    }
+    return lastControlId + 1
+  }
+  getPageCount (container: string) {
+    const containerList = this.getContainerList(container)
+    const pageList: string[] = []
+    for (const id of containerList) {
+      const type = this.userformData[this.userFormId][id].type
+      if (type === 'MultiPage') {
+        for (const pageId of this.userformData[this.userFormId][id].controls) {
+          pageList.push(this.userformData[this.userFormId][pageId].properties.Name!)
+        }
+      }
+    }
+    const name = this.createPageName(pageList)
+    return name
   }
 
   /**

@@ -26,7 +26,7 @@
       ></span
     ></label>
       <div id="logo" :style="logoStyleObj">
-      <img v-if="properties.Picture" id="img" :src="properties.Picture" :style="imageProperty">
+      <img v-if="properties.Picture" id="img" :src="properties.Picture" :style="imageProperty" ref="imageRef">
         <div ref="divAutoSize"
           v-if="!syncIsEditMode || isRunMode"
           @click="isRunMode && makeChecked($event)"
@@ -67,7 +67,8 @@ export default class FDOptionButton extends Mixins(FdControlVue) {
   @Ref('divAutoSize') autoSizeOptionButton!: HTMLDivElement;
   @Ref('optBtnInput') optBtnInput!: HTMLInputElement;
   @Ref('spanRef') spanRef!: HTMLSpanElement;
-  @Ref('optionBtnSpanRef') optionBtnSpanRef!: FDEditableText
+  @Ref('optionBtnSpanRef') optionBtnSpanRef!: FDEditableText;
+  @Ref('imageRef') imageRef: HTMLImageElement
   $el: HTMLDivElement
   alignItem: boolean = false
   get logoStyleObj (): Partial<CSSStyleDeclaration> {
@@ -175,7 +176,12 @@ export default class FDOptionButton extends Mixins(FdControlVue) {
       this.spanRef.style.backgroundColor = 'white'
     }
   }
-
+  @Watch('properties.Picture')
+  setPictureSize () {
+    if (this.properties.Picture) {
+      this.onPictureLoad()
+    }
+  }
   /**
    * @description getDisableValue checks for the RunMode of the control and then returns after checking for the Enabled
    * and the Locked property
@@ -390,29 +396,6 @@ export default class FDOptionButton extends Mixins(FdControlVue) {
         (this.optionBtnSpanRef.$el as HTMLSpanElement).focus()
       }
     }
-  }
-
-  pictureSize () {
-    const imgStyle = {
-      width: 'fit-content',
-      height: 'fit-content',
-      filter: ''
-    }
-    if (this.properties.Picture) {
-      Vue.nextTick(() => {
-        const imgProp = document.getElementById('img')
-        const logoProp = document.getElementById('logo-main')
-        imgStyle.width = this.properties.Width! < imgProp!.clientWidth ? `${this.properties.Width! - 15}px` : 'fit-content'
-        imgStyle.height = this.properties.Height! < imgProp!.clientHeight ? `${this.properties.Height}px` : 'fit-content'
-        imgStyle.filter = !this.properties.Enabled ? 'sepia(0) invert(1) grayscale(1) blur(3px) opacity(0.2)' : ''
-        this.imageProperty = imgStyle
-      })
-    }
-  }
-
-  @Watch('properties.Picture')
-  pictureValidate () {
-    this.pictureSize()
   }
 }
 </script>

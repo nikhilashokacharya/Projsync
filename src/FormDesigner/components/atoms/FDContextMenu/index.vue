@@ -269,6 +269,27 @@ export default class ContextMenu extends FDCommonMethod {
   displayProp () {
     EventBus.$emit('dispProp', false)
   }
+  createPageName (pageList: string[]) {
+    let lastControlId = 0
+    for (let i of pageList) {
+      if (i.indexOf('Page') !== -1) {
+        const IdNum = i.split('Page').pop() || '-1'
+        const pasreId = parseInt(IdNum, 10)
+        if (!isNaN(pasreId) && lastControlId < pasreId) {
+          lastControlId = pasreId
+        }
+      }
+    }
+    return lastControlId + 1
+  }
+  getPageCount (container: string) {
+    const pageList: string[] = []
+    for (const pageId of this.userformData[this.userFormId][container].controls) {
+      pageList.push(this.userformData[this.userFormId][pageId].properties.Name!)
+    }
+    const name = this.createPageName(pageList)
+    return name
+  }
 
   addNewPage () {
     const type = this.userformData[this.userFormId][this.controlId].type
@@ -332,8 +353,9 @@ export default class ContextMenu extends FDCommonMethod {
       const item = JSON.parse(JSON.stringify(controlObj!))
       lastControlId += 1
       item.properties.ID = `ID_${controlName}${lastControlId}`
-      item.properties.Caption = `Page${lastControlId}`
-      item.properties.Name = `Page${lastControlId}`
+      const count = this.getPageCount(this.controlId)
+      item.properties.Caption = `Page${count}`
+      item.properties.Name = `Page${count}`
       item.properties.Index = this.userformData[this.userFormId][this.controlId].controls.length
       this.addControl({
         userFormId: this.userFormId,

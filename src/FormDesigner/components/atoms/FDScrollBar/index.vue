@@ -55,6 +55,7 @@ import { controlProperties } from '@/FormDesigner/controls-properties'
 })
 export default class FDScrollBar extends Mixins(FdControlVue) {
   $el: HTMLDivElement
+  isInvert: boolean = false
   updateValueProperty (e: Event) {
     if (e.target instanceof HTMLInputElement) {
       const targetValue = parseInt(e.target!.value)
@@ -72,7 +73,18 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
       '--bg-color': this.properties.BackColor,
       '--height': this.checkOtherOrientations() ? `${this.properties.Width!}px` : `${this.properties.Height!}px`,
       transform: (this.properties.Min! > this.properties.Max!) ? this.scrollReAlign() : this.checkOtherOrientations() ? 'rotate(90deg)' : '',
-      transformOrigin: (this.properties.Min! > this.properties.Max!) ? this.checkOtherOrientations() ? '0% 0%' : '' : ''
+      transformOrigin: (this.properties.Min! > this.properties.Max!) ? this.checkOtherOrientations() ? '0% 0%' : '' : '',
+      '--invertValue': this.isEditMode ? this.isInvert ? '1' : '0' : '0'
+    }
+  }
+
+  @Watch('isEditMode')
+  editModeValidate () {
+    let intervalVariable
+    if (this.isEditMode) {
+      setInterval(() => {
+        this.isInvert = !this.isInvert
+      }, 1000)
     }
   }
   scrollReAlign () {
@@ -233,12 +245,14 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
   border: 2px solid gray;
   border-right: 2px solid black;
   height: var(--height);
+  opacity: var(--opacityValue);
   -webkit-appearance: none;
   appearance: none;
   width: 25px;
   --alpha: 1;
   cursor: inherit;
   pointer-events:auto;
+  filter: invert(var(--invertValue));
 }
 
 .slider::-moz-range-thumb {

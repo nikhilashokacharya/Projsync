@@ -1462,13 +1462,28 @@ pictureSize () {
   }
   if (this.properties.Picture) {
     Vue.nextTick(() => {
-      const imgProp = document.getElementById('img')
-      imgStyle.width = this.properties.Width! < imgProp!.clientWidth ? `${this.properties.Width}px` : 'fit-content'
-      imgStyle.height = this.properties.Height! < imgProp!.clientHeight ? `${this.properties.Height}px` : 'fit-content'
-      imgStyle.filter = !this.properties.Enabled ? 'sepia(0) invert(1) grayscale(1) blur(3px) opacity(0.2)' : ''
-      this.imageProperty = imgStyle
+      // const imgProp = document.getElementById('img')
+      const img = new Image()
+      img.onload = () => {
+        if (this.data.type === 'CheckBox' || this.data.type === 'OptionButton') {
+          imgStyle.width = this.properties.Width! <= img!.width ? `${this.properties.Width! - 15}px` : 'fit-content'
+        } else {
+          imgStyle.width = this.properties.Width! <= img!.height ? `${this.properties.Width}px` : 'fit-content'
+        }
+        imgStyle.height = this.properties.Height! <= img!.height ? `${this.properties.Height}px` : 'fit-content'
+        imgStyle.filter = !this.properties.Enabled ? 'sepia(0) grayscale(1) blur(3px) opacity(0.2)' : ''
+      }
+      img.src = this.properties.Picture!
     })
   }
+  this.imageProperty = imgStyle
+}
+onPictureLoad () {
+  const img = new Image()
+  img.onload = () => {
+    this.pictureSize()
+  }
+  img.src = this.properties.Picture!
 }
 get spanStyleObj () {
   const controlProp = this.properties

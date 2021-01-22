@@ -69,8 +69,8 @@
             @keydown.ctrl.stop="handleKeyDown"
             @keydown.enter.exact="setContentEditable($event, true)"
             @keydown.shift.exact.stop="selectMultipleCtrl($event, true)"
-             @contextmenu.stop="
-              showContextMenu($event, controlId, selectedPageID, 'container', isEditMode)
+            @contextmenu.stop="
+              showContextMenu($event, selectedPageID, selectedPageID, 'container', isEditMode)
             "
           >
             <Container
@@ -288,7 +288,8 @@ export default class FDMultiPage extends FdContainerVue {
         ? this.selectedPageData.properties.Zoom! / 100
         : ''
       return {
-        width: 'fit-content',
+        width: '100%',
+        height: '100%',
         position: 'relative',
         backgroundImage: `url(${this.selectedPageData.properties.Picture})`,
         backgroundSize:
@@ -701,13 +702,13 @@ export default class FDMultiPage extends FdContainerVue {
               : '0px'
           : '0px',
       padding: '0px',
-      overflow: 'hidden',
+      // overflow: 'hidden',
       overflowX: this.getScrollBarPage ? this.getScrollBarPage.overflowX! : '',
       overflowY: this.getScrollBarPage ? this.getScrollBarPage.overflowY! : '',
       backgroundColor: 'rgb(238,238,238)',
-      backgroundImage:
-        'radial-gradient(circle, rgb(0, 0, 0) 0.5px, rgba(0, 0, 0, 0) 0.2px) !important',
-      backgroundSize: '9px 10px',
+      // backgroundImage:
+      //   'radial-gradient(circle, rgb(0, 0, 0) 0.5px, rgba(0, 0, 0, 0) 0.2px) !important',
+      // backgroundSize: '9px 10px',
       boxShadow:
         controlProp.TabOrientation === 0 ? '1px 0px gray' : '1px 1px gray'
     }

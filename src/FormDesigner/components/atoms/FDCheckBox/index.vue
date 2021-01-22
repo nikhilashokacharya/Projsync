@@ -25,7 +25,7 @@
       ></span
     ></label>
       <div id="logo" :style="logoStyleObj">
-      <img id="img" v-if="properties.Picture" :src="properties.Picture" :style="imageProperty">
+      <img id="img" v-if="properties.Picture" :src="properties.Picture" :style="imageProperty" ref="imageRef">
         <div ref="divAutoSize"
           v-if="!syncIsEditMode || isRunMode"
           @click="isRunMode && makeChecked($event)"
@@ -66,7 +66,8 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
   @Ref('checkboxInput') checkboxInput!: HTMLInputElement;
   @Ref('divAutoSize') autoSizecheckbox!: HTMLDivElement;
   @Ref('spanRef') spanRef!: HTMLSpanElement;
-  @Ref('checkBoxSpanRef') checkBoxSpanRef!: FDEditableText
+  @Ref('checkBoxSpanRef') checkBoxSpanRef!: FDEditableText;
+  @Ref('imageRef') imageRef: HTMLImageElement
   $el: HTMLDivElement
   alignItem: boolean = false
 
@@ -118,6 +119,12 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
       }
     } else {
       this.handleValue(this.properties.Value! as string)
+    }
+  }
+  @Watch('properties.Picture')
+  setPictureSize () {
+    if (this.properties.Picture) {
+      this.onPictureLoad()
     }
   }
 
@@ -392,29 +399,6 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
         (this.checkBoxSpanRef.$el as HTMLSpanElement).focus()
       }
     }
-  }
-
-  pictureSize () {
-    const imgStyle = {
-      width: 'fit-content',
-      height: 'fit-content',
-      filter: ''
-    }
-    if (this.properties.Picture) {
-      Vue.nextTick(() => {
-        const imgProp = document.getElementById('img')
-        const logoProp = document.getElementById('logo-main')
-        imgStyle.width = this.properties.Width! < imgProp!.clientWidth ? `${this.properties.Width! - 15}px` : 'fit-content'
-        imgStyle.height = this.properties.Height! < imgProp!.clientHeight ? `${this.properties.Height}px` : 'fit-content'
-        imgStyle.filter = !this.properties.Enabled ? 'sepia(0) invert(1) grayscale(1) blur(3px) opacity(0.2)' : ''
-        this.imageProperty = imgStyle
-      })
-    }
-  }
-
-  @Watch('properties.Picture')
-  pictureValidate () {
-    this.pictureSize()
   }
 }
 </script>

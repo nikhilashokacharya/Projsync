@@ -12,7 +12,7 @@
     @contextmenu="isEditMode ? openTextContextMenu($event): parentConextMenu($event)"
   >
     <div id="logo" :style="reverseStyle">
-    <img v-if="properties.Picture" id="img" :src="properties.Picture" :style="imageProperty">
+    <img v-if="properties.Picture" id="img" :src="properties.Picture" :style="imageProperty" ref="imageRef">
     <div v-if="!syncIsEditMode" id="label" :style="labelStyle">
        <span :style="spanStyleObj">{{ computedCaption.afterbeginCaption }}</span>
           <span class="spanStyle" :style="spanStyleObj">{{
@@ -23,6 +23,7 @@
     <FDEditableText
       v-else
       id="label"
+      ref="labelSpanRef"
       :editable="isRunMode === false && syncIsEditMode"
       :style="labelStyle"
       :caption="properties.Caption"
@@ -48,6 +49,8 @@ import Vue from 'vue'
 export default class FDLabel extends Mixins(FdControlVue) {
   $el!: HTMLLabelElement;
   @Ref('labelRef') labelRef: HTMLLabelElement
+  @Ref('labelSpanRef') labelSpanRef!: FDEditableText
+  @Ref('imageRef') imageRef: HTMLImageElement
 
   /**
    * @description style object is passed to :style attribute in label tag
@@ -167,6 +170,13 @@ export default class FDLabel extends Mixins(FdControlVue) {
     }
   }
 
+  @Watch('properties.Picture')
+  setPictureSize () {
+    if (this.properties.Picture) {
+      this.onPictureLoad()
+    }
+  }
+
   /**
    * @description updateAutoSize calls Vuex Actions to update object
    * @function updateAutoSize
@@ -211,7 +221,7 @@ export default class FDLabel extends Mixins(FdControlVue) {
       event.stopPropagation()
       this.selectedItem(event)
       if (this.isEditMode) {
-        (this.$el.children[0] as HTMLSpanElement).focus()
+        (this.labelSpanRef.$el as HTMLSpanElement).focus()
       }
     }
   }
