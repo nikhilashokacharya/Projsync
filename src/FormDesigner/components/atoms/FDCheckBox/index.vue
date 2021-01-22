@@ -4,9 +4,9 @@
     class="outer-check"
     :style="cssStyleProperty"
     @click="checkBoxClick"
-    @mousedown="controlEditMode"
     @keydown.enter.prevent="setContentEditable($event, true)"
     :tabindex="properties.TabIndex"
+    @mousedown="controlEditMode"
     @contextmenu="isEditMode ? openTextContextMenu($event): parentConextMenu($event)"
   >
     <label class="control" :style="controlStyleObj">

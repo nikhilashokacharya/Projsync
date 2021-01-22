@@ -210,7 +210,7 @@ export default class FDPage extends Vue {
   created () {
     this.tabData = this.userformData[this.userFormId][this.userFormId]
     EventBus.$on('contextMenuDisplay', (event: MouseEvent, containerId: string, controlId: string, type: string, mode: boolean) => {
-      this.containerId = controlId
+      this.containerId = containerId
       this.controlId = controlId
       this.openMenu(event, containerId, controlId, type, mode)
     })

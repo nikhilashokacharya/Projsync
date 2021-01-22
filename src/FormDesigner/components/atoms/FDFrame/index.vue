@@ -11,7 +11,7 @@
     @keydown.delete.stop.exact="deleteFrame"
     @keydown.enter.exact="setContentEditable($event, true)"
     @click.stop="!isEditMode ? selectedItem : addControlObj($event)"
-    @contextmenu.stop="showContextMenu($event, userFormId, controlId, 'container', isEditMode)"
+    @contextmenu.stop="showContextMenu($event, controlId, controlId, 'container', isEditMode)"
     @mousedown="frameMouseDown"
     @mouseup="dragSelectorControl($event)"
     @keyup.stop="selectMultipleCtrl($event, false)"

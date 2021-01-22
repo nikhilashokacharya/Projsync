@@ -238,6 +238,7 @@ export default class FDControlTabs extends Vue {
           : controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3
             ? this.tempWidth + 'px'
             : '',
+      minWidth: controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3 ? '30px' : '0px',
       top: controlProp.TabOrientation === 1 ? '5px' : '0px',
       fontFamily: font.FontStyle! !== '' ? this.setFontStyle : font.FontName!,
       fontSize: `${font.FontSize}px`,
@@ -270,8 +271,7 @@ export default class FDControlTabs extends Vue {
           : '',
       paddingTop:
         this.indexValue === this.data.properties.Value ? '5px' : '1px',
-      // paddingBottom: this.indexValue === this.data.properties.Value ? '5px' : '3px',
-      paddingBottom: '9px',
+      paddingBottom: controlProp.Style !== 1 ? '9px' : '',
       marginTop:
         this.data.properties.TabOrientation === 1
           ? this.indexValue === this.data.properties.Value
@@ -320,6 +320,7 @@ export default class FDControlTabs extends Vue {
   margin: 3px;
   border-radius: 3px;
   z-index: 2;
+  border: 2px outset !important;
 }
 .page [type="radio"]:checked ~ label.forButton {
   margin: 3px;
@@ -328,16 +329,16 @@ export default class FDControlTabs extends Vue {
   border-radius: 3px;
   z-index: 2;
   background: gray;
-  border: 2px inset;
 }
 .active-item-button {
   margin: 3px;
+  margin-bottom: 6px !important;
   border-right: 2px solid gray;
   border-bottom: none;
   border-radius: 3px;
   z-index: 2;
   background-color: gray;
-  border: 2px inset;
+  border: 2px inset !important;
 }
 .forLeft {
   border-bottom: none;
@@ -367,7 +368,6 @@ export default class FDControlTabs extends Vue {
   background-color: rgb(238, 238, 238);
   display: flex;
   padding: 5px 5px 5px 5px;
-  margin: 0;
   cursor: default;
   position: relative;
   top: 0px;

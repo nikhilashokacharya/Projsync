@@ -824,6 +824,13 @@ export default class FDMultiPage extends FdContainerVue {
     }
   }
 
+  @Watch('tempWidth')
+  tempWidthValidate () {
+    if (this.tempWidth < 30) {
+      this.tempWidth = 30
+    }
+  }
+
   @Watch('properties.TabOrientation')
   orientValidate () {
     this.scrollButtonVerify()
@@ -869,6 +876,9 @@ export default class FDMultiPage extends FdContainerVue {
    */
   @Watch('selectedPageData.properties.Caption')
   captionValue (newVal: string, oldVal: string) {
+    if (newVal === '') {
+      this.tempWidth = 30
+    }
     this.calculateWidthHeight()
     this.scrollButtonVerify()
     this.scrollDisabledValidate()
@@ -880,12 +890,18 @@ export default class FDMultiPage extends FdContainerVue {
       const divElement = this.controlTabsRef
       let tempWidth = 0
       let tempHeight = 0
+      let maxWidth = 0
       Vue.nextTick(function () {
         for (let i = 0; i < divElement.length; i++) {
           const ele = divElement[i].children[0].children[1]
             .children[0] as HTMLInputElement
-          if (ele.offsetWidth > tempWidth) {
-            tempWidth = ele.offsetWidth
+          if (ele.offsetWidth > maxWidth) {
+            maxWidth = ele.offsetWidth
+          }
+          if (maxWidth > 30) {
+            tempWidth = maxWidth
+          } else {
+            tempWidth = 30
           }
           if (ele.offsetHeight > tempHeight) {
             tempHeight = ele.offsetHeight

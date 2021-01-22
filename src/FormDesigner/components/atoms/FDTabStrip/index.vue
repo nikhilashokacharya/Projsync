@@ -460,11 +460,6 @@ export default class FDTabStrip extends FdControlVue {
           : 'default'
     }
   }
-
-  @Watch('scrolling.offsetHeight')
-  topValueUpdate () {
-    this.topValue = this.scrolling.offsetHeight
-  }
   /**
    * @description style object is passed to :style attribute in div tag
    * dynamically changing the styles of the component based on propControlData
@@ -636,13 +631,16 @@ export default class FDTabStrip extends FdControlVue {
   }
 
   /**
-   * @description watches changes in selectedPageData to set the caption
+   * @description watches changes in selectedTabData to set the caption
    * @function captionValue
-   * @param oldVal previous selectedPageData data
-   * @param newVal  new/changed selectedPageData data
+   * @param oldVal previous selectedTabData data
+   * @param newVal  new/changed selectedTabData data
    */
   @Watch('selectedTabData.Caption')
   captionValue (newVal: string, oldVal: string) {
+    if (newVal === '') {
+      this.tempWidth = 30
+    }
     this.calculateWidthHeight()
     this.scrollButtonVerify()
   }
@@ -657,12 +655,18 @@ export default class FDTabStrip extends FdControlVue {
       const divElement = this.controlTabsRef
       let tempWidth = 0
       let tempHeight = 0
+      let maxWidth = 0
       Vue.nextTick(function () {
         for (let i = 0; i < divElement.length; i++) {
           const ele = divElement[i].children[0].children[1]
             .children[0] as HTMLInputElement
-          if (ele.offsetWidth > tempWidth) {
+          if (ele.offsetWidth > maxWidth) {
+            maxWidth = ele.offsetWidth
+          }
+          if (maxWidth > 30) {
             tempWidth = ele.offsetWidth
+          } else {
+            tempWidth = 30
           }
           if (ele.offsetHeight > tempHeight) {
             tempHeight = ele.offsetHeight
@@ -741,6 +745,13 @@ export default class FDTabStrip extends FdControlVue {
     if (this.toolBoxSelectControl === 'Select') {
       event.stopPropagation()
       this.selectedItem(event)
+    }
+  }
+
+  @Watch('tempWidth')
+  tempWidthValidate () {
+    if (this.tempWidth < 30) {
+      this.tempWidth = 30
     }
   }
 
