@@ -1505,7 +1505,8 @@ get spanStyleObj () {
           ? 'underline'
           : font.FontStrikethrough
             ? 'line-through'
-            : ''
+            : '',
+    color: !this.properties.Enabled ? 'gray' : ''
   }
 }
 }

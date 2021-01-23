@@ -19,7 +19,7 @@
         type="checkbox"
         class="control-input visually-hidden" />
       <span
-        class="control-indicator"
+        :class="['control-indicator', getCheckStyle]"
         :style="controlIndicatorStyleObj"
         ref="spanRef"
       ></span
@@ -42,7 +42,7 @@
           ref="checkBoxSpanRef"
           :editable="isRunMode === false && syncIsEditMode"
           :caption="properties.Caption"
-          :style="labelStyle"
+          :style="{labelStyle, color: !properties.Enabled ? 'gray' : ''}"
           @updateCaption="updateCaption"
           @releaseEditMode="releaseEditMode"
         >
@@ -70,6 +70,20 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
   @Ref('imageRef') imageRef: HTMLImageElement
   $el: HTMLDivElement
   alignItem: boolean = false
+
+  get getCheckStyle () {
+    if (this.properties.Enabled) {
+      if (this.properties.Value === 'True') {
+        return 'trueImage'
+      } else if (this.properties.Value === '') {
+        return 'disabledImage'
+      }
+    } else {
+      if ((this.properties.Value === 'True') || (this.properties.Value === '')) {
+        return 'disabledImage'
+      }
+    }
+  }
 
   get logoStyleObj (): Partial<CSSStyleDeclaration> {
     return {
@@ -201,7 +215,7 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
     const controlProp = this.properties
     return {
       boxShadow:
-        controlProp.SpecialEffect === 0 ? '0px 0px gray' : '-1px -1px gray'
+      controlProp.SpecialEffect === 0 ? '0px 0px gray' : '-1px -1px gray'
     }
   }
 
@@ -448,13 +462,19 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
   border: 1px inset grey;
 }
 
-.control-input:checked ~ .control-indicator {
+ .trueImage {
   background-image: url(../../../../assets/checkmark.png);
-  background-size: 10px;
+  background-size: 8px;
   background-position: center;
   background-repeat: no-repeat;
-}
+ }
 
+ .disabledImage {
+  background-image: url(../../../../assets/checkmarkdisabled.png);
+  background-size: 8px;
+  background-position: center;
+  background-repeat: no-repeat;
+ }
 .spanStyle {
   text-decoration: underline;
   text-underline-position: under;

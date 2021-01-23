@@ -112,7 +112,7 @@ export default class FDTabStrip extends FdControlVue {
   tempHeight: number = 0;
   multiRowCount: number = 1;
   isScrollVisible: boolean = false;
-  topValue: number
+  topValue: number = 0;
   rightClickSelect (value: number) {
     this.updateDataModel({ propertyName: 'Value', value: value })
   }
@@ -488,10 +488,10 @@ export default class FDTabStrip extends FdControlVue {
                 : '33px'
           : controlProp.TabOrientation === 1
             ? controlProp.MultiRow
-              ? '-' + (this.tempHeight + 12) * (this.multiRowCount - 1) + 'px'
+              ? '-' + (this.topValue - 30) + 'px'
               : controlProp.TabFixedHeight! > 0
-                ? '0px'
-                : '0px'
+                ? '-' + (this.topValue - 30) + 'px'
+                : '-' + (this.topValue - 30) + 'px'
             : '0px',
       height:
         controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1
@@ -610,6 +610,16 @@ export default class FDTabStrip extends FdControlVue {
   orientValidate () {
     this.scrollButtonVerify()
     this.scrollDisabledValidate()
+    if (this.scrolling) {
+      this.topValue = this.scrolling.offsetHeight
+    }
+  }
+
+  @Watch('properties.MultiRow')
+  multiRowValidate () {
+    if (this.scrolling) {
+      this.topValue = this.scrolling.offsetHeight
+    }
   }
   mounted () {
     this.$el.focus()

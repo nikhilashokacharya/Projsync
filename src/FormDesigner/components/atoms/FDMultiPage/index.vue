@@ -98,17 +98,12 @@
 
 <script lang="ts">
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator'
-import FdControlVue from '@/api/abstract/FormDesigner/FdControlVue'
-import { State, Action } from 'vuex-class'
+import { State } from 'vuex-class'
 import FdContainerVue from '@/api/abstract/FormDesigner/FdContainerVue'
 import { controlProperties } from '@/FormDesigner/controls-properties'
 import ContextMenu from '../FDContextMenu/index.vue'
 import { tabsContextMenu } from '../../../models/tabsContextMenu'
 import Vue from 'vue'
-import {
-  KeyValueProp,
-  ScrollBarProp
-} from '@/FormDesigner/controls-properties-types'
 import FDControlTabs from '@/FormDesigner/components/atoms/FDControlTabs/index.vue'
 import Container from '@/FormDesigner/components/organisms/FDContainer/index.vue'
 import { EventBus } from '@/FormDesigner/event-bus'
@@ -145,6 +140,7 @@ export default class FDMultiPage extends FdContainerVue {
   tempHeight: number = 0;
   multiRowCount: number = 1;
   isScrollVisible = false;
+  topValue: number = 0;
 
   @Watch('selectedPageData.properties.ScrollLeft')
   updateScrollLeft () {
@@ -265,7 +261,7 @@ export default class FDMultiPage extends FdContainerVue {
           ? this.isScrollVisible
             ? `${controlProp.Height! - 54}px`
             : `${controlProp.Height}px`
-          : '',
+          : 'fit-content',
       width:
         controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3
           ? ''
@@ -610,7 +606,7 @@ export default class FDMultiPage extends FdContainerVue {
           ? controlProp.Style === 1
             ? controlProp.TabOrientation === 0
               ? controlProp.MultiRow
-                ? (this.tempHeight + 15) * this.multiRowCount + 'px'
+                ? this.topValue + 'px'
                 : controlProp.TabFixedHeight! > 0
                   ? controlProp.TabFixedHeight! + 13 + 'px'
                   : controlProp.TabFixedHeight! === 0
@@ -619,7 +615,7 @@ export default class FDMultiPage extends FdContainerVue {
               : '3px'
             : controlProp.TabOrientation === 0
               ? controlProp.MultiRow
-                ? (this.tempHeight + 12) * this.multiRowCount + 'px'
+                ? this.topValue + 'px'
                 : controlProp.TabFixedHeight! > 0
                   ? controlProp.TabFixedHeight! + 10 + 'px'
                   : controlProp.TabFixedHeight! === 0
@@ -631,9 +627,8 @@ export default class FDMultiPage extends FdContainerVue {
         controlProp.Style !== 2
           ? controlProp.Style === 1 ? controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1
             ? controlProp.MultiRow
-              ? controlProp.Height! -
-                (this.tempHeight + 3) * this.multiRowCount +
-                'px'
+              ? (controlProp.Height! -
+                this.topValue + 5) + 'px'
               : controlProp.TabFixedHeight! > 0
                 ? controlProp.TabOrientation === 0
                   ? controlProp.Height! - controlProp.TabFixedHeight! - 19 + 'px'
@@ -648,9 +643,8 @@ export default class FDMultiPage extends FdContainerVue {
             : `${controlProp.Height! - 10}px`
             : controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1
               ? controlProp.MultiRow
-                ? controlProp.Height! -
-                (this.tempHeight + 12) * this.multiRowCount +
-                'px'
+                ? (controlProp.Height! -
+                this.topValue + 5) + 'px'
                 : controlProp.TabFixedHeight! > 0
                   ? controlProp.TabOrientation === 0
                     ? controlProp.Height! - controlProp.TabFixedHeight! - 10 + 'px'
@@ -803,6 +797,11 @@ export default class FDMultiPage extends FdContainerVue {
   isScrollUsed (newVal: number, oldVal: number) {
     this.scrollDisabledValidate()
     if (this.properties.MultiRow) {
+      if (this.scrolling) {
+        Vue.nextTick(() => {
+          this.topValue = this.scrolling.offsetHeight!
+        })
+      }
       const initialLength = this.controls.length!
       const len = (this.tempWidth + 12) * initialLength
       if (len - this.properties.Width! >= 0) {
@@ -836,6 +835,9 @@ export default class FDMultiPage extends FdContainerVue {
   orientValidate () {
     this.scrollButtonVerify()
     this.scrollDisabledValidate()
+    if (this.scrolling) {
+      this.topValue = this.scrolling.offsetHeight
+    }
   }
 
   @Watch('properties.Height')
@@ -854,6 +856,13 @@ export default class FDMultiPage extends FdContainerVue {
   tabFixedHeightValidate () {
     this.scrollButtonVerify()
     this.scrollDisabledValidate()
+  }
+
+  @Watch('properties.MultiRow')
+  multiRowValidate () {
+    if (this.scrolling) {
+      this.topValue = this.scrolling.offsetHeight
+    }
   }
 
   /**

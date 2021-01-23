@@ -20,7 +20,7 @@
         type="radio"
         class="control-input visually-hidden" />
       <span
-        class="control-indicator"
+        :class="['control-indicator', getCheckStyle]"
         :style="controlIndicatorStyleObj"
         ref="spanRef"
       ></span
@@ -41,7 +41,7 @@
         <FDEditableText
           v-else
           :editable="isRunMode === false && syncIsEditMode"
-          :style="labelStyle"
+          :style="{labelStyle, color: !properties.Enabled ? 'gray' : ''}"
           :caption="properties.Caption"
           ref="optionBtnSpanRef"
           @updateCaption="updateCaption"
@@ -81,6 +81,21 @@ export default class FDOptionButton extends Mixins(FdControlVue) {
       overflow: 'hidden'
     }
   }
+
+  get getCheckStyle () {
+    if (this.properties.Enabled) {
+      if (this.properties.Value === 'True') {
+        return 'trueImage'
+      } else if (this.properties.Value === '') {
+        return 'disabledImage'
+      }
+    } else {
+      if ((this.properties.Value === 'True') || (this.properties.Value === '')) {
+        return 'disabledImage'
+      }
+    }
+  }
+
   get controlStyleObj () {
     const controlProp = this.properties
     return {
@@ -471,13 +486,21 @@ export default class FDOptionButton extends Mixins(FdControlVue) {
   background-color: white;
 }
 
-.control-input:checked ~ .control-indicator {
+ .trueImage {
   background-image: url(../../../../assets/optionmark-img.png);
   background-size: 5px;
   border-radius: 50%;
   background-position: center;
   background-repeat: no-repeat;
-}
+ }
+
+ .disabledImage {
+  background-image: url(../../../../assets/optionbuttondisabled.png);
+  background-size: 5px;
+  border-radius: 50%;
+  background-position: center;
+  background-repeat: no-repeat;
+ }
 
 .spanClass {
   text-decoration: underline;

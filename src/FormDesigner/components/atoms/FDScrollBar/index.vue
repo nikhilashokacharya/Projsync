@@ -82,9 +82,11 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
   editModeValidate () {
     let intervalVariable
     if (this.isEditMode) {
-      setInterval(() => {
+      intervalVariable = setInterval(() => {
         this.isInvert = !this.isInvert
       }, 1000)
+    } else {
+      clearInterval(intervalVariable)
     }
   }
   scrollReAlign () {
