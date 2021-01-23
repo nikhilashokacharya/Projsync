@@ -243,6 +243,7 @@ export default class ResizeControl extends FdSelectVue {
     })
   }
   selectedItem (e: MouseEvent) {
+    debugger
     if (this.selMultipleCtrl === false) {
       const userData = this.userformData[this.userFormId]
       const groupId = this.propControlData.properties.GroupID

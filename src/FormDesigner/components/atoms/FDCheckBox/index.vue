@@ -101,7 +101,10 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
     return {
       order: controlProp.Alignment === 1 ? '0' : '1',
       position: 'sticky',
-      top: controlProp.Picture ? '0px' : ''
+      top: controlProp.Picture ? '0px' : '0px',
+      display: 'flex',
+      height: '100%',
+      alignItems: 'center'
     }
   }
   /**
