@@ -116,6 +116,8 @@ export default class FDTextBox extends Mixins(FdControlVue) {
   @Ref('autoSizeTextarea') readonly autoSizeTextarea!: HTMLLabelElement;
   @Ref('textareaRef') textareaRef: HTMLTextAreaElement;
   $el: HTMLDivElement
+  originalText: string = ''
+  trimmedText: string = ''
   get getDisableValue () {
     if (this.isRunMode || this.isEditMode) {
       return (
@@ -162,7 +164,7 @@ export default class FDTextBox extends Mixins(FdControlVue) {
       borderTop: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 2 ? '2px solid gray' : controlProp.SpecialEffect === 3 ? '1.5px solid gray' : controlProp.SpecialEffect === 4 ? '0.5px solid gray' : '',
       borderBottom: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 1 ? '2px solid gray' : controlProp.SpecialEffect === 4 ? '1.5px solid gray' : controlProp.SpecialEffect === 3 ? '0.5px solid gray' : '',
       whiteSpace:
-        controlProp.WordWrap && controlProp.MultiLine ? 'normal' : 'nowrap',
+        this.isEditMode ? controlProp.WordWrap && controlProp.MultiLine ? 'normal' : 'nowrap' : controlProp.WordWrap && controlProp.MultiLine ? 'pre-line' : 'pre',
       wordBreak:
         controlProp.WordWrap && controlProp.MultiLine ? 'break-word' : 'normal',
       color:
@@ -395,6 +397,28 @@ export default class FDTextBox extends Mixins(FdControlVue) {
     e.preventDefault()
   }
 
+  @Watch('isEditMode')
+  editModeValidation () {
+    if (this.textareaRef) {
+      this.originalText = this.textareaRef.value
+      this.trimmedText = this.originalText.replace(/(\r\n|\n|\r)/gm, ',')
+    }
+  }
+
+  @Watch('properties.MultiLine')
+  multiLineValidate () {
+    if (this.textareaRef) {
+      this.originalText = this.textareaRef.value
+      this.trimmedText = this.originalText.replace(/(\r\n|\n|\r)/gm, '¶')
+
+      if (this.properties.MultiLine) {
+        this.trimmedText = this.originalText.replaceAll('¶', '\n')
+        this.updateDataModel({ propertyName: 'Value', value: this.trimmedText })
+      } else {
+        this.updateDataModel({ propertyName: 'Value', value: this.trimmedText })
+      }
+    }
+  }
   /**
    * @override
    */

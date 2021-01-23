@@ -303,7 +303,8 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   isScrolling: boolean = false;
   tempHeight: number;
   inBlur: boolean = false;
-  headWidth: string = '100%'
+  headWidth: string = '100%';
+  controlZIndex: number = -1;
   makeOpen () {
     this.open = true
   }
@@ -335,6 +336,11 @@ export default class FDComboBox extends Mixins(FdControlVue) {
 
   @Watch('open')
   openValidate () {
+    if (this.open) {
+      this.updateDataModelExtraData({ propertyName: 'zIndex', value: -1 })
+    } else {
+      this.updateDataModelExtraData({ propertyName: 'zIndex', value: this.controlZIndex })
+    }
     if (this.open && this.properties.RowSource !== '') {
       Vue.nextTick(() => {
         this.headWidth = this.comboRef.children[1].children[0].scrollWidth + 'px'
@@ -1149,8 +1155,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
       display = 'inline-block'
     }
     return {
-      display: display,
-      zIndex: '0'
+      display: display
     }
   }
   protected get tdStyleObj (): Partial<CSSStyleDeclaration> {
@@ -1211,7 +1216,13 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     this.updateColumns()
   }
 
+  @Watch('data.extraDatas.zIndex')
+  setLocalZIndex () {
+    this.controlZIndex = this.data.extraDatas!.zIndex!
+  }
+
   mounted () {
+    this.controlZIndex = this.data.extraDatas!.zIndex!
     this.$el.focus()
     if (this.properties.RowSource !== '') {
       const initialRowSourceData = this.extraDatas.RowSourceData!
@@ -1340,7 +1351,9 @@ export default class FDComboBox extends Mixins(FdControlVue) {
           ? this.isEditMode || !this.isActivated
             ? this.getMouseCursorData
             : 'default'
-          : 'default'
+          : 'default',
+      position: 'relative',
+      zIndex: '999'
     }
   }
 
