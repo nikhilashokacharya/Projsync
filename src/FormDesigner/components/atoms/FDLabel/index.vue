@@ -15,7 +15,7 @@
     <img v-if="properties.Picture" id="img" :src="properties.Picture" :style="[imageProperty,imagePos]" ref="imageRef">
     <div v-if="!syncIsEditMode" id="label" ref="textSpanRef" :style="labelStyle" >
        <span :style="spanStyleObj">{{ computedCaption.afterbeginCaption }}</span>
-          <span class="spanStyle" :style="spanStyleObj">{{
+          <span class="spanClass" :style="spanStyleObj">{{
             computedCaption.acceleratorCaption
           }}</span>
           <span :style="spanStyleObj">{{ computedCaption.beforeendCaption }}</span>
@@ -299,7 +299,7 @@ export default class FDLabel extends Mixins(FdControlVue) {
 }
 .spanClass {
   text-decoration: underline;
-  text-underline-position: under;
+  text-decoration-skip-ink: none;
 }
 #logo{
  display: inline-flex;

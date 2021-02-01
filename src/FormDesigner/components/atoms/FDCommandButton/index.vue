@@ -21,7 +21,7 @@
     <img v-if="properties.Picture" id="img" :src="properties.Picture" :style="[imageProperty,imagePos]" ref="imageRef">
     <div v-if="!syncIsEditMode || isRunMode" :style="labelStyle"  ref="textSpanRef">
       <span :style="spanStyleObj">{{ computedCaption.afterbeginCaption }}</span>
-          <span class="spanStyle" :style="spanStyleObj">{{
+          <span class="spanClass" :style="spanStyleObj">{{
             computedCaption.acceleratorCaption
           }}</span>
           <span :style="spanStyleObj">{{ computedCaption.beforeendCaption }}</span>
@@ -336,6 +336,10 @@ export default class FDCommandButton extends Mixins(FdControlVue) {
 }
 .commandbutton[runmode]:active {
   border-style: outset !important;
+}
+.spanClass {
+  text-decoration: underline;
+  text-decoration-skip-ink: none;
 }
 #logo{
  display: inline-flex;
