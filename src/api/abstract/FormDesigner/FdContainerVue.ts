@@ -1,4 +1,4 @@
-import { Prop, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 import { controlProperties } from '@/FormDesigner/controls-properties'
 import FdControlVue from './FdControlVue'
 import { Action, State } from 'vuex-class'
@@ -8,8 +8,10 @@ import { controlContextMenu } from '@/FormDesigner/models/controlContextMenuData
 import { userformContextMenu } from '@/FormDesigner/models/userformContextMenuData'
 import { ControlPropertyData } from '@/FormDesigner/models/ControlsTableProperties/ControlPropertyData.ts'
 import { EventBus } from '@/FormDesigner/event-bus'
-
-export default abstract class FdContainerVue extends FdControlVue {
+@Component({
+  name: 'FdContainerVue'
+})
+export default class FdContainerVue extends FdControlVue {
   @Prop({ required: true, type: String }) public readonly userFormId!: string
   @Prop({ required: true, type: String }) public readonly containerId!: string
   @State((state: rootState) => state.fd.toolBoxSelect) toolBoxSelect!: fdState['toolBoxSelect'];
@@ -34,6 +36,9 @@ export default abstract class FdContainerVue extends FdControlVue {
   selectedAreaStyle: ISelectedArea | undefined
   selMultipleCtrl: boolean = false
   activateCtrl: boolean = false
+  backColorProp = ['Frame', 'CheckBox', 'OptionButton', 'Label', 'MultiPage']
+  foreColorProp = ['Frame', 'CheckBox', 'OptionButton', 'Label', 'MultiPage', 'TabStrip']
+  fontProp = ['Frame', 'CheckBox', 'OptionButton', 'Label', 'MultiPage', 'TabStrip', 'ToggleButton', 'CommandButton']
 
   get selConatiner () {
     return this.selectedControls[this.userFormId].container
@@ -208,15 +213,22 @@ export default abstract class FdContainerVue extends FdControlVue {
    */
   addControlObj (e: MouseEvent, pageId: string) {
     if (this.toolBoxSelect !== 'Select' && this.toolBoxSelect !== '') {
+      const container = this.userformData[this.userFormId][this.controlId]
+      const containerProp = container.properties
       const type = this.userformData[this.userFormId][this.controlId].type
       const item = this.generateControlId(this.toolBoxSelect)
       const sw = parseInt(this.selectedAreaStyle!.width!)
       const sh = parseInt(this.selectedAreaStyle!.height)
 
-      item.properties.Left = parseInt(this.selectedAreaStyle!.left)
-      item.properties.Top = parseInt(this.selectedAreaStyle!.top)
+      item.properties.Left = (isNaN(sw!) || sw! === 0) ? e.offsetX : parseInt(this.selectedAreaStyle!.left)
+      item.properties.Top = (isNaN(sh!) || sh! === 0) ? e.offsetY : parseInt(this.selectedAreaStyle!.top)
       item.properties.Width = (isNaN(sw!) || sw! === 0) ? item.properties.Width : sw
       item.properties.Height = (isNaN(sh!) || sh! === 0) ? item.properties.Height : sh
+      if (container.type === 'UserForm' || container.type === 'Frame') {
+        item.properties.BackColor = this.backColorProp.includes(item.type) ? containerProp.BackColor : item.properties.BackColor
+        item.properties.ForeColor = this.foreColorProp.includes(item.type) ? containerProp.ForeColor : item.properties.ForeColor
+        item.properties.Font = this.fontProp.includes(item.type) ? { ...containerProp.Font } : { ...item.properties.Font }
+      }
       const controls = item.controls
       item.controls = item.type === 'MultiPage' ? [] : item.controls
       const newControlId = type === 'MultiPage' ? pageId : this.controlId
@@ -383,7 +395,7 @@ export default abstract class FdContainerVue extends FdControlVue {
    * @param this  - VueComponent of container
    * @event mousedown
    */
-  deActiveControl (this: this) {
+  deActiveControl () {
     const controlType: string = this.userformData[this.userFormId][this.controlId].type
     if (this.selMultipleCtrl === false && this.activateCtrl === false) {
       this.selectControl({

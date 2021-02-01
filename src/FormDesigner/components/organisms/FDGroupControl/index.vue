@@ -167,7 +167,7 @@ export default class GroupControl extends FDCommonMethod {
     // if (this.getIsMoveTarget) {
     this.positions.movementX = 0
     this.positions.movementY = 0
-    // this.isMove = false
+    this.isMove = false
     // }
   }
   topArray: number[] = [];
@@ -195,6 +195,7 @@ export default class GroupControl extends FDCommonMethod {
     if (this.getIsMoveTarget) {
       //   this.moveBorder(event)
       if (event.movementX !== 0 && event.movementY !== 0) {
+        EventBus.$emit('moveControl', event, 'groupControlDrag', this.positions)
         EventBus.$emit('groupDrag', 'groupdrag')
         this.isMove = true
         // this.updateIsMove(true)
@@ -358,6 +359,7 @@ export default class GroupControl extends FDCommonMethod {
   elementMouseDrag (event: MouseEvent, containerX: number, containerY: number, previousEvent: MouseEvent): void {
     event.preventDefault()
     if (this.container === this.containerId) {
+      const containerProp = this.userformData[this.userFormId][this.containerId].properties
       for (const i of this.selectedControls[this.userFormId].selected) {
         if (i.startsWith('group')) {
           const index = this.divStyleArray.findIndex(val => val.groupName === i)
@@ -379,8 +381,8 @@ export default class GroupControl extends FDCommonMethod {
         targetLeft = parseInt(targetData.left!)
         targetTop = parseInt(targetData.top!)
       }
-      this.positions.movementX = (targetLeft) - (containerX - (this.positions.offsetX!))
-      this.positions.movementY = (targetTop) - (containerY - (this.positions.offsetY!))
+      this.positions.movementX = (targetLeft - (containerX - this.positions.offsetX!))
+      this.positions.movementY = (targetTop - (containerY - this.positions.offsetY!))
       const scale: number = 1
       const grid: Array<number> = [10, 10]
       const x: number =
@@ -406,8 +408,8 @@ export default class GroupControl extends FDCommonMethod {
           left = parseInt(dragResizeControl.left!) - x
 
           if (this.resizeDiv === 'drag') {
-            dragResizeControl.top = `${top}px`
-            dragResizeControl.left = `${left}px`
+            dragResizeControl.top = `${top + containerProp.ScrollTop!}px`
+            dragResizeControl.left = `${left + containerProp.ScrollLeft!}px`
           }
           for (const j in this.userformData[this.userFormId][this.containerId]
             .controls) {
@@ -423,8 +425,8 @@ export default class GroupControl extends FDCommonMethod {
               if (this.resizeDiv === 'drag') {
                 top = dragResizeControl1.Top! - y
                 left = dragResizeControl1.Left! - x
-                this.updateControlAction('Top', top, index)
-                this.updateControlAction('Left', left, index)
+                this.updateControlAction('Top', top + containerProp.ScrollTop!, index)
+                this.updateControlAction('Left', left + containerProp.ScrollLeft!, index)
               }
             }
           }
@@ -446,8 +448,8 @@ export default class GroupControl extends FDCommonMethod {
           const left = control.Left! - x
 
           if (this.resizeDiv === 'drag') {
-            this.updateControlAction('Top', top, k)
-            this.updateControlAction('Left', left, k)
+            this.updateControlAction('Top', top + containerProp.ScrollTop!, k)
+            this.updateControlAction('Left', left + containerProp.ScrollLeft!, k)
           }
         }
       }
@@ -654,7 +656,9 @@ export default class GroupControl extends FDCommonMethod {
     } else {
       this.value = 'different'
     }
+    EventBus.$emit('updateIsControlMove', this.isMove)
     EventBus.$emit('groupDrag', 'NotDrag')
+    EventBus.$emit('endMoveControl', 'groupEndMove')
     EventBus.$emit('endGroupMoveControl')
     document.onmouseup = null
     document.onmousemove = null

@@ -841,7 +841,7 @@ export default class FDListBox extends Mixins(FdControlVue) {
             : font.FontStrikethrough
               ? 'line-through'
               : '',
-      textUnderlinePosition: 'under',
+      textDecorationSkipInk: 'none',
       fontWeight: font.FontBold
         ? 'bold'
         : font.FontStyle !== ''
@@ -856,7 +856,7 @@ export default class FDListBox extends Mixins(FdControlVue) {
    * dynamically changing the styles of the component based on properties
    * @function tableStyleObj
    */
-  protected get tableStyleObj (): Partial<CSSStyleDeclaration> {
+  protected get tableStyleObj () {
     const controlProp = this.properties
     const font: font = controlProp.Font
       ? controlProp.Font
@@ -883,7 +883,7 @@ export default class FDListBox extends Mixins(FdControlVue) {
             : font.FontStrikethrough
               ? 'line-through'
               : '',
-      textUnderlinePosition: 'under',
+      textDecorationSkipInk: 'none',
       fontWeight: font.FontBold
         ? 'bold'
         : font.FontStyle !== ''

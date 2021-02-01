@@ -3,6 +3,7 @@
     :title="properties.ControlTipText"
     class="outer-check"
     :style="cssStyleProperty"
+    ref="componentRef"
     @click="optionBtnClick"
     :tabindex="properties.TabIndex"
     @mousedown="controlEditMode"
@@ -12,7 +13,7 @@
   <label class="control" :style="controlStyleObj">
     <input
         @change="handleChange($event, optionBtnRef)"
-        @click="SetValue()"
+        @click="setValue()"
         ref="optBtnInput"
         :name="properties.Name"
         :tabindex="properties.TabIndex"
@@ -25,9 +26,9 @@
         ref="spanRef"
       ></span
     ></label>
-      <div id="logo" :style="logoStyleObj">
-      <img v-if="properties.Picture" id="img" :src="properties.Picture" :style="imageProperty" ref="imageRef">
-        <div ref="divAutoSize"
+      <div id="logo" ref="logoRef" :style="reverseStyle">
+      <img v-if="properties.Picture" id="img" :src="properties.Picture" :style="[imageProperty,imagePos]" ref="imageRef">
+        <div ref="textSpanRef"
           v-if="!syncIsEditMode || isRunMode"
           @click="isRunMode && makeChecked($event)"
           :style="labelStyle"
@@ -41,9 +42,9 @@
         <FDEditableText
           v-else
           :editable="isRunMode === false && syncIsEditMode"
-          :style="{labelStyle, color: !properties.Enabled ? 'gray' : ''}"
+          :style="[labelStyle, {color: !properties.Enabled ? 'gray' : ''}]"
           :caption="properties.Caption"
-          ref="optionBtnSpanRef"
+          ref="editableTextRef"
           @updateCaption="updateCaption"
           @releaseEditMode="releaseEditMode"
         >
@@ -64,11 +65,13 @@ import FDEditableText from '@/FormDesigner/components/atoms/FDEditableText/index
   }
 })
 export default class FDOptionButton extends Mixins(FdControlVue) {
-  @Ref('divAutoSize') autoSizeOptionButton!: HTMLDivElement;
+  @Ref('componentRef') componentRef: HTMLDivElement
   @Ref('optBtnInput') optBtnInput!: HTMLInputElement;
   @Ref('spanRef') spanRef!: HTMLSpanElement;
-  @Ref('optionBtnSpanRef') optionBtnSpanRef!: FDEditableText;
+  @Ref('textSpanRef') textSpanRef!: HTMLDivElement;
   @Ref('imageRef') imageRef: HTMLImageElement
+  @Ref('logoRef') logoRef : HTMLDivElement
+  @Ref('editableTextRef') editableTextRef!: FDEditableText
   $el: HTMLDivElement
   alignItem: boolean = false
   get logoStyleObj (): Partial<CSSStyleDeclaration> {
@@ -101,10 +104,7 @@ export default class FDOptionButton extends Mixins(FdControlVue) {
     return {
       order: controlProp.Alignment === 1 ? '0' : '1',
       position: 'sticky',
-      top: controlProp.Picture ? '0px' : '0px',
-      display: 'flex',
-      height: '100%',
-      alignItems: 'center'
+      top: `${controlProp.Height! / 2 - 10}px`
     }
   }
 
@@ -112,7 +112,7 @@ export default class FDOptionButton extends Mixins(FdControlVue) {
    * @description  updates Value property and the sets the backGround in runMode
    * @function setValue
    */
-  SetValue () {
+  setValue () {
     if (this.isRunMode) {
       this.updateDataModel({ propertyName: 'Value', value: 'true' })
       this.spanRef.style.backgroundColor = 'white'
@@ -175,8 +175,98 @@ export default class FDOptionButton extends Mixins(FdControlVue) {
 
   @Watch('properties.Caption', { deep: true })
   autoSizeValidateOnCaptionChange () {
+    if (this.properties.Picture) {
+      Vue.nextTick(() => {
+        this.labelAlignment()
+      })
+    }
     if (this.properties.AutoSize) {
       this.updateAutoSize()
+    }
+  }
+  @Watch('properties.AutoSize', { deep: true })
+  autoSize () {
+    this.updateAutoSize()
+  }
+
+    @Watch('properties.Picture')
+  setPictureSize () {
+    if (this.properties.Picture) {
+      this.$nextTick(() => {
+        this.onPictureLoad()
+        this.positionLogo(this.properties.PicturePosition)
+        if (this.properties.AutoSize) {
+          this.updateAutoSize()
+        }
+      })
+    }
+  }
+
+  @Watch('properties.Height')
+    updateImageSizeHeight () {
+      if (this.properties.Picture) {
+        this.positionLogo(this.properties.PicturePosition)
+        this.pictureSize()
+      }
+    }
+  @Watch('properties.Width')
+  updateImageSizeWidth () {
+    if (this.properties.Picture) {
+      this.positionLogo(this.properties.PicturePosition)
+      this.pictureSize()
+    }
+  }
+  @Watch('properties.PicturePosition')
+  updatePicturePosition () {
+    if (this.properties.Picture) {
+      this.positionLogo(this.properties.PicturePosition)
+      if (this.properties.AutoSize) {
+        this.updateAutoSize()
+      }
+    }
+  }
+  @Watch('properties.TextAlign')
+  autoSizeOnTextAlignment () {
+    if (this.properties.AutoSize) {
+      this.updateAutoSize()
+    }
+  }
+  @Watch('properties.BorderStyle')
+  autoSizeOnBorderStyleChange () {
+    if (this.properties.AutoSize) {
+      this.updateAutoSize()
+    }
+  }
+
+  /**
+   * @description updateAutoSize calls Vuex Actions to update object
+   * @function updateAutoSize
+   * @override
+   */
+  updateAutoSize () {
+    if (this.properties.AutoSize === true) {
+      const imgStyle = {
+        width: 'fit-content',
+        height: 'fit-content',
+        filter: ''
+      }
+      this.imageProperty = imgStyle
+      if (this.properties.Picture) {
+        this.positionLogo(this.properties.PicturePosition)
+      }
+      this.$nextTick(() => {
+        const { width, height } = this.getWidthHeight()
+        this.updateDataModel({
+          propertyName: 'Height',
+          value: height + 5
+        })
+        this.updateDataModel({
+          propertyName: 'Width',
+          value: width
+        })
+      })
+    } else {
+      return undefined
     }
   }
 
@@ -190,16 +280,13 @@ export default class FDOptionButton extends Mixins(FdControlVue) {
   checkEnabled (newVal: boolean, oldVal: boolean) {
     if (!this.properties.Enabled) {
       this.spanRef.style.backgroundColor = 'rgba(220, 220, 220, 1)'
+      this.imageProperty.filter = 'sepia(0) grayscale(1) blur(3px) opacity(0.2)'
     } else {
       this.spanRef.style.backgroundColor = 'white'
+      this.imageProperty.filter = ''
     }
   }
-  @Watch('properties.Picture')
-  setPictureSize () {
-    if (this.properties.Picture) {
-      this.onPictureLoad()
-    }
-  }
+
   /**
    * @description getDisableValue checks for the RunMode of the control and then returns after checking for the Enabled
    * and the Locked property
@@ -236,12 +323,9 @@ export default class FDOptionButton extends Mixins(FdControlVue) {
    */
   get cssStyleProperty () {
     const controlProp = this.properties
-    this.pictureSize()
     this.reverseStyle.justifyContent = 'center'
     if (!controlProp.Picture) {
       this.reverseStyle.justifyContent = controlProp.TextAlign === 0 ? 'flex-start' : controlProp.TextAlign === 1 ? 'center' : 'flex-end'
-    } else {
-      this.positionLogo(controlProp.PicturePosition)
     }
     const font: font = controlProp.Font
       ? controlProp.Font
@@ -259,12 +343,11 @@ export default class FDOptionButton extends Mixins(FdControlVue) {
     } else {
       display = 'grid'
     }
-    let alignItems = 'center'
+    const alignItems = controlProp.Picture ? 'inherit' : 'center'
     if (controlProp.Picture) {
-      let labelStyle = document.getElementById('logo')
-      if (this.properties.Height! < labelStyle!.clientHeight) {
-        alignItems = 'normal'
-      }
+      Vue.nextTick(() => {
+        this.labelAlignment()
+      })
     }
     return {
       left: `${controlProp.Left}px`,
@@ -306,7 +389,7 @@ export default class FDOptionButton extends Mixins(FdControlVue) {
         : font.FontStyle !== ''
           ? this.tempWeight
           : '',
-      textUnderlinePosition: 'under',
+      textDecorationSkipInk: 'none',
       fontStretch: font.FontStyle !== '' ? this.tempStretch : '',
       display: display,
       overflow: 'hidden',
@@ -345,7 +428,7 @@ export default class FDOptionButton extends Mixins(FdControlVue) {
   editableTextVerify () {
     if (this.isEditMode) {
       Vue.nextTick(() => {
-        if (this.isEditMode && this.optionBtnSpanRef.$el.clientHeight > this.properties.Height!) {
+        if (this.isEditMode && this.editableTextRef.$el.clientHeight > this.properties.Height!) {
           this.alignItem = true
         } else {
           this.alignItem = false
@@ -357,35 +440,6 @@ export default class FDOptionButton extends Mixins(FdControlVue) {
   /**
    * @override
    */
-  @Watch('properties.AutoSize', { deep: true })
-  updateAutoSize () {
-    if (this.properties.AutoSize) {
-      const imgStyle = {
-        width: 'fit-content',
-        height: 'fit-content'
-      }
-      this.positionLogo(this.properties.PicturePosition)
-      this.imageProperty = imgStyle
-      this.$nextTick(() => {
-        let divRef: HTMLDivElement = this.autoSizeOptionButton
-        const offsetWidth = (divRef.childNodes[0] as HTMLSpanElement)
-          .offsetWidth
-        const offsetHeight = (divRef.childNodes[0] as HTMLSpanElement)
-          .offsetHeight
-        // Value 11 for OptionButton, 2 for Gap style value, and offsetHeight and offsetWidth + 1
-        this.updateDataModel({
-          propertyName: 'Width',
-          value: 11 + 4 + offsetWidth + 1
-        })
-        this.updateDataModel({
-          propertyName: 'Height',
-          value: 10 + 4 + offsetHeight + 1
-        })
-      })
-    } else {
-      return undefined
-    }
-  }
 
   @Watch('properties.Caption', { deep: true })
   handleCaption () {
@@ -411,7 +465,7 @@ export default class FDOptionButton extends Mixins(FdControlVue) {
       event.stopPropagation()
       this.selectedItem(event)
       if (this.isEditMode) {
-        (this.optionBtnSpanRef.$el as HTMLSpanElement).focus()
+        (this.editableTextRef.$el as HTMLSpanElement).focus()
       }
     }
   }
@@ -478,9 +532,8 @@ export default class FDOptionButton extends Mixins(FdControlVue) {
   display: inline-flex;
   position: sticky;
   top: 47%;
-  align-items: center;
+  align-self: center;
 }
-
 .control-indicator {
   width: 10px;
   height: 10px;

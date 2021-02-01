@@ -5,10 +5,6 @@
       :style="pageStyleObj"
       :title="properties.ControlTipText"
       @mousedown="multiPageMouseDown"
-      @click.stop="
-        !isEditMode ? selectedItem : addControlObj($event, selectedPageID)
-      "
-      @mouseup="dragSelectorControl($event)"
       @contextmenu.stop="handleContextMenu"
       @keydown.delete.stop.exact="deleteMultiPage"
       @keyup.stop="selectMultipleCtrl($event, false)"
@@ -57,7 +53,6 @@
           :style="styleContentObj"
           ref="contentRef"
           :title="properties.ControlTipText"
-          @scroll="updateScrollingLeftTop"
         >
           <div
             v-if="controls.includes(selectedPageID)"
@@ -78,11 +73,20 @@
               :controlId="selectedPageID"
               :containerId="selectedPageID"
               :isEditMode="isEditMode"
+              :getScrollBarX="getScrollBarPage.overflowX"
+              :getScrollBarY="getScrollBarPage.overflowY"
               :title="properties.ControlTipText"
               :width="properties.Width"
               :height="properties.Height"
               :getSampleDotPattern="getSampleDotPattern"
               ref="containerRef"
+              :createBackgroundString="getPicture"
+              :getSizeMode="getSizeMode"
+              :getRepeatData="getRepeatData"
+              :getPosition="getPosition"
+             @deActiveControl="deActControl"
+             @dragSelectorControl="dragSelectorControl"
+             @addControlObj="addContainerControl"
             />
           </div>
         </div>
@@ -97,8 +101,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Ref, Watch } from 'vue-property-decorator'
-import { State } from 'vuex-class'
+import { Component, Mixins, Prop, Ref, Watch } from 'vue-property-decorator'
+import { State, Action } from 'vuex-class'
 import FdContainerVue from '@/api/abstract/FormDesigner/FdContainerVue'
 import { controlProperties } from '@/FormDesigner/controls-properties'
 import ContextMenu from '../FDContextMenu/index.vue'
@@ -117,9 +121,8 @@ import { EventBus } from '@/FormDesigner/event-bus'
       import('@/FormDesigner/components/organisms/FDContainer/index.vue')
   }
 })
-export default class FDMultiPage extends FdContainerVue {
+export default class FDMultiPage extends Mixins(FdContainerVue) {
   @State((state) => state.fd.userformData) userformData!: userformData;
-  @Prop() isEditMode: boolean;
   @Prop({ required: true, type: String }) public userFormId!: string;
   @Ref('scrolling') scrolling: HTMLDivElement;
   @Ref('contentRef') contentRef: HTMLDivElement;
@@ -144,19 +147,6 @@ export default class FDMultiPage extends FdContainerVue {
   widthValue: number = 40;
   rowsCount: string = '';
 
-  @Watch('selectedPageData.properties.ScrollLeft')
-  updateScrollLeft () {
-    if (this.selectedPageData) {
-      this.scrollLeftTop(this.selectedPageData!)
-    }
-  }
-
-  @Watch('selectedPageData.properties.ScrollTop')
-  updateScrollTop () {
-    if (this.selectedPageData) {
-      this.scrollLeftTop(this.selectedPageData!)
-    }
-  }
   /**
    * @description sets scrollbar left and top position
    * @function scrollLeftTop
@@ -292,16 +282,6 @@ export default class FDMultiPage extends FdContainerVue {
         width: '100%',
         height: '100%',
         position: 'relative',
-        backgroundImage: `url(${this.selectedPageData.properties.Picture})`,
-        backgroundSize:
-          this.selectedPageData.properties.Picture === ''
-            ? ''
-            : this.getSizeMode,
-        backgroundRepeat: this.getRepeatData,
-        backgroundPosition:
-          this.selectedPageData.properties.Picture === ''
-            ? ''
-            : this.getPosition,
         zoom: zoomVal + ''
       }
     }
@@ -710,13 +690,6 @@ export default class FDMultiPage extends FdContainerVue {
               : '0px'
           : '0px',
       padding: controlProp.MultiRow ? '0px' : '0px',
-      // overflow: 'hidden',
-      overflowX: this.getScrollBarPage ? this.getScrollBarPage.overflowX! : '',
-      overflowY: this.getScrollBarPage ? this.getScrollBarPage.overflowY! : '',
-      backgroundColor: 'rgb(238,238,238)',
-      // backgroundImage:
-      //   'radial-gradient(circle, rgb(0, 0, 0) 0.5px, rgba(0, 0, 0, 0) 0.2px) !important',
-      // backgroundSize: '9px 10px',
       boxShadow:
         controlProp.TabOrientation === 0 ? '1px 0px gray' : '1px 1px gray'
     }
@@ -727,7 +700,7 @@ export default class FDMultiPage extends FdContainerVue {
    */
   protected get getSampleDotPattern () {
     const dotSize = 1
-    const dotSpace = 10
+    const dotSpace = 9
     return {
       backgroundPosition: `7px 7px`,
       backgroundImage: `radial-gradient(${this.properties.ForeColor} 11%, transparent 10%)`,
@@ -823,7 +796,6 @@ export default class FDMultiPage extends FdContainerVue {
           }
         } else {
           for (let j = 0; j < Math.trunc(count); j++) {
-            console.log('IN FOR LOOP;')
             if (j === k) {
               this.rowsCount = this.rowsCount + (parseInt(a) + 5 + 'px') + ' '
             } else {
@@ -975,7 +947,6 @@ export default class FDMultiPage extends FdContainerVue {
   @Watch('topValue')
   topValueValidate () {
     this.topValue = this.scrolling.offsetHeight
-    console.log('topValue', this.topValue)
   }
 
   /**
@@ -1060,9 +1031,11 @@ export default class FDMultiPage extends FdContainerVue {
       this.calSelectedAreaStyle(event, this.selectedPageData)
     }
   }
+  deActControl (event: MouseEvent) {
+    this.multiPageMouseDown(event)
+  }
 
   multiPageMouseDown (e: MouseEvent) {
-    EventBus.$emit('isEditMode', this.isEditMode)
     this.selectedItem(e)
     if (this.selMultipleCtrl === false && this.activateCtrl === false) {
       const selContainer = this.selectedControls[this.userFormId].container[0]
@@ -1262,6 +1235,18 @@ export default class FDMultiPage extends FdContainerVue {
       }
       this.focusPage()
     })
+  }
+  addContainerControl (event: MouseEvent) {
+    if (!this.isEditMode) {
+      this.selectedItem(event)
+    } else {
+      this.addControlObj(event, this.selectedPageID)
+    }
+  }
+  get getPicture () {
+    if (this.selectedPageData) {
+      return `url(${this.selectedPageData.properties!.Picture!})`
+    }
   }
 }
 </script>

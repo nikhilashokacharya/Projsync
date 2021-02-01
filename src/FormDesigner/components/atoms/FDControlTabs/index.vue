@@ -210,7 +210,7 @@ export default class FDControlTabs extends Vue {
    * @function styleLabelObj
    *
    */
-  protected get styleLabelObj (): Partial<CSSStyleDeclaration> {
+  protected get styleLabelObj () {
     const controlProp = this.data.properties
     const font: font = controlProp.Font
       ? controlProp.Font
@@ -246,7 +246,7 @@ export default class FDControlTabs extends Vue {
             : font.FontStrikethrough
               ? 'line-through'
               : '',
-      textUnderlinePosition: 'under',
+      textDecorationSkipInk: 'none',
       fontWeight: font.FontBold
         ? 'bold'
         : font.FontStyle !== ''

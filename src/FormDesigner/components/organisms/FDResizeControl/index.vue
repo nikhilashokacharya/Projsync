@@ -26,10 +26,13 @@
         controlType="control"
         @createGroup="createGroup"
         @muldragControl="muldragControl"
+        @updateModel="updateModelHandle"
         @updateIsMove="updateIsMove"
         :size="{
           width: propControlData.properties.Width,
           height: propControlData.properties.Height,
+          left: propControlData.properties.Left,
+          top: propControlData.properties.Top
         }"
       />
       <component
@@ -243,7 +246,6 @@ export default class ResizeControl extends FdSelectVue {
     })
   }
   selectedItem (e: MouseEvent) {
-    debugger
     if (this.selMultipleCtrl === false) {
       const userData = this.userformData[this.userFormId]
       const groupId = this.propControlData.properties.GroupID

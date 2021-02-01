@@ -50,6 +50,7 @@ export default class FDTable extends Vue {
   @State((state) => state.fd.userformData) userformData!: userformData;
   @Prop({ required: true, type: String }) public readonly userFormId! : string
   @Prop({ required: true }) public readonly getSelectedControlsDatas: any
+  @Prop() resultArray: boolean[]
   @Action('fd/updateControl') updateControl!: (payload: IupdateControl) => void;
   @Action('fd/updateControlExtraData') updateControlExtraData!: (
     payload: IupdateControlExtraData
@@ -184,6 +185,21 @@ export default class FDTable extends Vue {
       }
     }
   }
+
+  updateValueProperty (arg: IPropControl) {
+    const selected = this.getSelectedControlsDatas!
+    let isValid: boolean = true
+    for (let i = 0; i < selected.length; i++) {
+      const type = this.userformData[this.userFormId][selected[i]].type
+      if (type === 'ListBox') {
+        isValid = this.validateTextValueProperty(arg.value, arg.propertyName, selected[i])
+      }
+    }
+    if (isValid) {
+      this.emitUpdateProperty(arg.propertyName, arg.value)
+    }
+    return isValid
+  }
   updatePropValue (id: string, propName: keyof controlProperties, propValue: any) {
     this.updateControl({
       userFormId: this.userFormId,
@@ -285,11 +301,15 @@ export default class FDTable extends Vue {
     // should validate the propertyValue
     return true
   }
-  validateTextProperty (propertyValue : string) {
-    const controlData = this.userformData[this.userFormId][this.getSelectedControlsDatas[0]]
+  validateTextValueProperty (propertyValue : string, propertyName: string, controlId: string) {
+    const controlData = this.userformData[this.userFormId][controlId]
     const rowSourceData = controlData.extraDatas!.RowSourceData!
+    const boundColumn = propertyName === 'Value' ? controlData.properties.BoundColumn! : 1
+    if (boundColumn <= 0 || boundColumn > rowSourceData[0].length) {
+      return false
+    }
     for (let i = 0; i < rowSourceData.length; i++) {
-      if (propertyValue === rowSourceData[i][0]) {
+      if (propertyValue === rowSourceData[i][boundColumn - 1]) {
         return true
       }
     }
@@ -388,17 +408,41 @@ export default class FDTable extends Vue {
           EventBus.$emit('showErrorPopup', true, 'invalid', `Not a legal object name: '${propertyValue}'`)
         }
       } else if (propertyName === 'Value') {
-        const controlType = this.userformData[this.userFormId][this.getSelectedControlsDatas[0]].type
-        if (controlType === 'CheckBox' || controlType === 'OptionButton' || controlType === 'ToggleButton') {
-          const resultValue = this.validateValuePropertyChboxOpbtnTglbtn(propertyName, propertyValue);
-          (e.target as HTMLInputElement).value = resultValue
+        if (this.getSelectedControlsDatas.length === 1) {
+          const controlType = this.userformData[this.userFormId][this.getSelectedControlsDatas[0]].type
+          if (controlType === 'CheckBox' || controlType === 'OptionButton' || controlType === 'ToggleButton') {
+            const resultValue = this.validateValuePropertyChboxOpbtnTglbtn(propertyName, propertyValue);
+            (e.target as HTMLInputElement).value = resultValue
+          } else if (controlType === 'ListBox') {
+            const isTextValid = this.validateTextValueProperty(propertyValue, propertyName, this.getSelectedControlsDatas[0])
+            if (isTextValid) {
+              this.emitUpdateProperty(propertyName, propertyValue)
+            } else {
+              EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property Value`);
+              (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+            }
+          } else {
+            this.emitUpdateProperty(propertyName, propertyValue)
+          }
         } else {
-          this.emitUpdateProperty(propertyName, propertyValue)
+          if (this.resultArray[0] === true) {
+            const resultValue = this.validateValuePropertyChboxOpbtnTglbtn(propertyName, propertyValue);
+            (e.target as HTMLInputElement).value = resultValue
+          } else if (this.resultArray[1] === true) {
+            const isValueValid = this.updateValueProperty({ propertyName: propertyName, value: propertyValue })
+            if (!isValueValid) {
+              EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property Value`);
+              (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+            }
+          } else if (this.resultArray[2] === true) {
+
+          }
+          // this.updateValueProperty({ propertyName: propertyName, value: propertyValue })
         }
       } else if (propertyName === 'Text') {
         const controlType = this.userformData[this.userFormId][this.getSelectedControlsDatas[0]].type
         if (controlType === 'ListBox') {
-          const isTextValid = this.validateTextProperty(propertyValue)
+          const isTextValid = this.validateTextValueProperty(propertyValue, propertyName, this.getSelectedControlsDatas[0])
           if (isTextValid) {
             this.emitUpdateProperty(propertyName, propertyValue)
           } else {
@@ -509,32 +553,46 @@ export default class FDTable extends Vue {
       } else if (propertyName === 'Value') {
         const controlData = this.userformData[this.userFormId][this.getSelectedControlsDatas[0]]
         const controlType = controlData.type
-        if (controlType === 'TabStrip') {
-          if (value < -1 || value >= controlData.extraDatas!.Tabs!.length!) {
-            (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
-            EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value.`)
+        if (this.getSelectedControlsDatas.length === 1) {
+          if (controlType === 'TabStrip') {
+            if (value < -1 || value >= controlData.extraDatas!.Tabs!.length!) {
+              (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+              EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value.`)
+            } else {
+              this.emitUpdateProperty(propertyName, value)
+            }
+          } else if (controlType === 'MultiPage') {
+            if (value < -1 || value >= controlData.controls.length) {
+              (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+              EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value.`)
+            } else {
+              this.emitUpdateProperty(propertyName, value)
+            }
+          } else if (controlType === 'SpinButton' || controlType === 'ScrollBar') {
+            if (this.isDecimalNumber(propertyValue)) {
+              (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+            } else {
+              const isSuccess = this.updateSpinButtonScrollBarValueProp(this.getSelectedControlsDatas[0], value)
+              if (!isSuccess) {
+                (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+                EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value.`)
+              }
+            }
           } else {
-            this.emitUpdateProperty(propertyName, value)
+            this.emitUpdateProperty(propertyName, propertyValue)
           }
-        } else if (controlType === 'MultiPage') {
-          if (value < -1 || value >= controlData.controls.length) {
-            (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
-            EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value.`)
-          } else {
-            this.emitUpdateProperty(propertyName, value)
-          }
-        } else if (controlType === 'SpinButton' || controlType === 'ScrollBar') {
+        } else {
           if (this.isDecimalNumber(propertyValue)) {
             (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
           } else {
-            const isSuccess = this.updateProperty({ propertyName: propertyName, value: value })
+            const isSuccess = this.validateMultipleValueProperty({ propertyName: propertyName, value: propertyValue })
             if (!isSuccess) {
               (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
               EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value.`)
+            } else {
+              this.updateMultiSelectPropValue(propertyName, value)
             }
           }
-        } else {
-          this.emitUpdateProperty(propertyName, propertyValue)
         }
       } else if (propertyName === 'Min' || propertyName === 'Max' || propertyName === 'SmallChange') {
         if (this.isDecimalNumber(propertyValue)) {
@@ -661,7 +719,34 @@ export default class FDTable extends Vue {
       }
     }
   }
-
+  updateMultiSelectPropValue (propertyName: keyof controlProperties, value: number) {
+    const selected = this.getSelectedControlsDatas!
+    for (let i = 0; i < selected.length; i++) {
+      this.updatePropValue(selected[i], propertyName, value)
+    }
+  }
+  validateMultipleValueProperty (arg: IPropControl) {
+    debugger
+    const selected = this.getSelectedControlsDatas!
+    let isValid: boolean = true
+    for (let i = 0; i < selected.length; i++) {
+      const type = this.userformData[this.userFormId][selected[i]].type
+      if (type === 'ScrollBar' || type === 'SpinButton') {
+        isValid = this.checkValueRangeMinMax(selected[i], arg.value)
+      } else if (type === 'MultiPage' || type === 'TabStrip') {
+        if (arg.value < -1 || (type === 'TabStrip' && arg.value >= this.userformData[this.userFormId][selected[i]].extraDatas!.Tabs!.length!) ||
+        (type === 'MultiPage' && arg.value >= this.userformData[this.userFormId][selected[i]].controls.length!)) {
+          isValid = false
+        } else {
+          isValid = true
+        }
+      }
+      if (!isValid) {
+        return isValid
+      }
+    }
+    return isValid
+  }
   isDecimalNumber (propValue : string) {
     if (propValue.indexOf('.') > -1) {
       EventBus.$emit('showErrorPopup', true, 'invalid', `Invalid property value.`)

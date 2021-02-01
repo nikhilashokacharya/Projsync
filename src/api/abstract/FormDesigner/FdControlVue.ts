@@ -6,6 +6,8 @@ import {
 import { PropType } from 'vue'
 import { Component, Emit, Prop, PropSync, Vue, Watch } from 'vue-property-decorator'
 import { EventBus } from '@/FormDesigner/event-bus'
+import FDEditableText from '@/FormDesigner/components/atoms/FDEditableText/index.vue'
+
 @Component({
   name: 'FdControlVue'
 })
@@ -36,10 +38,16 @@ export default class FdControlVue extends Vue {
     position: '',
     justifyContent: 'center',
     alignItems: '',
+    alignSelf: '',
     width: ''
   }
   imageProperty={
-    height: 'fit-content'
+    height: 'fit-content',
+    width: '',
+    filter: ''
+  }
+  imagePos={
+    alignSelf: ''
   }
 
    // global variable to keep track of TripleState when enabled
@@ -58,6 +66,12 @@ export default class FdControlVue extends Vue {
   protected checkboxRef: HTMLDivElement
   protected optionBtnRef: HTMLDivElement
   protected textareaRef: HTMLTextAreaElement
+
+  protected textSpanRef!: HTMLSpanElement
+  protected imageRef: HTMLImageElement
+  protected logoRef: HTMLSpanElement
+  protected componentRef : HTMLSpanElement
+  protected editableTextRef: FDEditableText
 
   preventClickOnce: boolean = false
   addEventCustomCallback (e: CustomMouseEvent) {
@@ -1213,7 +1227,6 @@ clearOptionBGColorAndChecked (e: any) {
       }
     }
   }
-  debugger
   const tempPath = e.path
   if (tempPath && tempPath.length > 0) {
     for (let index = 0; index < tempPath.length; index++) {
@@ -1373,119 +1386,6 @@ parentConextMenu (event: MouseEvent) {
 openTextContextMenu (event: MouseEvent) {
   EventBus.$emit('openTextContextMenu', event, this.controlId)
 }
-positionLogo (value:any) {
-  let style = {
-    order: Number(),
-    alignItems: '',
-    transform: '',
-    top: '',
-    left: '',
-    position: '',
-    display: 'inline-flex',
-    width: '',
-    justifyContent: ''
-  }
-  this.reverseStyle = {
-    display: '',
-    flexDirection: '',
-    justifyItems: '',
-    position: '',
-    justifyContent: 'center',
-    alignItems: '',
-    width: ''
-  }
-  this.reverseStyle.display = 'flex'
-  switch (value) {
-    case 0:
-      break
-    case 1:style.alignItems = 'center'
-      this.reverseStyle.alignItems = 'center'
-      break
-    case 2:style.alignItems = 'flex-end'
-      this.reverseStyle.alignItems = 'flex-end'
-      break
-    case 3: this.reverseStyle.flexDirection = 'row-reverse'
-      break
-    case 4:
-      this.reverseStyle.flexDirection = 'row-reverse'
-      style.alignItems = 'center'
-      this.reverseStyle.alignItems = 'center'
-      break
-    case 5:
-      this.reverseStyle.flexDirection = 'row-reverse'
-      style.alignItems = 'flex-end'
-      this.reverseStyle.alignItems = 'flex-end'
-      break
-    case 6:
-      this.reverseStyle.display = 'grid'
-      break
-    case 7:
-      this.reverseStyle.display = 'grid'
-      this.reverseStyle.justifyItems = 'center'
-      break
-    case 8:
-      this.reverseStyle.display = 'grid'
-      this.reverseStyle.justifyItems = 'end'
-      break
-    case 9:
-      this.reverseStyle.display = 'grid'
-      style.order = -1
-      break
-    case 10:
-      this.reverseStyle.display = 'grid'
-      this.reverseStyle.justifyItems = 'center'
-      style.order = -1
-      break
-    case 11:
-      this.reverseStyle.display = 'grid'
-      this.reverseStyle.justifyItems = 'end'
-      style.order = -1
-      break
-    case 12:
-      this.reverseStyle.position = 'relative'
-      this.reverseStyle.width = '100%'
-      style.position = 'absolute'
-      style.top = '50%'
-      style.left = '50%'
-      style.transform = 'translate(-50%, -50%)'
-      style.justifyContent = 'center'
-      style.width = '100%'
-      break
-    default:
-  }
-  this.labelStyle = style
-}
-pictureSize () {
-  const imgStyle = {
-    width: 'fit-content',
-    height: 'fit-content',
-    filter: ''
-  }
-  if (this.properties.Picture) {
-    Vue.nextTick(() => {
-      // const imgProp = document.getElementById('img')
-      const img = new Image()
-      img.onload = () => {
-        if (this.data.type === 'CheckBox' || this.data.type === 'OptionButton') {
-          imgStyle.width = this.properties.Width! <= img!.width ? `${this.properties.Width! - 15}px` : 'fit-content'
-        } else {
-          imgStyle.width = this.properties.Width! <= img!.height ? `${this.properties.Width}px` : 'fit-content'
-        }
-        imgStyle.height = this.properties.Height! <= img!.height ? `${this.properties.Height}px` : 'fit-content'
-        imgStyle.filter = !this.properties.Enabled ? 'sepia(0) grayscale(1) blur(3px) opacity(0.2)' : ''
-      }
-      img.src = this.properties.Picture!
-    })
-  }
-  this.imageProperty = imgStyle
-}
-onPictureLoad () {
-  const img = new Image()
-  img.onload = () => {
-    this.pictureSize()
-  }
-  img.src = this.properties.Picture!
-}
 get spanStyleObj () {
   const controlProp = this.properties
   const font: font = controlProp.Font
@@ -1509,5 +1409,204 @@ get spanStyleObj () {
             : '',
     color: !this.properties.Enabled ? 'gray' : ''
   }
+}
+positionLogo (value:any) {
+  let style = {
+    order: Number(),
+    alignItems: '',
+    transform: '',
+    top: '',
+    left: '',
+    position: '',
+    display: 'inline-flex',
+    width: '',
+    justifyContent: ''
+  }
+  this.reverseStyle = {
+    display: '',
+    flexDirection: '',
+    justifyItems: '',
+    position: '',
+    justifyContent: 'center',
+    alignItems: '',
+    width: '',
+    alignSelf: 'center'
+  }
+  this.imagePos.alignSelf = ''
+  this.reverseStyle.display = 'flex'
+  switch (value) {
+    case 0: break
+    case 1: style.alignItems = 'center'
+      this.imagePos.alignSelf = 'center'
+      break
+    case 2: style.alignItems = 'flex-end'
+      this.reverseStyle.alignItems = 'flex-end'
+      break
+    case 3: this.reverseStyle.flexDirection = 'row-reverse'
+      break
+    case 4: this.reverseStyle.flexDirection = 'row-reverse'
+      style.alignItems = 'center'
+      this.imagePos.alignSelf = 'center'
+      break
+    case 5: this.reverseStyle.flexDirection = 'row-reverse'
+      style.alignItems = 'flex-end'
+      this.reverseStyle.alignItems = 'flex-end'
+      break
+    case 6: this.reverseStyle.display = 'grid'
+      break
+    case 7: this.reverseStyle.display = 'grid'
+      this.reverseStyle.justifyItems = 'center'
+      break
+    case 8: this.reverseStyle.display = 'grid'
+      this.reverseStyle.justifyItems = 'end'
+      break
+    case 9: this.reverseStyle.display = 'grid'
+      style.order = -1
+      break
+    case 10: this.reverseStyle.display = 'grid'
+      this.reverseStyle.justifyItems = 'center'
+      style.order = -1
+      break
+    case 11: this.reverseStyle.display = 'grid'
+      this.reverseStyle.justifyItems = 'end'
+      style.order = -1
+      break
+    case 12: this.reverseStyle.position = 'relative'
+      this.reverseStyle.width = '100%'
+      style.position = 'absolute'
+      style.top = '50%'
+      style.left = '50%'
+      style.transform = 'translate(-50%, -50%)'
+      style.justifyContent = 'center'
+      style.width = 'fit-content'
+      break
+    default:
+  }
+  this.labelStyle = style
+}
+pictureSize () {
+  const imgStyle = {
+    width: 'fit-content',
+    height: 'fit-content',
+    filter: '',
+    maxWidth: '100%'
+  }
+  if (this.properties.Picture) {
+    Vue.nextTick(() => {
+      imgStyle.width = this.properties.Width! <= this.imageRef!.naturalWidth ? `${this.properties.Width}px` : 'fit-content'
+      imgStyle.height = this.properties.Height! <= this.imageRef!.naturalHeight ? `${this.properties.Height}px` : 'fit-content'
+      if (this.properties.PicturePosition === 9 || this.properties.PicturePosition === 10 || this.properties.PicturePosition === 11) {
+        this.imageRef.scrollIntoView(true)
+      }
+      imgStyle.filter = !this.properties.Enabled ? 'sepia(0) grayscale(1) blur(3px) opacity(0.2)' : ''
+    })
+  }
+  this.imageProperty = imgStyle
+}
+onPictureLoad () {
+  const imgStyle = {
+    width: 'auto',
+    height: 'auto',
+    filter: ''
+  }
+  this.imageProperty = imgStyle
+  this.pictureSize()
+}
+labelAlignment () {
+  let { picPosLeftRight, picPosTopBottom, imgHeight, labelHeight } = this.setHeightWidthVariable()
+  let totalHeight = {
+    height: 0
+  }
+
+  if (picPosLeftRight.includes(this.properties.PicturePosition!)) {
+    totalHeight.height = labelHeight
+  } else if (picPosTopBottom.includes(this.properties.PicturePosition!)) {
+    totalHeight.height = imgHeight + labelHeight
+  } else if (this.properties.PicturePosition! === 12) {
+    totalHeight.height = imgHeight >= labelHeight ? imgHeight : labelHeight
+  }
+
+  this.reverseStyle.alignSelf = 'inherit'
+  if (this.imageRef && this.imageRef.naturalHeight > this.properties.Height!) {
+    this.reverseStyle.alignSelf = 'inherit'
+  } else {
+    let logoProp = this.logoRef
+    if (this.properties.Width! > logoProp!.clientWidth && this.properties.Height! > totalHeight.height && ((this.imageRef && this.imageRef.naturalHeight) < this.properties.Height! || (this.imageRef && this.imageRef.naturalWidth) < this.properties.Width!)) {
+      this.reverseStyle.alignSelf = 'center'
+    }
+  }
+}
+getWidthHeight () {
+  let widthHeightData = {
+    width: 0,
+    height: 0
+  }
+  let { picPosLeftRight, picPosTopBottom, controlWidthIncrease, imgHeight, imgWidth, labelHeight, labelWidth } = this.setHeightWidthVariable()
+  let componentRef = this.componentRef
+  if (this.properties.Picture) {
+    if (picPosLeftRight.includes(this.properties.PicturePosition!)) {
+      if (imgHeight >= labelHeight) {
+        widthHeightData.height = imgHeight
+      } else {
+        widthHeightData.height = labelHeight
+      }
+      widthHeightData.width = (imgWidth + labelWidth)
+    } else if (picPosTopBottom.includes(this.properties.PicturePosition!)) {
+      if (imgWidth >= labelWidth) {
+        widthHeightData.width = imgWidth
+      } else {
+        widthHeightData.width = labelWidth
+      }
+      widthHeightData.height = imgHeight + labelHeight
+    } else if (this.properties.PicturePosition! === 12) {
+      widthHeightData.width = imgWidth >= labelWidth ? imgWidth : labelWidth
+      widthHeightData.height = imgHeight >= labelHeight ? imgHeight : labelHeight
+    }
+  } else {
+    widthHeightData.width = labelWidth + 5
+    widthHeightData.height = labelHeight
+  }
+  if (this.checkForWidthIncrease(controlWidthIncrease)) {
+    if (this.properties.Picture) {
+      widthHeightData.width = widthHeightData.width + 20
+    } else {
+      widthHeightData.width = widthHeightData.width + 15
+    }
+  } else if (this.properties.WordWrap) {
+    widthHeightData.width = (((widthHeightData.width + 20) < componentRef!.clientWidth) || (imgWidth > componentRef!.clientWidth)) ? widthHeightData.width : componentRef!.clientWidth
+  }
+  return widthHeightData
+}
+checkForWidthIncrease (controlArr:Array<string>) {
+  for (let val of controlArr) {
+    if (this.properties.Name!.toLowerCase().includes(val)) {
+      return true
+    }
+  }
+  return false
+}
+
+setHeightWidthVariable () {
+  const picPosLeftRight = [0, 1, 2, 3, 4, 5]
+  const picPosTopBottom = [6, 7, 8, 9, 10, 11]
+  const controlWidthIncrease = ['optionbutton', 'checkbox']
+  const imgHeight = this.imageRef && this.imageRef.naturalHeight
+  const imgWidth = this.imageRef && this.imageRef.naturalWidth
+  let labelHeight = 0
+  let labelWidth = 0
+  // calcluate text height
+  if (this.textSpanRef && this.textSpanRef.offsetHeight) {
+    labelHeight = this.textSpanRef.offsetHeight
+  } else if ((this.editableTextRef.$el as HTMLSpanElement) && (this.editableTextRef.$el as HTMLSpanElement).offsetHeight) {
+    labelHeight = (this.editableTextRef.$el as HTMLSpanElement).offsetHeight
+  }
+  // calcuate text width
+  if (this.textSpanRef && this.textSpanRef.offsetWidth) {
+    labelWidth = this.textSpanRef.offsetWidth
+  } else if ((this.editableTextRef.$el as HTMLSpanElement) && (this.editableTextRef.$el as HTMLSpanElement).offsetWidth) {
+    labelWidth = (this.editableTextRef.$el as HTMLSpanElement).offsetWidth
+  }
+
+  return { picPosLeftRight, picPosTopBottom, controlWidthIncrease, imgHeight, imgWidth, labelHeight, labelWidth }
 }
 }

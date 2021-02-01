@@ -1,4 +1,5 @@
 <template>
+<div ref="componentRef" :tabindex="properties.TabIndex">
   <button
     class="commandbutton"
     :style="styleObj"
@@ -16,9 +17,9 @@
     @click="commandButtonClick"
     @contextmenu="isEditMode ? openTextContextMenu($event): parentConextMenu($event)"
   >
-  <div id="logo" :style="reverseStyle">
-    <img v-if="properties.Picture" id="img" :src="properties.Picture" :style="imageProperty" ref="imageRef">
-    <div v-if="!syncIsEditMode || isRunMode" :style="labelStyle">
+  <div id="logo" ref="logoRef" :style="reverseStyle">
+    <img v-if="properties.Picture" id="img" :src="properties.Picture" :style="[imageProperty,imagePos]" ref="imageRef">
+    <div v-if="!syncIsEditMode || isRunMode" :style="labelStyle"  ref="textSpanRef">
       <span :style="spanStyleObj">{{ computedCaption.afterbeginCaption }}</span>
           <span class="spanStyle" :style="spanStyleObj">{{
             computedCaption.acceleratorCaption
@@ -29,7 +30,7 @@
       v-else
       :editable="isRunMode === false && syncIsEditMode"
       :style="labelStyle"
-      ref="commandButtonSpanRef"
+      ref="editableTextRef"
       :caption="properties.Caption"
       @updateCaption="updateCaption"
       @releaseEditMode="releaseEditMode"
@@ -37,6 +38,7 @@
     </FDEditableText>
     </div>
   </button>
+</div>
 </template>
 
 <script lang="ts">
@@ -52,12 +54,14 @@ import Vue from 'vue'
   }
 })
 export default class FDCommandButton extends Mixins(FdControlVue) {
-  $el!: HTMLButtonElement;
+  $el!: HTMLDivElement;
   isClicked: boolean = false;
   isContentEditable: boolean = false;
-  @Ref('commandButtonSpanRef') commandButtonSpanRef!: FDEditableText
+  @Ref('textSpanRef') textSpanRef!: HTMLDivElement
   @Ref('imageRef') imageRef: HTMLImageElement
-
+  @Ref('logoRef') logoRef : HTMLDivElement
+  @Ref('componentRef') componentRef: HTMLDivElement
+  @Ref('editableTextRef') editableTextRef!: FDEditableText
   /**
    * @description getDisableValue checks for the RunMode of the control and then returns after checking for the Enabled
    * and the Locked property
@@ -93,37 +97,8 @@ export default class FDCommandButton extends Mixins(FdControlVue) {
         }
       }
       if (this.isEditMode) {
-        (this.commandButtonSpanRef.$el as HTMLSpanElement).focus()
+        (this.editableTextRef.$el as HTMLSpanElement).focus()
       }
-    }
-  }
-
-  /**
-   * @description changes width and height when autoSize is true by getting content offsetWidth
-   *  and offsetHeight with the help of Ref attribute
-   * @function updateAutoSize
-   * @override
-   */
-  updateAutoSize () {
-    if (this.properties.AutoSize === true) {
-      const imgStyle = {
-        width: 'fit-content',
-        height: 'fit-content'
-      }
-      this.imageProperty = imgStyle
-      if (this.properties.Picture) {
-        this.positionLogo(this.properties.PicturePosition)
-      }
-      this.$nextTick(() => {
-        this.updateDataModel({
-          propertyName: 'Height',
-          value: (this.$el.childNodes[0] as HTMLSpanElement).offsetHeight + 20
-        })
-        this.updateDataModel({
-          propertyName: 'Width',
-          value: (this.$el.childNodes[0] as HTMLSpanElement).offsetWidth + 5
-        })
-      })
     }
   }
 
@@ -132,9 +107,8 @@ export default class FDCommandButton extends Mixins(FdControlVue) {
    * dynamically changing the styles of the component based on properties
    * @function styleObj
    */
-  protected get styleObj (): Partial<CSSStyleDeclaration> {
+  protected get styleObj () {
     const controlProp = this.properties
-    this.pictureSize()
     const font: font = controlProp.Font
       ? controlProp.Font
       : {
@@ -152,14 +126,12 @@ export default class FDCommandButton extends Mixins(FdControlVue) {
       display = 'inline-block'
     }
     this.reverseStyle.justifyContent = 'center'
-    let alignItems = 'normal'
+    const aignItems = 'inherit'
     if (controlProp.Picture) {
       display = 'flex'
-      this.positionLogo(controlProp.PicturePosition)
-      let labelStyle = document.getElementById('logo')
-      if (this.properties.Height! > labelStyle!.clientHeight) {
-        alignItems = 'center'
-      }
+      Vue.nextTick(() => {
+        this.labelAlignment()
+      })
     }
     return {
       ...(!controlProp.AutoSize && this.renderSize),
@@ -198,14 +170,14 @@ export default class FDCommandButton extends Mixins(FdControlVue) {
             : font.FontStrikethrough
               ? 'line-through'
               : '',
-      textUnderlinePosition: 'under',
+      textDecorationSkipInk: 'none',
       fontWeight: font.FontBold ? 'bold' : (font.FontStyle !== '') ? this.tempWeight : '',
       fontStretch: (font.FontStyle !== '') ? this.tempStretch : '',
       whiteSpace: controlProp.WordWrap ? 'pre-wrap' : 'pre',
       wordBreak: controlProp.WordWrap ? 'break-all' : 'normal',
       paddingLeft: controlProp.AutoSize ? '0px' : '0px',
       paddingRight: controlProp.WordWrap ? '0px' : '6px',
-      alignItems: alignItems
+      alignItems: aignItems
     }
   }
 
@@ -237,14 +209,103 @@ export default class FDCommandButton extends Mixins(FdControlVue) {
 
   @Watch('properties.Caption', { deep: true })
   autoSizeValidateOnCaptionChange () {
+    if (this.properties.Picture) {
+      Vue.nextTick(() => {
+        this.labelAlignment()
+      })
+    }
     if (this.properties.AutoSize) {
       this.updateAutoSize()
     }
   }
-  @Watch('properties.Picture')
+    @Watch('properties.Picture')
   setPictureSize () {
     if (this.properties.Picture) {
-      this.onPictureLoad()
+      this.$nextTick(() => {
+        this.onPictureLoad()
+        this.positionLogo(this.properties.PicturePosition)
+        if (this.properties.AutoSize) {
+          this.updateAutoSize()
+        }
+      })
+    }
+  }
+
+  @Watch('properties.Height')
+    updateImageSizeHeight () {
+      if (this.properties.Picture) {
+        this.positionLogo(this.properties.PicturePosition)
+        this.pictureSize()
+      }
+    }
+  @Watch('properties.Width')
+  updateImageSizeWidth () {
+    if (this.properties.Picture) {
+      this.positionLogo(this.properties.PicturePosition)
+      this.pictureSize()
+    }
+  }
+  @Watch('properties.PicturePosition')
+  updatePicturePosition () {
+    if (this.properties.Picture) {
+      this.positionLogo(this.properties.PicturePosition)
+      if (this.properties.AutoSize) {
+        this.updateAutoSize()
+      }
+    }
+  }
+  @Watch('properties.TextAlign')
+  autoSizeOnTextAlignment () {
+    if (this.properties.AutoSize) {
+      this.updateAutoSize()
+    }
+  }
+  @Watch('properties.BorderStyle')
+  autoSizeOnBorderStyleChange () {
+    if (this.properties.AutoSize) {
+      this.updateAutoSize()
+    }
+  }
+
+  @Watch('properties.Enabled', {
+    deep: true
+  })
+  checkEnabled (newVal: boolean, oldVal: boolean) {
+    if (!this.properties.Enabled) {
+      this.imageProperty.filter = 'sepia(0) grayscale(1) blur(3px) opacity(0.2)'
+    } else {
+      this.imageProperty.filter = ''
+    }
+  }
+  /**
+   * @description updateAutoSize calls Vuex Actions to update object
+   * @function updateAutoSize
+   * @override
+   */
+  updateAutoSize () {
+    if (this.properties.AutoSize === true) {
+      const imgStyle = {
+        width: 'fit-content',
+        height: 'fit-content',
+        filter: ''
+      }
+      this.imageProperty = imgStyle
+      if (this.properties.Picture) {
+        this.positionLogo(this.properties.PicturePosition)
+      }
+      this.$nextTick(() => {
+        const { width, height } = this.getWidthHeight()
+        this.updateDataModel({
+          propertyName: 'Height',
+          value: height + 5
+        })
+        this.updateDataModel({
+          propertyName: 'Width',
+          value: width
+        })
+      })
+    } else {
+      return undefined
     }
   }
   /**

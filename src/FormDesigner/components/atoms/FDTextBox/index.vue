@@ -184,7 +184,7 @@ export default class FDTextBox extends Mixins(FdControlVue) {
             : font.FontStrikethrough
               ? 'line-through'
               : '',
-      textUnderlinePosition: 'under',
+      textDecorationSkipInk: 'none',
       fontWeight: font.FontBold ? 'bold' : (font.FontStyle !== '') ? this.tempWeight : '',
       fontStretch: (font.FontStyle !== '') ? this.tempStretch : '',
       display: controlProp.Visible ? 'block' : 'none',
@@ -416,7 +416,7 @@ export default class FDTextBox extends Mixins(FdControlVue) {
       this.trimmedText = this.originalText.replace(/(\r\n|\n|\r)/gm, '¶')
 
       if (this.properties.MultiLine) {
-        this.trimmedText = this.originalText.replaceAll('¶', '\n')
+        this.trimmedText = this.originalText.replace(/¶/g, '\n')
         this.updateDataModel({ propertyName: 'Value', value: this.trimmedText })
       } else {
         this.updateDataModel({ propertyName: 'Value', value: this.trimmedText })

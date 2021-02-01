@@ -1010,24 +1010,24 @@ export default class ContextMenu extends FDCommonMethod {
     const deltaLeft = (groupRectRight - groupRectLeft) / 2
 
     const type = this.userformData[this.userFormId][pasteContainer].type
-    const container = type === 'Page' ? this.userformData[this.userFormId][this.getContainerList(pasteContainer)[0]].properties : this.userformData[this.userFormId][pasteContainer].properties
-    const containerHeight = type === 'Userform' ? container.Height! - 37 : container.Height!
+    const container = type === 'Page' ? usrFrmData[this.getContainerList(pasteContainer)[0]].properties : usrFrmData[pasteContainer].properties
+    const containerHeight = type === 'Userform' ? container.Height! - 37 : container.Height! - 20
     const targetTop = ((containerHeight) / 2) - deltaTop
     const targetLeft = (container.Width! / 2) - deltaLeft
 
-    const diffTop = targetTop - usrFrmData[topArray[0]].properties.Top!
-    const diffLeft = targetLeft - usrFrmData[leftArray[0]].properties.Left!
+    const diffTop = targetTop - usrFrmData[topArray[0]].properties.Top! + usrFrmData[pasteContainer].properties.ScrollTop!
+    const diffLeft = targetLeft - usrFrmData[leftArray[0]].properties.Left! + usrFrmData[pasteContainer].properties.ScrollLeft!
 
     for (let i = 0; i < leftArray.length; i++) {
       let left = usrFrmData[leftArray[i]].properties.Left! + diffLeft
       if (!isNaN(left)) {
-        this.updateControlProperty('Left', Math.abs(left), leftArray[i])
+        this.updateControlProperty('Left', left, leftArray[i])
       }
     }
     for (let i = 0; i < topArray.length; i++) {
       let top = usrFrmData[topArray[i]].properties.Top! + diffTop
       if (!isNaN(top)) {
-        this.updateControlProperty('Top', Math.abs(top), topArray[i])
+        this.updateControlProperty('Top', top, topArray[i])
       }
     }
   }

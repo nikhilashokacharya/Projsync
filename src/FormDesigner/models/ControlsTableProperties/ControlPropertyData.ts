@@ -259,7 +259,7 @@ export class ControlPropertyData {
           MousePointer: 0,
           Name: 'ComboBox',
           ID: 'ID_ComboBox1',
-          RowSource: 'a1:c9',
+          RowSource: '',
           ShowDropButtonWhen: 2,
           SelectionMargin: true,
           SpecialEffect: 2,
@@ -289,7 +289,8 @@ export class ControlPropertyData {
             ['d', 'a', 'd4'],
             ['e', 'd', 'e5'],
             ['f', 'wef', 'f6'],
-            ['g', 'awe', 'g7']
+            ['g', 'awe', 'g7'],
+            ['h', 'rty', 'h8']
           ],
           zIndex: -1
         },
