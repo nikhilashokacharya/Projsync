@@ -295,6 +295,72 @@ export default class FDTable extends Vue {
     }
     return false
   }
+  validateColumnWidths (propertyName : keyof controlProperties, propertyValue : string) :string {
+    if (propertyValue === '') {
+      return ''
+    }
+    const initialColWidths = propertyValue.split(';')
+    let validPropertyValue: boolean = false
+    initialColWidths.forEach(element => {
+      for (let index = 0; index < element.length; index++) {
+        if (element.includes('in')) {
+          if ((element.charCodeAt(index) > 47 && element.charCodeAt(index) < 58) || (element.charCodeAt(index) === 73 || element.charCodeAt(index) === 105 || element.charCodeAt(index) === 32) || (element.charCodeAt(index) === 78 || element.charCodeAt(index) === 110 || element.charCodeAt(index) === 32)) {
+            validPropertyValue = true
+          } else {
+            validPropertyValue = false
+            break
+          }
+        } else if (element.includes('cm')) {
+          if ((element.charCodeAt(index) > 47 && element.charCodeAt(index) < 58) || (element.charCodeAt(index) === 67 || element.charCodeAt(index) === 99 || element.charCodeAt(index) === 32) || (element.charCodeAt(index) === 77 || element.charCodeAt(index) === 109 || element.charCodeAt(index) === 32)) {
+            validPropertyValue = true
+          } else {
+            validPropertyValue = false
+            break
+          }
+        } else if (element.includes('pt')) {
+          if ((element.charCodeAt(index) > 47 && element.charCodeAt(index) < 58) || (element.charCodeAt(index) === 80 || element.charCodeAt(index) === 112 || element.charCodeAt(index) === 32) || (element.charCodeAt(index) === 84 || element.charCodeAt(index) === 116 || element.charCodeAt(index) === 32)) {
+            validPropertyValue = true
+          } else {
+            validPropertyValue = false
+            break
+          }
+        } else {
+          if ((element.charCodeAt(index) > 47 && element.charCodeAt(index) < 58)) {
+            validPropertyValue = true
+          } else {
+            validPropertyValue = false
+            break
+          }
+        }
+      }
+    })
+    if (validPropertyValue) {
+      let a = (propertyValue.split(';'))
+      let pointValue:any = []
+      let newColumnWidthsValue = ''
+      a.forEach(element => {
+        if (!isNaN(parseInt(element))) {
+          if (element.includes('in')) {
+            pointValue.push(parseInt(element) * 72)
+          } else if (element.includes('cm')) {
+            pointValue.push(parseInt(element) * 28.35)
+          } else {
+            pointValue.push(parseInt(element))
+          }
+        }
+      })
+      for (let index = 0; index < pointValue.length; index++) {
+        if (index === pointValue.length - 1) {
+          newColumnWidthsValue = newColumnWidthsValue + (pointValue[index]) + 'pt'
+        } else {
+          newColumnWidthsValue = newColumnWidthsValue + (pointValue[index]) + 'pt;'
+        }
+      }
+      return newColumnWidthsValue
+    } else {
+      return 'Invalid'
+    }
+  }
   updateAppearance (e: Event) {
     const propertyName: keyof controlProperties = (e.target as HTMLInputElement).name as keyof controlProperties
     const inputType = this.tableData[propertyName]!.type
@@ -355,6 +421,14 @@ export default class FDTable extends Vue {
           this.emitUpdateProperty(propertyName, propertyValue)
         } else {
           EventBus.$emit('showErrorPopup', true, 'invalid', 'Invalid property value.')
+        }
+      } else if (propertyName === 'ColumnWidths') {
+        const resultValue = this.validateColumnWidths(propertyName, propertyValue)
+        if (resultValue !== 'Invalid') {
+          this.emitUpdateProperty(propertyName, resultValue)
+        } else {
+          EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Type mismatch`);
+          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
         }
       } else {
         this.emitUpdateProperty(propertyName, propertyValue)

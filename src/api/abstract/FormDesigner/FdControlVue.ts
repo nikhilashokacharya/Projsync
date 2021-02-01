@@ -1213,6 +1213,7 @@ clearOptionBGColorAndChecked (e: any) {
       }
     }
   }
+  debugger
   const tempPath = e.path
   if (tempPath && tempPath.length > 0) {
     for (let index = 0; index < tempPath.length; index++) {

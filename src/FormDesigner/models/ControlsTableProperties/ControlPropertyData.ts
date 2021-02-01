@@ -289,9 +289,7 @@ export class ControlPropertyData {
             ['d', 'a', 'd4'],
             ['e', 'd', 'e5'],
             ['f', 'wef', 'f6'],
-            ['g', 'awe', 'g7'],
-            ['h', 'rty', 'h8'],
-            ['i', 'qqq', 'i9']
+            ['g', 'awe', 'g7']
           ],
           zIndex: -1
         },

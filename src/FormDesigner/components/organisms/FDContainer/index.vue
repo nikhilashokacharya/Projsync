@@ -77,6 +77,7 @@ export default class Container extends FDCommonMethod {
   @State((state) => state.fd.userformData) userformData!: userformData;
   @State((state) => state.fd.groupedControls)
   groupedControls!: fdState['groupedControls'];
+  @State((state: rootState) => state.fd.toolBoxSelect) toolBoxSelect!: fdState['toolBoxSelect'];
 
   @Action('fd/updateGroup') updateGroup!: (payload: IupdateGroup) => void;
   @Action('fd/updateControlExtraData') updateControlExtraData!: (payload: IupdateControlExtraData) => void;
@@ -450,7 +451,7 @@ export default class Container extends FDCommonMethod {
         : this.propControlData.properties.MousePointer !== 0 ||
         this.propControlData.properties.MouseIcon !== ''
           ? `${this.mouseCursorData} !important`
-          : 'default !important'
+          : this.toolBoxSelect !== 'Select' && this.toolBoxSelect !== '' ? 'crosshair' : 'default !important'
     }
   }
 
