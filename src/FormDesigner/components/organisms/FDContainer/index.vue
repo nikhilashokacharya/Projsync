@@ -82,7 +82,7 @@ export default class Container extends FDCommonMethod {
   @Prop({ required: true, type: String }) containerId!: string;
   @Prop() mouseCursorData: string;
   @Prop() getSampleDotPattern: { backgroundImage: string; backgroundSize: string; backgroundPosition: string }
-
+  @State((state: rootState) => state.fd.toolBoxSelect) toolBoxSelect!: fdState['toolBoxSelect'];
   @State((state) => state.fd.selectedControls)
   selectedControls!: fdState['selectedControls'];
   @State((state) => state.fd.userformData) userformData!: userformData;
@@ -485,7 +485,7 @@ export default class Container extends FDCommonMethod {
         : this.propControlData.properties.MousePointer !== 0 ||
         this.propControlData.properties.MouseIcon !== ''
           ? `${this.mouseCursorData} !important`
-          : 'default !important'
+          : this.toolBoxSelect !== 'Select' ? 'crosshair !important' : 'default !important'
     }
   }
   get pictureChildDiv () {
