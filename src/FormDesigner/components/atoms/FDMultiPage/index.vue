@@ -319,7 +319,7 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
         controlProp.TabOrientation === 2
           ? 'rotate(90deg)'
           : this.transformScrollButtonStyle,
-      display: !this.properties.MultiRow
+      display: controlProp.Style === 2 ? 'none' : !this.properties.MultiRow
         ? this.isScrollVisible
           ? 'block'
           : 'none'
