@@ -1036,6 +1036,7 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
   }
 
   multiPageMouseDown (e: MouseEvent) {
+    EventBus.$emit('isEditMode', this.isEditMode)
     this.selectedItem(e)
     if (this.selMultipleCtrl === false && this.activateCtrl === false) {
       const selContainer = this.selectedControls[this.userFormId].container[0]
