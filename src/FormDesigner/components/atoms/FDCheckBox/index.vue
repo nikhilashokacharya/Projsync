@@ -56,6 +56,7 @@
 import { Component, Ref, Mixins, Watch, Vue } from 'vue-property-decorator'
 import FdControlVue from '@/api/abstract/FormDesigner/FdControlVue'
 import FDEditableText from '@/FormDesigner/components/atoms/FDEditableText/index.vue'
+import { borderStyle } from '@/FormDesigner/controls-select-types';
 
 @Component({
   name: 'FDCheckBox',
@@ -214,7 +215,8 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
     const controlProp = this.properties
     return {
       boxShadow:
-      controlProp.SpecialEffect === 0 ? '0px 0px gray' : '-1px -1px gray'
+      controlProp.SpecialEffect === 0 ? '' : '-1px -1px gray',
+      border: controlProp.SpecialEffect === 0 ? '2px solid gray' : ''
     }
   }
 
