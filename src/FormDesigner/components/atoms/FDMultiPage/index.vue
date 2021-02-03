@@ -703,7 +703,7 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
     const dotSpace = 9
     return {
       backgroundPosition: `${dotSize}px ${dotSize}px`,
-      backgroundImage: `radial-gradient(${this.properties.ForeColor} 11%, transparent 10%)`,
+      backgroundImage: `radial-gradient(black 11%, transparent 10%)`,
       backgroundSize: `${dotSpace}px ${dotSpace}px`
     }
   }
