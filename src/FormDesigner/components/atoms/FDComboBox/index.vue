@@ -355,6 +355,16 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     }
   }
 
+  @Watch('isEditMode')
+  editModeValidate () {
+    if (this.properties.ShowDropButtonWhen === 1) {
+      if (this.isEditMode) {
+        this.isVisible = true
+      } else {
+        this.isVisible = false
+      }
+    }
+  }
   @Watch('properties.ColumnWidths')
   columnWidthsValidate () {
     this.updateColumns()
@@ -731,6 +741,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   get selectionStyle () {
     const controlProp = this.properties
     return {
+      width: 'fit-content',
       borderLeft:
         controlProp.BorderStyle === 1
           ? '1px solid ' + controlProp.BorderColor
@@ -752,7 +763,13 @@ export default class FDComboBox extends Mixins(FdControlVue) {
                 ? '0.5px solid gray'
                 : '',
       borderBottom: controlProp.BorderStyle === 1
-        ? '0.25px solid ' + controlProp.BorderColor : ''
+        ? '0.25px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 1
+          ? '2px solid gray'
+          : controlProp.SpecialEffect === 4
+            ? '1.5px solid gray'
+            : controlProp.SpecialEffect === 3
+              ? '0.5px solid gray'
+              : ''
 
     }
   }
@@ -1350,31 +1367,11 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   protected get boxStyleObj (): Partial<CSSStyleDeclaration> {
     const controlProp = this.properties
     return {
-      borderColor: controlProp.BorderStyle === 1 ? controlProp.BorderColor : '',
-      borderRight:
-        controlProp.BorderStyle === 1
-          ? 'none'
-          : controlProp.SpecialEffect === 1
-            ? '2px solid gray'
-            : controlProp.SpecialEffect === 4
-              ? '1.5px solid gray'
-              : controlProp.SpecialEffect === 3
-                ? '0.5px solid gray'
-                : '',
-      borderBottom:
-        controlProp.BorderStyle === 1
-          ? 'none'
-          : controlProp.SpecialEffect === 1
-            ? '2px solid gray'
-            : controlProp.SpecialEffect === 4
-              ? '1.5px solid gray'
-              : controlProp.SpecialEffect === 3
-                ? '0.5px solid gray'
-                : '',
       display: 'grid',
       gridTemplateColumns: `${controlProp.Width! - 20}px` + ' 21px',
       gridTemplateRows: `${controlProp.Height! + 1}px`,
-      outline: 'none'
+      outline: 'none',
+      overflow: 'hidden'
     }
   }
 
@@ -1435,16 +1432,45 @@ export default class FDComboBox extends Mixins(FdControlVue) {
       display: 'flex',
       justifyContent: 'center',
       alignItems: controlProp.DropButtonStyle === 1 ? 'center' : 'flex-end',
-      borderTop: '1px solid' + controlProp.BorderColor,
-      borderRight: '1px solid' + controlProp.BorderColor,
-      borderBottom: '1px solid' + controlProp.BorderColor
+      borderTop:
+        controlProp.BorderStyle === 1
+          ? '0.25px solid ' + controlProp.BorderColor
+          : controlProp.SpecialEffect === 2
+            ? '2px solid gray'
+            : controlProp.SpecialEffect === 3
+              ? '1.5px solid gray'
+              : controlProp.SpecialEffect === 4
+                ? '0.5px solid gray'
+                : '0px',
+      borderColor: controlProp.BorderStyle === 1 ? controlProp.BorderColor : '',
+      borderRight:
+        controlProp.BorderStyle === 1
+          ? '1px solid' + controlProp.BorderColor
+          : controlProp.SpecialEffect === 1
+            ? '2px solid gray'
+            : controlProp.SpecialEffect === 4
+              ? '1.5px solid gray'
+              : controlProp.SpecialEffect === 3
+                ? '0.5px solid gray'
+                : '',
+      borderBottom:
+        controlProp.BorderStyle === 1
+          ? '1px solid' + controlProp.BorderColor
+          : controlProp.SpecialEffect === 1
+            ? '2px solid gray'
+            : controlProp.SpecialEffect === 4
+              ? '1.5px solid gray'
+              : controlProp.SpecialEffect === 3
+                ? '0.5px solid gray'
+                : '0.5px solid gray',
+      height: controlProp.SpecialEffect === 2 ? 'calc(100% - 4px)' : '100%'
     }
   }
   enabledCheck (e: MouseEvent) {
     if (this.isRunMode || this.isActivated || this.isEditMode) {
       if (this.open) {
-        this.textareaRef.focus()
         this.open = false
+        this.textareaRef.focus()
       } else if (this.inBlur) {
         this.open = false
       } else {

@@ -64,7 +64,9 @@
               </ul>
             </li>
           </ul>
+          <div style="margin-top: 2px;">
           <div class="triangle-right"></div>
+          </div>
         </button>
       </div>
     </div>
@@ -1236,6 +1238,7 @@ export default class ContextMenu extends FDCommonMethod {
         this.createGroup(control)
       }
     }
+    EventBus.$emit('afterPaste')
   }
 
   /**
@@ -1372,6 +1375,10 @@ export default class ContextMenu extends FDCommonMethod {
       }
     }
   }
+  convertToGridSize (val: number) {
+    const gridSize = 9
+    return Math.round(val / gridSize) * gridSize
+  }
   controlAlignMent (subVal: string) {
     const mainSel = this.selectedControls[this.userFormId].selected[0]
     const isGroup = mainSel.startsWith('group')
@@ -1407,6 +1414,22 @@ export default class ContextMenu extends FDCommonMethod {
     } else if (subVal === 'ID_BOTH') {
       this.updatePropVal('Height', newObject.Height!)
       this.updatePropVal('Width', newObject.Width!)
+    } else if (subVal === 'ID_GRID') {
+      const ctrlSel = this.selectedControls[this.userFormId].selected
+      for (let index = 0; index < ctrlSel.length; index++) {
+        if (!ctrlSel[index].startsWith('group')) {
+          const curProp = usrFrmData[ctrlSel[index]].properties
+          this.updateControlProperty('Left', this.convertToGridSize(curProp.Left!), ctrlSel[index])
+          this.updateControlProperty('Top', this.convertToGridSize(curProp.Top!), ctrlSel[index])
+        } else {
+          const groupIndex: number = this.groupStyleArray.findIndex(val => val.groupName === ctrlSel[index])
+          const curProp = this.groupStyleArray[groupIndex]
+          const left = parseInt(curProp.left!)
+          const top = parseInt(curProp.top!)
+          EventBus.$emit('updasteGroupSize', 'Top', this.convertToGridSize(top), groupIndex)
+          EventBus.$emit('updasteGroupSize', 'Left', this.convertToGridSize(left), groupIndex)
+        }
+      }
     }
   }
 
@@ -1451,12 +1474,9 @@ export default class ContextMenu extends FDCommonMethod {
   grid-template-columns: 10% 85% 5%;
 }
 .triangle-right {
-  width: 0;
-  height: 0;
-  border-top: 5px solid transparent;
+  border-top: 4px solid transparent;
   border-left: 5px solid black;
-  border-bottom: 5px solid transparent;
-  padding-top: 2px;
+  border-bottom: 4px solid transparent;
 }
 .iset-context {
   text-align: left;

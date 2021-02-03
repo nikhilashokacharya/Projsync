@@ -381,6 +381,67 @@ export default class FDTable extends Vue {
       return 'Invalid'
     }
   }
+  validateListWidth (propertyName : keyof controlProperties, propertyValue : string) :string {
+    if (propertyValue === '') {
+      return 'Invalid'
+    }
+    if (propertyValue[0] === '-') {
+      return 'Negative'
+    }
+    const initialListWidth = propertyValue
+    let validPropertyValue: boolean = false
+    const element = initialListWidth
+    for (let index = 0; index < initialListWidth.length; index++) {
+      if (element.includes('in') && (element.endsWith('in'))) {
+        if ((element.charCodeAt(index) > 47 && element.charCodeAt(index) < 58) || (element.charCodeAt(index) === 73 || element.charCodeAt(index) === 105 || element.charCodeAt(index) === 32) || (element.charCodeAt(index) === 78 || element.charCodeAt(index) === 110 || element.charCodeAt(index) === 32)) {
+          validPropertyValue = true
+        } else {
+          validPropertyValue = false
+          break
+        }
+      } else if (element.includes('cm') && (element.endsWith('cm'))) {
+        if ((element.charCodeAt(index) > 47 && element.charCodeAt(index) < 58) || (element.charCodeAt(index) === 67 || element.charCodeAt(index) === 99 || element.charCodeAt(index) === 32) || (element.charCodeAt(index) === 77 || element.charCodeAt(index) === 109 || element.charCodeAt(index) === 32)) {
+          validPropertyValue = true
+        } else {
+          validPropertyValue = false
+          break
+        }
+      } else if (element.includes('pt') && (element.endsWith('pt'))) {
+        if ((element.charCodeAt(index) > 47 && element.charCodeAt(index) < 58) || (element.charCodeAt(index) === 80 || element.charCodeAt(index) === 112 || element.charCodeAt(index) === 32) || (element.charCodeAt(index) === 84 || element.charCodeAt(index) === 116 || element.charCodeAt(index) === 32)) {
+          validPropertyValue = true
+        } else {
+          validPropertyValue = false
+          break
+        }
+      } else {
+        if ((element.charCodeAt(index) > 47 && element.charCodeAt(index) < 58)) {
+          validPropertyValue = true
+        } else {
+          validPropertyValue = false
+          break
+        }
+      }
+    }
+    if (validPropertyValue) {
+      let a = propertyValue
+      let pointValue:any = []
+      let newColumnWidthsValue = ''
+      const element = a
+      if (!isNaN(parseInt(element))) {
+        if (element.includes('in')) {
+          pointValue.push(parseInt(element) * 72)
+        } else if (element.includes('cm')) {
+          pointValue.push(parseInt(element) * 28.35)
+        } else {
+          pointValue.push(parseInt(element))
+        }
+      }
+      newColumnWidthsValue = pointValue + 'pt'
+      return newColumnWidthsValue
+    } else {
+      return 'Invalid'
+    }
+  }
   updateAppearance (e: Event) {
     const propertyName: keyof controlProperties = (e.target as HTMLInputElement).name as keyof controlProperties
     const inputType = this.tableData[propertyName]!.type
@@ -474,32 +535,49 @@ export default class FDTable extends Vue {
           EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Type mismatch`);
           (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
         }
+      } else if (propertyName === 'ListWidth') {
+        const resultValue = this.validateListWidth(propertyName, propertyValue)
+        if (resultValue !== 'Invalid' && resultValue !== 'Negative') {
+          this.emitUpdateProperty(propertyName, resultValue)
+        } else if (resultValue === 'Negative') {
+          EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value`);
+          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+        } else {
+          EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Type mismatch`);
+          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+        }
       } else {
         this.emitUpdateProperty(propertyName, propertyValue)
       }
     } else if (inputType === 'number' || inputType === 'float') {
       const value = propertyValue.includes('.') ? parseFloat(propertyValue) : parseInt(propertyValue)
       if (propertyName === 'Height' || propertyName === 'Width') {
-        if (checkPropertyValue(propertyName, value)) {
-          if ((this.userformData[this.userFormId][this.getSelectedControlsDatas[0]].type === 'Userform')) {
-            if (propertyName === 'Width') {
-              if (value >= 0 && value < 103) {
-                this.emitUpdateProperty(propertyName, 103);
-                (e.target as HTMLInputElement).value = '103'
-              } else {
-                this.emitUpdateProperty(propertyName, value)
-              }
-            } else if (propertyName === 'Height') {
-              if (value >= 0 && value < 30) {
-                this.emitUpdateProperty(propertyName, 30);
-                (e.target as HTMLInputElement).value = '30'
-              } else {
-                this.emitUpdateProperty(propertyName, value)
-              }
+        if ((this.userformData[this.userFormId][this.getSelectedControlsDatas[0]].type === 'Userform')) {
+          if (propertyName === 'Width') {
+            if (value >= 0 && value < 103) {
+              this.emitUpdateProperty(propertyName, 103);
+              (e.target as HTMLInputElement).value = '103'
+            } else if (value > 9830) {
+              this.emitUpdateProperty(propertyName, 9830)
+            } else if (value < 0) {
+              (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+            } else {
+              this.emitUpdateProperty(propertyName, value)
             }
-          } else {
-            this.emitUpdateProperty(propertyName, value)
+          } else if (propertyName === 'Height') {
+            if (value >= 0 && value < 30) {
+              this.emitUpdateProperty(propertyName, 30);
+              (e.target as HTMLInputElement).value = '30'
+            } else if (value > 9830) {
+              this.emitUpdateProperty(propertyName, 9830)
+            } else if (value < 0) {
+              (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+            } else {
+              this.emitUpdateProperty(propertyName, value)
+            }
           }
+        } else if (checkPropertyValue(propertyName, value)) {
+          this.emitUpdateProperty(propertyName, value)
         } else {
           (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
           if (value > 32767) {
@@ -760,15 +838,22 @@ export default class FDTable extends Vue {
     const fileInput = (e.target as HTMLInputElement)
     const filePath = fileInput.value
     let allowedExtensions
+    let typeMismatchExtensions
     // Allowed file type
     if (fileInput.name === 'Picture') {
       allowedExtensions = /(\.jpg|\.jpeg|\.bmp|\.ico|\.gif)$/i
+      typeMismatchExtensions = /(\.jpg|\.jpeg|\.bmp|\.ico|\.gif)$/i
     } else {
-      allowedExtensions = /(\.bmp|\.ico|\.gif)$/i
+      allowedExtensions = /(\.bmp|\.ico)$/i
+      typeMismatchExtensions = /(\.bmp|\.ico|\.gif)$/i
     }
     if (!allowedExtensions.exec(filePath)) {
       fileInput.value = ''
-      EventBus.$emit('showErrorPopup', true, 'invalid', 'Invalid Picture')
+      if (typeMismatchExtensions.exec(filePath)) {
+        EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${fileInput.name} property. The picture type is not valid.`)
+      } else {
+        EventBus.$emit('showErrorPopup', true, 'invalid', 'Invalid Picture')
+      }
       return false
     } else {
       if (fileInput.files && fileInput.files[0]) {

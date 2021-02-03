@@ -92,10 +92,10 @@ export default class UserForm extends FdContainerVue {
   }
 
   protected get getSampleDotPattern () {
-    const dotSize = 1
+    const dotSize = 13
     const dotSpace = 9
     return {
-      backgroundPosition: `7px 7px`,
+      backgroundPosition: `${dotSize}px ${dotSize}px`,
       backgroundImage: `radial-gradient(${this.properties.ForeColor} 11%, transparent 10%)`,
       backgroundSize: `${dotSpace}px ${dotSpace}px`
     }

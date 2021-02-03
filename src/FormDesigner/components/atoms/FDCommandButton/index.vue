@@ -140,9 +140,9 @@ export default class FDCommandButton extends Mixins(FdControlVue) {
       width: `${controlProp.Width}px`,
       height: `${controlProp.Height}px`,
       top: `${controlProp.Top}px`,
-      borderTopColor: controlProp.Default ? 'black' : controlProp.BackColor,
+      borderTopColor: controlProp.Default ? 'black' : 'white',
       borderBottomColor: controlProp.Default ? 'black' : controlProp.BackColor,
-      borderLeftColor: controlProp.Default ? 'black' : controlProp.BackColor,
+      borderLeftColor: controlProp.Default ? 'black' : 'white',
       borderRightColor: controlProp.Default ? 'black' : controlProp.BackColor,
       outline: controlProp.Enabled
         ? controlProp.TakeFocusOnClick && this.isClicked

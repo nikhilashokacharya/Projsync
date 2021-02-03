@@ -1,5 +1,5 @@
 <template>
-  <div @mouseup="onMouseUp" :style="parentDiv" @scroll.self="updateChildHeightWidth" ref="parentDivRef" >
+  <div @mouseup="onMouseUp" :style="parentDiv" @scroll="updateChildHeightWidth" ref="parentDivRef" >
     <drag-selector
       ref="dragSelector"
       :style="dragSelectorStyle"
@@ -76,6 +76,7 @@ export default class Container extends FDCommonMethod {
   currentSelectedGroup: string = '';
   @Prop() getScrollBarX: string
   @Prop() getScrollBarY: string
+  isControlPasted: boolean = false
 
   @Prop({ required: true, type: String }) public controlId!: string;
   @Prop({ required: true, type: String }) userFormId!: string;
@@ -129,9 +130,16 @@ export default class Container extends FDCommonMethod {
 
   updateChildHeightWidth () {
     if (this.parentDivRef) {
-      this.updatedDragHeight = this.parentDivRef.scrollHeight
-      this.updatedDragWidth = this.parentDivRef.scrollWidth
-      if (this.isControlMove === false) {
+      const controlProp = this.propControlData.properties
+      const type = this.propControlData.type
+      const ph = type && type === 'Page' ? this.height! : controlProp.Height!
+      const pw = type && type === 'Page' ? this.width! : controlProp.Width!
+      if (this.isControlPasted) {
+        this.updatedDragHeight = Math.abs(this.parentDivRef.scrollHeight - ph!)
+        this.updatedDragWidth = Math.abs(this.parentDivRef.scrollWidth - pw!)
+        this.isControlPasted = false
+      }
+      if (this.isControlMove === false && this.isControlPasted === false) {
         this.updateControl({
           userFormId: this.userFormId,
           controlId: this.controlId,
@@ -475,12 +483,9 @@ export default class Container extends FDCommonMethod {
     const type = this.propControlData.type
     const ph = type && type === 'Page' ? this.height! : this.propControlData.properties.Height!
     const pw = type && type === 'Page' ? this.width! : this.propControlData.properties.Width!
-    this.updatedDragHeight = this.parentDivRef ? (ph > this.parentDivRef.scrollHeight) ? ph : this.parentDivRef.scrollHeight : ph
-    this.updatedDragWidth = this.parentDivRef ? (pw > this.parentDivRef.scrollWidth) ? pw : this.parentDivRef.scrollWidth : pw
     return {
-      // ...backgroundStyle,
-      height: this.updatedDragHeight + 'px',
-      width: this.updatedDragWidth + 'px',
+      height: ph + this.updatedDragHeight + 'px',
+      width: pw + this.updatedDragWidth + 'px',
       cursor: type && type === 'Page' ? 'default !important'
         : this.propControlData.properties.MousePointer !== 0 ||
         this.propControlData.properties.MouseIcon !== ''
@@ -513,8 +518,8 @@ export default class Container extends FDCommonMethod {
     const ph = type && type === 'Page' ? this.height! : this.propControlData.properties.Height!
     const pw = type && type === 'Page' ? this.width! : this.propControlData.properties.Width!
     return {
-      height: (controlProp.ScrollHeight === 0 || controlProp.ScrollHeight! < ph) ? this.updatedDragHeight + 'px' : controlProp.ScrollHeight! + 'px',
-      width: (controlProp.ScrollWidth === 0 || controlProp.ScrollWidth! < pw) ? this.updatedDragWidth + 'px' : controlProp.ScrollWidth! + 'px',
+      height: (controlProp.ScrollHeight === 0 || controlProp.ScrollHeight! < ph) ? ph + this.updatedDragHeight + 'px' : controlProp.ScrollHeight! + 'px',
+      width: (controlProp.ScrollWidth === 0 || controlProp.ScrollWidth! < pw) ? pw + this.updatedDragWidth + 'px' : controlProp.ScrollWidth! + 'px',
       backgroundImage: controlProp.Picture === ''
         ? this.getSampleDotPattern.backgroundImage
         : this.createBackgroundString,
@@ -562,11 +567,17 @@ export default class Container extends FDCommonMethod {
     EventBus.$on('updateIsControlMove', (val: boolean) => {
       this.updateIsControlMove(val)
     })
+    EventBus.$on('afterPaste', () => {
+      if (this.selectedControls[this.userFormId].container[0] === this.containerId) {
+        this.isControlPasted = true
+      }
+    })
   }
-  // destroyed () {
-  //   EventBus.$off('handleName')
-  //   EventBus.$off('groupDrag')
-  // }
+  destroyed () {
+    // EventBus.$off('handleName')
+    // EventBus.$off('groupDrag')
+    EventBus.$off('afterPaste')
+  }
   @Watch('selectedControls', { deep: true })
   updateGroupStyle () {
     if (this.selectedContainer === this.containerId) {

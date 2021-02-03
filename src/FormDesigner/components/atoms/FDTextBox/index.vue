@@ -13,7 +13,7 @@
       :style="cssStyleProperty"
       :tabindex="properties.TabIndex"
       :maxlength="properties.MaxLength !==0 ? properties.MaxLength : ''"
-      :disabled="getDisableValue"
+      :disabled="isTextBoxDisabled"
       :title="properties.ControlTipText"
       :readonly="properties.Locked"
       @keydown.escape.exact="releaseEditMode"
@@ -118,13 +118,25 @@ export default class FDTextBox extends Mixins(FdControlVue) {
   $el: HTMLDivElement
   originalText: string = ''
   trimmedText: string = ''
-  get getDisableValue () {
-    if (this.isRunMode || this.isEditMode) {
-      return (
-        this.properties.Enabled === false || this.properties.Locked === true
-      )
+  isTextBoxDisabled: boolean = true
+  @Watch('isRunMode')
+  updateIsTextBoxDisabledProp () {
+    if (this.isRunMode) {
+      this.isTextBoxDisabled = this.properties.Enabled === false || this.properties.Locked === true
     } else {
-      return true
+      this.isTextBoxDisabled = true
+    }
+  }
+  @Watch('isEditMode')
+  updateIsTextBoxDisabledPropWhenEditMode () {
+    if (this.isEditMode) {
+      this.isTextBoxDisabled = this.properties.Enabled === false || this.properties.Locked === true
+      this.textareaRef.disabled = this.isTextBoxDisabled
+      this.textareaRef.focus()
+    } else {
+      setTimeout(() => {
+        this.isTextBoxDisabled = true
+      }, 10)
     }
   }
   /**
@@ -542,12 +554,16 @@ export default class FDTextBox extends Mixins(FdControlVue) {
     textareaRef: HTMLTextAreaElement,
     hideSelectionDiv: HTMLDivElement
   ) {
+    if (this.properties.HideSelection) {
+      this.textareaRef.focus()
+      this.textareaRef.setSelectionRange(0, 0)
+    }
     if (!this.properties.HideSelection) {
       if (event.target instanceof HTMLTextAreaElement) {
         const eventTarget = event.target
         hideSelectionDiv.style.display = 'block'
-        hideSelectionDiv.style.height = this.properties.Height! + 2 + 'px'
-        hideSelectionDiv.style.width = this.properties.Width! + 2 + 'px'
+        hideSelectionDiv.style.height = this.properties.Height! + 'px'
+        hideSelectionDiv.style.width = this.properties.Width! + 'px'
         textareaRef.style.display = 'none'
         let textarea = eventTarget.value
         let firstPart =

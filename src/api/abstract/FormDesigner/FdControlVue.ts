@@ -262,10 +262,8 @@ export default class FdControlVue extends Vue {
    */
   protected get getScrollBarY (): string {
     if (this.data.type === 'TextBox') {
-      if (this.isEditMode) {
-        const scrollYData = controlProperties.scrollBarTextBoxProp(this.data)
-        return scrollYData.overflowY
-      }
+      const scrollYData = controlProperties.scrollBarTextBoxProp(this.data)
+      return scrollYData.overflowY
     }
     const scrollY: ScrollBarData = controlProperties.scrollBarProp(
       this.data
@@ -1420,7 +1418,8 @@ positionLogo (value:any) {
     position: '',
     display: 'inline-flex',
     width: '',
-    justifyContent: ''
+    justifyContent: '',
+    overflow: ''
   }
   this.reverseStyle = {
     display: '',
@@ -1462,14 +1461,17 @@ positionLogo (value:any) {
       break
     case 9: this.reverseStyle.display = 'grid'
       style.order = -1
+      style.overflow = 'hidden'
       break
     case 10: this.reverseStyle.display = 'grid'
       this.reverseStyle.justifyItems = 'center'
       style.order = -1
+      style.overflow = 'hidden'
       break
     case 11: this.reverseStyle.display = 'grid'
       this.reverseStyle.justifyItems = 'end'
       style.order = -1
+      style.overflow = 'hidden'
       break
     case 12: this.reverseStyle.position = 'relative'
       this.reverseStyle.width = '100%'

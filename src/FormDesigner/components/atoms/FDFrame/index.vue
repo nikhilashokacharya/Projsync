@@ -73,10 +73,10 @@ export default class FDFrame extends Mixins(FdContainerVue) {
    * @function getSampleDotPattern
    */
   protected get getSampleDotPattern () {
-    const dotSize = 1
+    const dotSize = 13
     const dotSpace = 9
     return {
-      backgroundPosition: `7px 7px`,
+      backgroundPosition: `${dotSize}px ${dotSize}px`,
       backgroundImage: `radial-gradient(${this.properties.ForeColor} 11%, transparent 10%)`,
       backgroundSize: `${dotSpace}px ${dotSpace}px`
     }
@@ -187,7 +187,7 @@ export default class FDFrame extends Mixins(FdContainerVue) {
       borderBottom: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 1 ? '2px solid gray' : controlProp.SpecialEffect === 4 ? '1.5px solid gray' : controlProp.SpecialEffect === 3 ? '0.5px solid gray' : 'none',
       backgroundColor: controlProp.BackColor,
       display: display,
-      zoom: `${controlProp.Zoom}%`,
+      // zoom: `${controlProp.Zoom}%`,
       whiteSpace: 'nowrap',
       textOverflow: 'ellipsis',
       maxWidth: `${controlProp.Width!}px`

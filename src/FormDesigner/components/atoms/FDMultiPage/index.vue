@@ -281,8 +281,8 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
       return {
         width: '100%',
         height: '100%',
-        position: 'relative',
-        zoom: zoomVal + ''
+        position: 'relative'
+        // zoom: zoomVal + ''
       }
     }
   }
@@ -594,7 +594,7 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
           ? 'none'
           : controlProp.Width! < 30 || controlProp.Height! < 30
             ? 'none'
-            : 'block',
+            : controlProp.TabOrientation === 3 ? controlProp.Width! < (this.widthValue + 12) ? 'none' : 'block' : 'block',
       top:
         controlProp.Style !== 2
           ? controlProp.Style === 1
@@ -699,10 +699,10 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
    * @function getSampleDotPattern
    */
   protected get getSampleDotPattern () {
-    const dotSize = 1
+    const dotSize = 13
     const dotSpace = 9
     return {
-      backgroundPosition: `7px 7px`,
+      backgroundPosition: `${dotSize}px ${dotSize}px`,
       backgroundImage: `radial-gradient(${this.properties.ForeColor} 11%, transparent 10%)`,
       backgroundSize: `${dotSpace}px ${dotSpace}px`
     }

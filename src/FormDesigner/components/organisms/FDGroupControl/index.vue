@@ -89,6 +89,7 @@ export default class GroupControl extends FDCommonMethod {
     EventBus.$on('getClientValue', this.getClientValue)
     EventBus.$on('updasteGroupSize', this.updasteGroupSize)
     EventBus.$on('getGroupSize', this.getGroupSize)
+    EventBus.$on('groupElementDrag', this.elementDrag)
   }
   destroyed () {
     EventBus.$off('getGroupMoveValue', this.getGroupMoveValue)
@@ -97,15 +98,20 @@ export default class GroupControl extends FDCommonMethod {
     EventBus.$off('endGroupMoveControl', this.endGroupMoveControl)
     EventBus.$off('getClientValue', this.getClientValue)
     EventBus.$off('updasteGroupSize', this.updasteGroupSize)
-    EventBus.$on('getGroupSize', this.getGroupSize)
+    EventBus.$off('getGroupSize', this.getGroupSize)
+    EventBus.$off('groupElementDrag', this.elementDrag)
+  }
+  convertToGridSize (val: number) {
+    const gridSize = 9
+    return Math.round(val / gridSize) * gridSize
   }
   updasteGroupSize (propName: keyof controlProperties, propertyValue: number, groupIndex: number) {
     if (this.selectedControls[this.userFormId].container[0] === this.containerId) {
       if (propName === 'GroupID') {
-        this.divStyleArray[groupIndex].left = `${Math.trunc(parseInt(this.divStyleArray[groupIndex].left!))}px`
-        this.divStyleArray[groupIndex].height = `${Math.trunc(parseInt(this.divStyleArray[groupIndex].height!))}px`
-        this.divStyleArray[groupIndex].top = `${Math.trunc(parseInt(this.divStyleArray[groupIndex].top!))}px`
-        this.divStyleArray[groupIndex].width = `${Math.trunc(parseInt(this.divStyleArray[groupIndex].width!))}px`
+        this.divStyleArray[groupIndex].left = `${this.convertToGridSize(parseInt(this.divStyleArray[groupIndex].left!))}px`
+        this.divStyleArray[groupIndex].height = `${this.convertToGridSize(parseInt(this.divStyleArray[groupIndex].height!))}px`
+        this.divStyleArray[groupIndex].top = `${this.convertToGridSize(parseInt(this.divStyleArray[groupIndex].top!))}px`
+        this.divStyleArray[groupIndex].width = `${this.convertToGridSize(parseInt(this.divStyleArray[groupIndex].width!))}px`
       } else {
         this.groupStyle(this.divStyleArray[groupIndex].groupName!)
         this.updatedValue(groupIndex, propName, propertyValue)
@@ -195,7 +201,7 @@ export default class GroupControl extends FDCommonMethod {
     if (this.getIsMoveTarget) {
       //   this.moveBorder(event)
       if (event.movementX !== 0 && event.movementY !== 0) {
-        EventBus.$emit('moveControl', event, 'groupControlDrag', this.positions)
+        EventBus.$emit('moveControl', event, 'groupControlDrag')
         EventBus.$emit('groupDrag', 'groupdrag')
         this.isMove = true
         // this.updateIsMove(true)
@@ -342,12 +348,17 @@ export default class GroupControl extends FDCommonMethod {
     this.positions.clientY = event.clientY
     this.currentMouseDownEvent = event
     if (handler !== 'drag') {
-      document.onmousemove = this.elementDrag
+      EventBus.$emit('startGroupMoveControl', event)
+      EventBus.$emit('startResizeGroupControl', event, handler)
+      document.onmousemove = (event: MouseEvent) => {
+        EventBus.$emit('resizeGroupControl', event, this.positions)
+      }
     } else {
       this.positions.offsetX = event.offsetX
       this.positions.offsetY = event.offsetY
       this.isMainSelect = true
       EventBus.$emit('startGroupMoveControl', event)
+      EventBus.$emit('startResizeGroupControl', event, handler)
       document.onmousemove = (event: MouseEvent) => {
         EventBus.$emit('moveGroupControl', event)
       }
@@ -651,9 +662,8 @@ export default class GroupControl extends FDCommonMethod {
   }
 
   closeDragElement (event:MouseEvent, handler: string): void {
-    if (this.value === 'same') {
-      this.elementDrag(event)
-    } else {
+    this.elementDrag(event)
+    if (this.value !== 'same') {
       this.value = 'different'
     }
     EventBus.$emit('updateIsControlMove', this.isMove)

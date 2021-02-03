@@ -100,6 +100,8 @@ export default class Resizehandler extends FDCommonMethod {
     EventBus.$on('moveControl', this.moveControl)
     EventBus.$on('elementDrag', this.elementDrag)
     EventBus.$on('endMoveControl', this.endMoveControl)
+    EventBus.$on('resizeGroupControl', this.resizeGroupControl)
+    EventBus.$on('startResizeGroupControl', this.startResizeGroupControl)
   }
   destroyed () {
     EventBus.$off('getMoveValue', this.getMoveValue)
@@ -107,6 +109,8 @@ export default class Resizehandler extends FDCommonMethod {
     EventBus.$off('moveControl', this.moveControl)
     EventBus.$off('elementDrag', this.elementDrag)
     EventBus.$off('endMoveControl', this.endMoveControl)
+    EventBus.$off('resizeGroupControl', this.resizeGroupControl)
+    EventBus.$off('startResizeGroupControl', this.startResizeGroupControl)
   }
   getMoveValue (callBack: Function) {
     if (this.isMainSelect) {
@@ -115,6 +119,18 @@ export default class Resizehandler extends FDCommonMethod {
       } else {
         callBack(this.positions.offsetX, this.positions.offsetY, this.controlId)
       }
+    }
+  }
+  startResizeGroupControl (event: MouseEvent, handler: string) {
+    const control = this.userformData[this.userFormId][this.controlId]
+    if (control.type !== 'Userform') {
+      this.positions.clientX = event.clientX
+      this.positions.clientY = event.clientY
+      this.handlerPosition.left = 0
+      this.handlerPosition.top = 0
+      this.handlerPosition.width = this.size.width
+      this.handlerPosition.height = this.size.height
+      this.resizeDiv = handler
     }
   }
   startMoveControl (event: MouseEvent, handler: string) {
@@ -130,9 +146,9 @@ export default class Resizehandler extends FDCommonMethod {
     }
   }
 
-  moveControl (event: MouseEvent, controltype: string, positions: IMousePosition) {
+  moveControl (event: MouseEvent, controltype: string) {
     if (controltype === 'groupControlDrag' && this.getSelectedControlsDatas!.includes(this.controlId)) {
-      this.moveGroupControlBorder(event, positions)
+      this.moveGroupControlBorder(event)
       this.isMove = true
     } else {
       if (this.getIsMoveTarget) {
@@ -155,6 +171,8 @@ export default class Resizehandler extends FDCommonMethod {
   }
   endMoveControl (val: string) {
     if (val === 'groupEndMove') {
+      this.positions.movementX = 0
+      this.positions.movementY = 0
       this.isMove = false
     } else {
       if (this.getIsMoveTarget) {
@@ -198,7 +216,7 @@ export default class Resizehandler extends FDCommonMethod {
           this.isMainSelect = true
           EventBus.$emit('startMoveControl', event, handler)
           if (containerType === 'Frame' || containerType === 'MultiPage') {
-            document.onmousemove = (event: MouseEvent) => { this.moveControl(event, containerType, this.positions) }
+            document.onmousemove = (event: MouseEvent) => { this.moveControl(event, containerType) }
           } else {
             document.onmousemove = (event: MouseEvent) => { EventBus.$emit('moveControl', event) }
           }
@@ -216,13 +234,31 @@ export default class Resizehandler extends FDCommonMethod {
     event.preventDefault()
     this.positions.movementX = this.positions.clientX - event.clientX
     this.positions.movementY = this.positions.clientY - event.clientY
+    const scale: number = (this.propControlData.properties.Zoom! * 1) / 100
+    const grid: Array<number> = [9, 9]
+    const x: number =
+      Math.round(this.positions.movementX / scale / grid[0]) * grid[0]
+    const y: number =
+      Math.round(this.positions.movementY / scale / grid[1]) * grid[1]
+
+    this.positions.movementX = x
+    this.positions.movementY = y
   }
-  moveGroupControlBorder (event: MouseEvent, positions: IMousePosition) {
+  moveGroupControlBorder (event: MouseEvent) {
     event.preventDefault()
     this.resizeDiv = 'drag'
     this.isGroupControl = true
-    this.positions.movementX = positions.clientX - event.clientX
-    this.positions.movementY = positions.clientY - event.clientY
+    this.positions.movementX = this.positions.clientX - event.clientX
+    this.positions.movementY = this.positions.clientY - event.clientY
+    const scale: number = (this.propControlData.properties.Zoom! * 1) / 100
+    const grid: Array<number> = [9, 9]
+    const x: number =
+      Math.round(this.positions.movementX / scale / grid[0]) * grid[0]
+    const y: number =
+      Math.round(this.positions.movementY / scale / grid[1]) * grid[1]
+
+    this.positions.movementX = x
+    this.positions.movementY = y
   }
   get getLStyle () {
     if (this.resizeDiv === 'drag') {
@@ -320,8 +356,8 @@ export default class Resizehandler extends FDCommonMethod {
     this.positions.movementX = this.positions.clientX - event.clientX
     this.positions.movementY = this.positions.clientY - event.clientY
     const scale: number = (this.propControlData.properties.Zoom! * 1) / 100
-    const scale1: number = (this.propControlData.properties.Zoom! * 10) / 100
-    const grid: Array<number> = [scale1, scale1]
+    // const scale1: number = (this.propControlData.properties.Zoom! * 10) / 100
+    const grid: Array<number> = [9, 9]
     const x: number =
       Math.round(this.positions.movementX / scale / grid[0]) * grid[0]
     const y: number =
@@ -400,6 +436,66 @@ export default class Resizehandler extends FDCommonMethod {
       } else {
         this.isMove = true
       }
+    }
+  }
+
+  resizeGroupControl (event: MouseEvent, positions: IMousePosition): void {
+    event.preventDefault()
+    const control = this.userformData[this.userFormId][this.controlId]
+    if (control.type !== 'Userform' && this.getSelectedControlsDatas!.includes(this.controlId)) {
+      this.positions.movementX = positions.clientX - event.clientX
+      this.positions.movementY = positions.clientY - event.clientY
+      const scale: number = (this.propControlData.properties.Zoom! * 1) / 100
+      const scale1: number = (this.propControlData.properties.Zoom! * 10) / 100
+      const grid: Array<number> = [scale1, scale1]
+      const x: number =
+      Math.round(this.positions.movementX / scale / grid[0]) * grid[0]
+      const y: number =
+      Math.round(this.positions.movementY / scale / grid[1]) * grid[1]
+      this.handlerPosition.movementX = x
+      this.handlerPosition.movementY = y
+      // const diffGridX: number = x - this.positions.movementX
+      // const diffGridY: number = y - this.positions.movementY
+
+      // this.positions.clientX = event.clientX - diffGridX
+      // this.positions.clientY = event.clientY - diffGridY
+      if (this.currentMouseDownEvent && (x !== 0 || y !== 0)) {
+        this.currentMouseDownEvent.customCallBack && this.currentMouseDownEvent.customCallBack()
+      }
+
+      const top = y
+      const left = x
+      let incWidth = (this.size.width! + x) > 0 ? (this.size.width! + x) : 0
+      let incHeight = (this.size.height! + y) > 0 ? (this.size.height! + y) : 0
+      let decWidth = (this.size.width! - x) > 0 ? (this.size.width! - x) : 0
+      let decHeight = (this.size.height! - y) > 0 ? (this.size.height! - y) : 0
+      if (this.resizeDiv.includes('t')) {
+        if (incHeight > 0) {
+          this.handlerPosition.top = top
+        }
+        this.handlerPosition.height = incHeight
+      } else if (this.resizeDiv.includes('b')) {
+        this.handlerPosition.height = decHeight
+      }
+      if (this.resizeDiv.includes('l')) {
+        if (incWidth > 0) {
+          this.handlerPosition.left = left
+        }
+        this.handlerPosition.width = incWidth
+      } else if (this.resizeDiv.includes('r')) {
+        this.handlerPosition.width = decWidth
+      }
+      this.isMove = true
+    // if (this.getIsMoveTarget) {
+    //   const containerType = this.userformData[this.userFormId][this.controlId].type
+    //   if (containerType === 'Frame' || containerType === 'MultiPage') {
+    //     if (controltype === containerType) {
+    //       this.isMove = true
+    //     }
+    //   } else {
+    //     this.isMove = true
+    //   }
+    // }
     }
   }
 
