@@ -210,7 +210,6 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
       width: `${controlProp.Width}px`,
       height: `${controlProp.Height}px`,
       top: `${controlProp.Top}px`,
-      backgroundColor: controlProp.BackColor,
       display: display,
       borderLeft: '2px solid whitesmoke',
       borderBottom: controlProp.TabOrientation === 0 ? '1px solid gray' : ''
@@ -228,6 +227,7 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
     return {
       overflow: 'hidden',
       display: 'flex',
+      backgroundColor: controlProp.BackColor,
       justifyContent: controlProp.TabOrientation === 3 ? 'flex-end' : '',
       height: `${controlProp.Height!}px`
     }
@@ -587,6 +587,7 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
     }
     return {
       position: 'absolute',
+      backgroundColor: 'rgb(238, 238, 238)',
       display:
       controlProp.MultiRow ? 'block' : controlProp.Height! < controlProp.TabFixedHeight!
         ? 'none'
