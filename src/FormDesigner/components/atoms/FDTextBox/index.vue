@@ -675,6 +675,7 @@ export default class FDTextBox extends Mixins(FdControlVue) {
   resize: none;
   overflow: hidden;
   box-sizing: border-box;
+  caret-color: black;
 }
 .text-box-design:focus {
   outline: none;

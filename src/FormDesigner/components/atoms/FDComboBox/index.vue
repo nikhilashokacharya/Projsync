@@ -1647,6 +1647,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   overflow: hidden;
   border: none;
   font-family: monospace;
+  caret-color: black;
 }
 .text-box-design:focus {
   outline: none;
