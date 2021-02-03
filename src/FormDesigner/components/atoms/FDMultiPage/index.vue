@@ -282,7 +282,6 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
         width: '100%',
         height: '100%',
         position: 'relative'
-        // zoom: zoomVal + ''
       }
     }
   }
@@ -1266,10 +1265,7 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
   position: sticky;
 }
 .pages {
-  /* display: grid; */
   margin: 0;
-  /* width: calc(100%);
-  height: calc(100%); */
   white-space: nowrap;
   overflow-x: hidden;
   overflow-y: hidden;
@@ -1281,9 +1277,11 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
   background-size: 30%;
   background-position: center;
   background-repeat: no-repeat;
-  border: 2px solid white;
-  border-right-color: gray;
-  border-bottom-color: gray;
+  border-width: 2px;
+  border-right-color: lightgray;
+  border-bottom-color: lightgray;
+  border-top-color: white;
+  border-left-color: white;
   top: 3px;
   right: 15px;
   width: 22px;
@@ -1300,9 +1298,11 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
   background-size: 30%;
   background-position: center;
   background-repeat: no-repeat;
-  border: 2px solid white;
-  border-right-color: gray;
-  border-bottom-color: gray;
+  border-width: 2px;
+  border-right-color: lightgray;
+  border-bottom-color: lightgray;
+  border-top-color: white;
+  border-left-color: white;
   top: 3px;
   right: 15px;
   width: 22px;
@@ -1326,7 +1326,6 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
 .page label {
   border: 0.1px solid white;
   background-color: rgb(238, 238, 238);
-  /* display: inline-block; */
   padding: 5px 5px 5px 5px;
   margin: 0;
   cursor: pointer;
@@ -1363,7 +1362,6 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
   background-size: 10px;
   background-position: center;
   background-repeat: no-repeat;
-  /* border-color: lightgrey; */
 }
 
 /* Down */
@@ -1372,7 +1370,6 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
   background-size: 10px;
   background-position: center;
   background-repeat: no-repeat;
-  /* border-color: lightgrey; */
 }
 
 ::-webkit-scrollbar-track-piece {
@@ -1390,7 +1387,6 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
   white-space: normal;
   top: 23px;
   left: 0px;
-  /* background: rgb(238, 238, 238); */
   background-color: white;
   background-size: 9px 10px;
   background-image: radial-gradient(
