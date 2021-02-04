@@ -341,6 +341,13 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     }
   }
 
+  @Watch('properties.Style')
+  stylePropertyValidation () {
+    if (this.properties.Style === 1) {
+      this.updateDataModel({ propertyName: 'Text', value: '' })
+    }
+  }
+
   @Watch('open')
   openValidate () {
     if (this.open) {
@@ -722,8 +729,10 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     return finalWidths
   }
   get getDisableValue () {
-    if (this.isRunMode || this.isEditMode) {
+    if (this.isRunMode) {
       return this.properties.Enabled === false || this.properties.Locked
+    } else if (this.isEditMode) {
+      return false
     } else {
       return true
     }
@@ -902,7 +911,9 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     }
     this.isScrolling = false
     if (this.properties.ShowDropButtonWhen === 1) {
-      this.isVisible = false
+      if (!this.isEditMode) {
+        this.isVisible = false
+      }
     }
     if (
       this.properties.EnterFieldBehavior === 1 &&
@@ -1173,7 +1184,8 @@ export default class FDComboBox extends Mixins(FdControlVue) {
       backgroundColor: controlProp.BackStyle
         ? controlProp.BackColor
         : 'transparent',
-      color: controlProp.ForeColor,
+      color:
+        controlProp.Enabled === true ? controlProp.ForeColor : this.getEnabled,
       textAlign:
         controlProp.TextAlign === 0
           ? 'left'
