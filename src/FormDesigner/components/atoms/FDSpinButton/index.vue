@@ -155,6 +155,12 @@ export default class FDSpinButton extends Mixins(FdControlVue) {
    */
   protected get styleObj (): Partial<CSSStyleDeclaration> {
     const controlProp = this.properties
+    let display = ''
+    if (this.isRunMode) {
+      display = controlProp.Visible ? controlProp.Width === 0 || controlProp.Height === 0 ? 'none' : '' : 'none'
+    } else {
+      display = controlProp.Width === 0 || controlProp.Height === 0 ? 'none' : ''
+    }
     return {
       ...this.baseStyle,
       overflow: 'hidden',
@@ -163,12 +169,7 @@ export default class FDSpinButton extends Mixins(FdControlVue) {
       height: `${controlProp.Height}px`,
       top: `${controlProp.Top}px`,
       backgroundColor: controlProp.BackColor,
-      display:
-        controlProp.Visible && this.isRunMode
-          ? ''
-          : controlProp.Visible === false && this.isRunMode
-            ? 'none'
-            : ''
+      display: display
     }
   }
 

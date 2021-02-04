@@ -17,6 +17,7 @@
     <div :style="scrollSize" ref="frame" >
       <div>
       <Container
+      :style="frameContainerStyleObj"
       :userFormId="userFormId"
       :controlId="controlId"
       :containerId="controlId"
@@ -79,6 +80,13 @@ export default class FDFrame extends Mixins(FdContainerVue) {
       backgroundPosition: `${dotSize}px ${dotSize}px`,
       backgroundImage: `radial-gradient(${this.properties.ForeColor} 11%, transparent 10%)`,
       backgroundSize: `${dotSpace}px ${dotSpace}px`
+    }
+  }
+  protected get frameContainerStyleObj (): Partial<CSSStyleDeclaration> {
+    const scale = (this.properties.Zoom!) / 100
+    return {
+      transform: `scale(${scale})`,
+      transformOrigin: `top left`
     }
   }
 
@@ -152,9 +160,9 @@ export default class FDFrame extends Mixins(FdContainerVue) {
       }
     let display = ''
     if (this.isRunMode) {
-      display = controlProp.Visible ? 'block' : 'none'
+      display = controlProp.Visible ? controlProp.Width === 0 || controlProp.Height === 0 ? 'none' : 'block' : 'none'
     } else {
-      display = 'block'
+      display = controlProp.Width === 0 || controlProp.Height === 0 ? 'none' : 'block'
     }
     return {
       position: 'relative',
@@ -242,6 +250,7 @@ export default class FDFrame extends Mixins(FdContainerVue) {
   }
 
   frameMouseDown (e: MouseEvent) {
+    EventBus.$emit('isEditMode', this.isEditMode)
     this.selectedItem(e)
     const selContainer = this.selectedControls[this.userFormId].container[0]
     if (selContainer === this.controlId) {

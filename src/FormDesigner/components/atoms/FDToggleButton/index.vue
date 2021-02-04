@@ -142,9 +142,9 @@ export default class FDToggleButton extends Mixins(FdControlVue) {
       }
     let display = ''
     if (this.isRunMode) {
-      display = controlProp.Visible ? 'inline-block' : 'none'
+      display = controlProp.Visible ? controlProp.Width === 0 || controlProp.Height === 0 ? 'none' : 'inline-block' : 'none'
     } else {
-      display = 'inline-block'
+      display = controlProp.Width === 0 || controlProp.Height === 0 ? 'none' : 'inline-block'
     }
     const alignItems = 'inherit'
     if (controlProp.Picture) {

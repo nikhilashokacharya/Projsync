@@ -78,9 +78,9 @@ export default class FDLabel extends Mixins(FdControlVue) {
       }
     let display = ''
     if (this.isRunMode) {
-      display = controlProp.Visible ? 'inline-block' : 'none'
+      display = controlProp.Visible ? controlProp.Width === 0 || controlProp.Height === 0 ? 'none' : 'inline-block' : 'none'
     } else {
-      display = 'inline-block'
+      display = controlProp.Width === 0 || controlProp.Height === 0 ? 'none' : 'inline-block'
     }
     const labelAlignItems = 'inherit'
     if (controlProp.Picture) {
@@ -110,7 +110,6 @@ export default class FDLabel extends Mixins(FdControlVue) {
         borderBottom: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : ''
       }
     }
-    console.log('SPE', controlProp.SpecialEffect)
     return {
       ...(!controlProp.AutoSize && this.renderSize),
       ...this.baseStyle,

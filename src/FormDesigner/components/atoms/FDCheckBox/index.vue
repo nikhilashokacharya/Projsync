@@ -244,9 +244,9 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
       }
     let display = ''
     if (this.isRunMode) {
-      display = controlProp.Visible ? 'grid' : 'none'
+      display = controlProp.Visible ? controlProp.Width === 0 || controlProp.Height === 0 ? 'none' : 'grid' : 'none'
     } else {
-      display = 'grid'
+      display = controlProp.Width === 0 || controlProp.Height === 0 ? 'none' : 'grid'
     }
     const alignItems = controlProp.Picture ? 'inherit' : 'center'
     if (controlProp.Picture) {

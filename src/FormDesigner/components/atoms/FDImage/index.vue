@@ -76,9 +76,9 @@ export default class FDImage extends Mixins(FdControlVue) {
     const controlProp = this.properties
     let display = ''
     if (this.isRunMode) {
-      display = controlProp.Visible ? 'block' : 'none'
+      display = controlProp.Visible ? controlProp.Width === 0 || controlProp.Height === 0 ? 'none' : 'block' : 'none'
     } else {
-      display = 'block'
+      display = controlProp.Width === 0 || controlProp.Height === 0 ? 'none' : 'block'
     }
     return {
       ...this.baseStyle,
