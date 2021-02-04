@@ -158,6 +158,7 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
     }
 
     return {
+      '--display': this.properties.Min === this.properties.Max ? 'none' : 'block',
       width: this.checkOtherOrientations() ? `${controlProp.Height! - 40}px` : `${controlProp.Width! - 40}px`,
       height: this.checkOtherOrientations() ? `${controlProp.Width!}px` : `${controlProp.Height!}px`,
       cursor:
@@ -243,6 +244,7 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
 }
 
 .slider::-webkit-slider-thumb {
+  display: var(--display);
   background-color: var(--bg-color);
   border: 2px solid gray;
   border-right: 2px solid black;
