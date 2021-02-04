@@ -562,7 +562,7 @@ export default class FDTabStrip extends FdControlVue {
             ? controlProp.MultiRow
               ? '-' + (this.topValue - 30) + 'px'
               : controlProp.TabFixedHeight! > 0
-                ? '-' + (this.topValue - 30) + 'px'
+                ? '0px'
                 : '-' + (this.topValue - 30) + 'px'
             : '0px',
       height:
@@ -572,7 +572,7 @@ export default class FDTabStrip extends FdControlVue {
             : controlProp.TabFixedHeight! === 0
               ? controlProp.Height! - controlProp.Font!.FontSize! - 13 + 'px'
               : controlProp.TabOrientation === 1
-                ? `${controlProp.Height! - 21}px`
+                ? `${controlProp.Height! - this.topValue}px`
                 : `${controlProp.Height! - 35}px`
           : `${controlProp.Height! - 3}px`,
       width:

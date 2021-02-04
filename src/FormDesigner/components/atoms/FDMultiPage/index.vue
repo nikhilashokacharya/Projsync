@@ -626,7 +626,7 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
               : controlProp.TabFixedHeight! > 0
                 ? controlProp.TabOrientation === 0
                   ? controlProp.Height! - controlProp.TabFixedHeight! - 19 + 'px'
-                  : controlProp.Height! - controlProp.TabFixedHeight! - 14 + 'px'
+                  : controlProp.Height! - this.topValue + 5 + 'px'
                 : controlProp.TabFixedHeight! === 0
                   ? controlProp.Font!.FontSize! === 72
                     ? controlProp.Height! - controlProp.Font!.FontSize! - 27 + 'px'
@@ -642,7 +642,7 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
                 : controlProp.TabFixedHeight! > 0
                   ? controlProp.TabOrientation === 0
                     ? controlProp.Height! - controlProp.TabFixedHeight! - 10 + 'px'
-                    : controlProp.Height! - controlProp.TabFixedHeight! - 5 + 'px'
+                    : controlProp.Height! - this.topValue + 5 + 'px'
                   : controlProp.TabFixedHeight! === 0
                     ? controlProp.Font!.FontSize! === 72
                       ? controlProp.Height! - controlProp.Font!.FontSize! - 18 + 'px'

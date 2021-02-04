@@ -56,7 +56,6 @@
 import { Component, Ref, Mixins, Watch, Vue } from 'vue-property-decorator'
 import FdControlVue from '@/api/abstract/FormDesigner/FdControlVue'
 import FDEditableText from '@/FormDesigner/components/atoms/FDEditableText/index.vue'
-import { borderStyle } from '@/FormDesigner/controls-select-types';
 
 @Component({
   name: 'FDCheckBox',
