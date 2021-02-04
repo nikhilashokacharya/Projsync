@@ -813,7 +813,7 @@ export default class FDListBox extends Mixins(FdControlVue) {
       height: `${controlProp.Height}px`,
       top: `${controlProp.Top}px`,
       display: display,
-      overflow: controlProp.RowSource === '' ? 'hidden' : this.$el && this.$el.scrollWidth > this.properties.Width! + 3 ? 'auto' : 'hidden'
+      overflow: controlProp.RowSource === '' ? 'hidden' : this.$el && this.$el.scrollWidth > this.properties.Width! + 3 ? 'auto' : 'auto'
     }
   }
 
