@@ -96,8 +96,10 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
     return 'ScaleX(-1)'
   }
   get getDisableValue () {
-    if (this.isRunMode || this.isEditMode) {
+    if (this.isRunMode) {
       return this.properties.Enabled === false
+    } else if (this.isEditMode) {
+      return false
     } else {
       return true
     }
@@ -190,7 +192,7 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
         controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''
           ? this.getMouseCursorData
           : 'default',
-      border: !controlProp.Enabled ? '1px solid gray' : ''
+      border: !controlProp.Enabled && this.isRunMode ? '1px solid gray' : ''
     }
   }
   mounted () {
