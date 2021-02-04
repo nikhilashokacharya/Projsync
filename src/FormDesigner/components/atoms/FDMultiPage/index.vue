@@ -329,7 +329,8 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
           : controlProp.TabOrientation === 2
             ? `${controlProp.Width! - 40}px`
             : '0px',
-      top: '0px'
+      top: '0px',
+      backgroundColor: 'rgb(238, 238, 238)'
     }
   }
 
@@ -1272,7 +1273,6 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
   overflow-y: hidden;
 }
 .left-button {
-  position: relative;
   outline: none;
   background-image: url("../../../../assets/left-arrow-img.png");
   background-size: 30%;
@@ -1293,7 +1293,6 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
   z-index: 5;
 }
 .right-button {
-  position: relative;
   outline: none;
   background-image: url("../../../../assets/right-arrow-img.png");
   background-size: 30%;
