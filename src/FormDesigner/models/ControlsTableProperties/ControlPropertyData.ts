@@ -416,7 +416,7 @@ export class ControlPropertyData {
           MultiSelect: 0,
           Name: 'ListBox1',
           ID: 'ID_ListBox1',
-          RowSource: 'a2:c5',
+          RowSource: '',
           SpecialEffect: 2,
           TabIndex: 7,
           TabStop: true,
