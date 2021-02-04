@@ -347,6 +347,20 @@ export const controlProperties = {
       }
     } else {
       afterbeginCaption = caption!
+    } if (!isPresent) {
+      for (var j = 0; j < caption.length; j++) {
+        if (caption[j].toLowerCase() === accelerator.toLowerCase()) {
+          isPresent = true
+          break
+        }
+      } if (isPresent && accelerator.toLowerCase() !== '') {
+        const postion:number = caption.toLowerCase().indexOf(accelerator.toLowerCase())
+        acceleratorCaption = caption[postion]
+        afterbeginCaption = caption.substring(0, postion)
+        beforeendCaption = caption.substring(postion + 1, caption.length)
+      } else {
+        afterbeginCaption = caption
+      }
     }
     return {
       afterbeginCaption: afterbeginCaption,
