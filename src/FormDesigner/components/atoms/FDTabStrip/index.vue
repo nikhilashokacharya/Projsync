@@ -698,6 +698,9 @@ export default class FDTabStrip extends FdControlVue {
 
   @Watch('properties.MultiRow')
   multiRowValidate () {
+    if (this.properties.MultiRow) {
+      this.isScrollVisible = false
+    }
     this.updateMultiRowforLeftAndRight()
     if (this.scrolling) {
       Vue.nextTick(() => {

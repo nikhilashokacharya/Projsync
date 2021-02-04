@@ -655,7 +655,7 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
           : `${controlProp.Height! - 1}px`,
       width:
         controlProp.Style !== 2
-          ? controlProp.Style === 1 ? controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1 ? `${controlProp.Width! - 9}px` : controlProp.TabFixedWidth! > 0 ? controlProp.Width! - controlProp.TabFixedWidth! - 16 + 'px' : controlProp.TabFixedWidth! === 0 ? controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3 ? `${controlProp.Width! - this.tempWidth - 19}px` : controlProp.Width! - controlProp.Font!.FontSize! - 26 + 'px' : 'calc(100% - 50px)'
+          ? controlProp.Style === 1 ? controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1 ? `${controlProp.Width! - 9}px` : controlProp.TabFixedWidth! > 0 ? controlProp.Width! - controlProp.TabFixedWidth! - 16 + 'px' : controlProp.TabFixedWidth! === 0 ? controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3 ? controlProp.MultiRow ? (controlProp.Width! - this.widthValue) + 'px' : `${controlProp.Width! - this.tempWidth - 19}px` : controlProp.Width! - controlProp.Font!.FontSize! - 26 + 'px' : 'calc(100% - 50px)'
             : controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1
               ? `${controlProp.Width! - 3}px`
               : controlProp.TabFixedWidth! > 0
@@ -914,6 +914,9 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
 
   @Watch('properties.MultiRow')
   multiRowValidate () {
+    if (this.properties.MultiRow) {
+      this.isScrollVisible = false
+    }
     this.updateMultiRowforLeftAndRight()
     if (this.scrolling) {
       Vue.nextTick(() => {
