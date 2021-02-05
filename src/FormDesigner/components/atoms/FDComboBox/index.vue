@@ -732,7 +732,11 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     if (this.isRunMode) {
       return this.properties.Enabled === false || this.properties.Locked
     } else if (this.isEditMode) {
-      return false
+      if (this.properties.Locked) {
+        return true
+      } else {
+        return false
+      }
     } else {
       return true
     }
