@@ -750,7 +750,8 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   get selectionStyle () {
     const controlProp = this.properties
     return {
-      width: 'fit-content',
+      width: controlProp.Width! > 21 ? 'fit-content' : '0px',
+      gridTemplateColumns: controlProp.Width! > 21 ? '5px auto' : '0px 0px',
       borderLeft:
         controlProp.BorderStyle === 1
           ? '1px solid ' + controlProp.BorderColor
@@ -1089,7 +1090,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     } else {
       return {
         backgroundColor: controlProp.BackColor,
-        border: '1px solid black',
+        border: 'none',
         width: 'calc(100% - 2px)',
         height: 'calc(100% - 2px)',
         minWidth: '100px'
@@ -1155,12 +1156,12 @@ export default class FDComboBox extends Mixins(FdControlVue) {
       left: `${controlProp.Left}px`,
       width:
         controlProp.ShowDropButtonWhen === 0
-          ? `${controlProp.Width! - 4}px`
+          ? controlProp.Width! >= 4 ? `${controlProp.Width! - 4}px` : controlProp.Width! + 'px'
           : controlProp.ShowDropButtonWhen === 1 && this.isVisible === false
-            ? `${controlProp.Width! - 4}px`
+            ? controlProp.Width! >= 4 ? `${controlProp.Width! - 4}px` : controlProp.Width! + 'px'
             : controlProp.SelectionMargin
-              ? `${controlProp.Width! - 30}px`
-              : `${controlProp.Width! - 25}px`,
+              ? controlProp.Width! >= 30 ? `${controlProp.Width! - 30}px` : '0px'
+              : controlProp.Width! >= 25 ? `${controlProp.Width! - 25}px` : '0px',
       height: `${controlProp.Height! - 5}px`,
       top: `${controlProp.Top}px`,
       fontFamily: font.FontStyle! !== '' ? this.setFontStyle : font.FontName!,
@@ -1389,7 +1390,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
       display: 'grid',
       gridTemplateRows: `${controlProp.Height! + 1}px`,
       outline: 'none',
-      overflow: 'hidden'
+      overflow: this.open ? '' : 'hidden'
     }
   }
 
@@ -1406,7 +1407,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
           : controlProp.ColumnHeads
             ? '30px'
             : '15px',
-      border: controlProp.RowSource !== '' ? '1px solid black' : 'none',
+      border: controlProp.RowSource !== '' ? '1px solid black' : '1px solid black',
       cursor:
         controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''
           ? this.isEditMode || !this.isActivated
@@ -1429,6 +1430,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   protected get selectedStyleObj (): Partial<CSSStyleDeclaration> {
     const controlProp = this.properties
     return {
+      width: controlProp.Width! > 21 ? '21px' : controlProp.Width! + 'px',
       visibility:
         controlProp.ShowDropButtonWhen === 2 ? 'visible' : this.expandWidth(),
       backgroundPosition:

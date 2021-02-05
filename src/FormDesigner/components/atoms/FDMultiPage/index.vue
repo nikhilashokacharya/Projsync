@@ -165,12 +165,14 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
     }
   }
   focusPage () {
-    if (typeof this.properties.Value === 'number' && this.controls.length > 0) {
-      const value: number = this.properties.Value as number;
-      (this.controlTab[value].$el.children[1] as HTMLSpanElement).focus()
-    } else {
-      (this.$el.children[0] as HTMLDivElement).focus()
-    }
+    Vue.nextTick(() => {
+      if (typeof this.properties.Value === 'number' && this.controls.length > 0) {
+        const value: number = this.properties.Value as number
+        (this.controlTab[value].$el.children[1] as HTMLSpanElement).focus()
+      } else {
+        (this.$el.children[0] as HTMLDivElement).focus()
+      }
+    })
   }
   closeContextMenu () {
     this.multiPageContextMenu = false
@@ -1022,7 +1024,6 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
     this.scrollLeftTop(this.data)
     this.selectedPageID = this.controls[0]
     this.calculateWidthHeight()
-    // this.focusPage()
   }
   dragSelectorControl (event: MouseEvent) {
     this.selectedControlArray = []
