@@ -488,10 +488,10 @@ export default class Container extends FDCommonMethod {
       height: ph + this.updatedDragHeight + 'px',
       width: pw + this.updatedDragWidth + 'px',
       cursor: type && type === 'Page' ? 'default !important'
-        : this.propControlData.properties.MousePointer !== 0 ||
+        : this.toolBoxSelect !== 'Select' ? 'crosshair !important' : this.propControlData.properties.MousePointer !== 0 ||
         this.propControlData.properties.MouseIcon !== ''
           ? `${this.mouseCursorData} !important`
-          : this.toolBoxSelect !== 'Select' ? 'crosshair !important' : 'default !important'
+          : 'default !important'
     }
   }
   get pictureChildDiv () {
