@@ -547,9 +547,7 @@ export default class FDTabStrip extends FdControlVue {
       display:
         controlProp.Style === 1 || controlProp.Style === 2
           ? 'none'
-          : controlProp.Width! < 30 || controlProp.Height! < 30
-            ? 'none'
-            : controlProp.TabOrientation === 3 ? controlProp.Width! < this.widthValue ? 'none' : 'block' : 'block',
+          : controlProp.TabOrientation === 3 ? controlProp.Width! < (this.widthValue + 12) ? 'none' : 'block' : 'block',
       top:
         controlProp.TabOrientation === 0
           ? controlProp.MultiRow

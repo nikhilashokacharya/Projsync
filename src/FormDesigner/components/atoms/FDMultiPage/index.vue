@@ -595,9 +595,7 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
         ? 'none'
         : controlProp.Width! < controlProp.TabFixedWidth!
           ? 'none'
-          : controlProp.Width! < 30 || controlProp.Height! < 30
-            ? 'none'
-            : controlProp.TabOrientation === 3 ? controlProp.Width! < (this.widthValue + 12) ? 'none' : 'block' : 'block',
+          : controlProp.TabOrientation === 3 ? controlProp.Width! < (this.widthValue + 12) ? 'none' : 'block' : 'block',
       top:
         controlProp.Style !== 2
           ? controlProp.Style === 1
