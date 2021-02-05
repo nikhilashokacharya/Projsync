@@ -80,8 +80,30 @@ export default class FDImage extends Mixins(FdControlVue) {
     } else {
       display = controlProp.Width === 0 || controlProp.Height === 0 ? 'none' : 'block'
     }
+    let borderStyles = {}
+    if (controlProp.SpecialEffect !== 0) {
+      borderStyles = {
+        borderStyle: controlProp.SpecialEffect === 3 || controlProp.SpecialEffect === 4 ? 'solid' : controlProp.SpecialEffect === 1 ? 'outset' : controlProp.SpecialEffect === 2 ? 'inset' : '',
+        borderLeftColor: controlProp.SpecialEffect === 1 ? 'white' : controlProp.SpecialEffect === 3 ? 'gray' : controlProp.SpecialEffect === 4 ? 'gray' : '',
+        borderTopColor: controlProp.SpecialEffect === 1 ? 'white' : controlProp.SpecialEffect === 3 ? 'gray' : controlProp.SpecialEffect === 4 ? 'gray' : '',
+        borderRightColor: controlProp.SpecialEffect === 2 ? 'white' : controlProp.SpecialEffect === 3 ? 'gray' : controlProp.SpecialEffect === 4 ? 'gray' : '',
+        borderBottomColor: controlProp.SpecialEffect === 2 ? 'white' : controlProp.SpecialEffect === 3 ? 'gray' : controlProp.SpecialEffect === 4 ? 'gray' : '',
+        borderLeftWidth: controlProp.SpecialEffect === 1 ? '2px' : controlProp.SpecialEffect === 2 ? '3px' : controlProp.SpecialEffect === 3 ? '2px' : controlProp.SpecialEffect === 4 ? '0.5px' : '',
+        borderTopWidth: controlProp.SpecialEffect === 1 ? '2px' : controlProp.SpecialEffect === 2 ? '3px' : controlProp.SpecialEffect === 3 ? '2px' : controlProp.SpecialEffect === 4 ? '0.5px' : '',
+        borderRightWidth: controlProp.SpecialEffect === 2 ? '2px' : controlProp.SpecialEffect === 1 ? '3px' : controlProp.SpecialEffect === 3 ? '0.5px' : controlProp.SpecialEffect === 4 ? '2px' : '',
+        borderBottomWidth: controlProp.SpecialEffect === 2 ? '2px' : controlProp.SpecialEffect === 1 ? '3px' : controlProp.SpecialEffect === 3 ? '0.5px' : controlProp.SpecialEffect === 4 ? '2px' : ''
+      }
+    } else if (controlProp.BorderStyle !== 0) {
+      borderStyles = {
+        borderLeft: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : '',
+        borderRight: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : '',
+        borderTop: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : '',
+        borderBottom: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : ''
+      }
+    }
     return {
       ...this.baseStyle,
+      ...borderStyles,
       left: `${controlProp.Left}px`,
       width: `${controlProp.Width}px`,
       height: `${controlProp.Height}px`,
@@ -89,11 +111,6 @@ export default class FDImage extends Mixins(FdControlVue) {
       backgroundColor: controlProp.BackStyle
         ? controlProp.BackColor
         : 'transparent',
-      borderColor: controlProp.BorderStyle === 1 ? controlProp.BorderColor : '',
-      borderLeft: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 2 ? '2px solid gray' : controlProp.SpecialEffect === 3 ? '1.5px solid gray' : controlProp.SpecialEffect === 4 ? '0.5px solid gray' : '',
-      borderRight: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 1 ? '2px solid gray' : controlProp.SpecialEffect === 4 ? '1.5px solid gray' : controlProp.SpecialEffect === 3 ? '0.5px solid gray' : '',
-      borderTop: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 2 ? '2px solid gray' : controlProp.SpecialEffect === 3 ? '1.5px solid gray' : controlProp.SpecialEffect === 4 ? '0.5px solid gray' : '',
-      borderBottom: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 1 ? '2px solid gray' : controlProp.SpecialEffect === 4 ? '1.5px solid gray' : controlProp.SpecialEffect === 3 ? '0.5px solid gray' : '',
       cursor:
         controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''
           ? this.getMouseCursorData
