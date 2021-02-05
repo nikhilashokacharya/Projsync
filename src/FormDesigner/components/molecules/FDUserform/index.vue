@@ -141,6 +141,7 @@ export default class UserForm extends FdContainerVue {
   }
 
   protected get containerStyleObj (): Partial<CSSStyleDeclaration> {
+    const scale = (this.properties.Zoom!) / 100
     return {
       width: 'calc(100% - 2px)',
       height: 'calc(100% - 2px)',
@@ -148,7 +149,9 @@ export default class UserForm extends FdContainerVue {
       borderRight: this.data.properties.BorderStyle === 1 ? '1px solid ' + this.data.properties.BorderColor : this.data.properties.SpecialEffect === 1 ? '2px solid gray' : this.data.properties.SpecialEffect === 4 ? '1.5px solid gray' : this.data.properties.SpecialEffect === 3 ? '0.5px solid gray' : '',
       borderTop: this.data.properties.BorderStyle === 1 ? '1px solid ' + this.data.properties.BorderColor : this.data.properties.SpecialEffect === 2 ? '2px solid gray' : this.data.properties.SpecialEffect === 3 ? '1.5px solid gray' : this.data.properties.SpecialEffect === 4 ? '0.5px solid gray' : '',
       borderBottom: this.data.properties.BorderStyle === 1 ? '1px solid ' + this.data.properties.BorderColor : this.data.properties.SpecialEffect === 1 ? '2px solid gray' : this.data.properties.SpecialEffect === 4 ? '1.5px solid gray' : this.data.properties.SpecialEffect === 3 ? '0.5px solid gray' : '',
-      borderColor: this.data.properties.BorderStyle === 1 ? this.data.properties.BorderColor : ''
+      borderColor: this.data.properties.BorderStyle === 1 ? this.data.properties.BorderColor : '',
+      transform: `scale(${scale})`,
+      transformOrigin: `top left`
     }
   }
   protected get innerWindowBodyStyle (): Partial<CSSStyleDeclaration> {

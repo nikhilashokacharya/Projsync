@@ -408,7 +408,6 @@ export default class ContextMenu extends FDCommonMethod {
         return 'zIndex' in userData[val].extraDatas! && (userData[val].extraDatas!.zIndex === tempZIndex + 1)
       })
       const nextSelectedControl = controlIndex !== -1 ? Object.keys(userData)[controlIndex] : ''
-      const nextControlType = userData[nextSelectedControl].type
       if (nextSelectedControl !== '' && !highProrControl.includes(nextSelectedControl)) {
         if (getSelControl!.includes(nextSelectedControl)) {
           if (!nextSelctedSeries.includes(selControl)) {
@@ -509,7 +508,6 @@ export default class ContextMenu extends FDCommonMethod {
         return 'zIndex' in userData[val].extraDatas! && (userData[val].extraDatas!.zIndex === tempZIndex - 1)
       })
       const nextSelectedControl = controlIndex !== -1 ? Object.keys(userData)[controlIndex] : ''
-      const nextControlType = userData[nextSelectedControl].type
       if (nextSelectedControl !== '' && !highProrControl.includes(selControl)) {
         if (getSelControl!.includes(nextSelectedControl)) {
           if (!nextSelctedSeries.includes(selControl)) {
@@ -1073,7 +1071,7 @@ export default class ContextMenu extends FDCommonMethod {
             const key = daTargetControls[i]
             const Name = this.newPasteControlId(key, daTarget)
             const controlID:| string| undefined = `ID_${Name}`
-            const controlObj = { ...this.copiedControl[this.userFormId][key] }
+            const controlObj = JSON.parse(JSON.stringify(this.copiedControl[this.userFormId][key]))
             let groupIdIndex = -1
             groupIdIndex = presentGroupId.findIndex((val) => val === controlObj.properties.GroupID)
             const item: controlData = {
@@ -1097,7 +1095,7 @@ export default class ContextMenu extends FDCommonMethod {
           oldControlId.push(key)
           const Name = this.newPasteControlId(key, '')
           const controlID:| string| undefined = `ID_${Name}`
-          const controlObj = { ...this.copiedControl[this.userFormId][key] }
+          const controlObj = JSON.parse(JSON.stringify(this.copiedControl[this.userFormId][key]))
           newControlId.push(controlID)
           let groupIdIndex = -1
           groupIdIndex = presentGroupId.findIndex(
@@ -1125,7 +1123,7 @@ export default class ContextMenu extends FDCommonMethod {
               if (controlProp === key) {
                 const Name = this.newPasteControlId(ctrlId, '')
                 const controlID:| string| undefined = `ID_${Name}`
-                const controlObj = this.copiedControl[this.userFormId][ctrlId]
+                const controlObj = JSON.parse(JSON.stringify(this.copiedControl[this.userFormId][ctrlId]))
 
                 let groupIdIndex = -1
                 groupIdIndex = presentGroupId.findIndex(

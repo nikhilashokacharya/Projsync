@@ -60,6 +60,9 @@ export default class FDTable extends Vue {
   ) => void;
   @State((state) => state.fd.selectedControls) selectedControls!: fdState['selectedControls'];
 
+  get selectedContainer () {
+    return this.selectedControls[this.userFormId].container
+  }
   emitUpdateProperty (
     propertyName: keyof controlProperties,
     value: any
@@ -171,8 +174,7 @@ export default class FDTable extends Vue {
         return this.updateName(selected[i], arg.value)
       } else if (arg.propertyName === 'Value' && (this.userformData[this.userFormId][selected[i]].type === 'SpinButton' || this.userformData[this.userFormId][selected[i]].type === 'ScrollBar')) {
         return this.updateSpinButtonScrollBarValueProp(selected[i], arg.value)
-      } else if (arg.propertyName === 'Value' && (this.userformData[this.userFormId][selected[i]].type === 'OptionButton') &&
-      (this.userformData[this.userFormId][selected[i]].properties.GroupName !== '') && arg.value === 'True') {
+      } else if (arg.propertyName === 'Value' && (this.userformData[this.userFormId][selected[i]].type === 'OptionButton') && arg.value === 'True') {
         const groupName = this.userformData[this.userFormId][selected[i]].properties.GroupName!
         this.updateValueForCommonGroupName(selected[i], arg.value, groupName)
       } else if (arg.propertyName === 'Min' || arg.propertyName === 'Max') {
@@ -209,7 +211,7 @@ export default class FDTable extends Vue {
     })
   }
   updateValueForCommonGroupName (id: string, value: string, groupName: string) {
-    const userData = Object.keys(this.userformData[this.userFormId])
+    const userData = this.userformData[this.userFormId][this.selectedContainer[0]].controls
     this.updatePropValue(id, 'Value', 'True')
     for (let i = 0; i < userData.length; i++) {
       const controlData = this.userformData[this.userFormId][userData[i]]
@@ -583,7 +585,7 @@ export default class FDTable extends Vue {
           if (value > 32767) {
             EventBus.$emit('showErrorPopup', true, 'overflow', 'Overflow')
           } else {
-            EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value. Enter a value between 0 and 32768`)
+            EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value. Enter a value between 0 and 32767`)
           }
         }
       } else if (propertyName === 'Top' || propertyName === 'Left') {
@@ -626,7 +628,7 @@ export default class FDTable extends Vue {
           this.emitUpdateProperty(propertyName, value)
         } else {
           (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
-          EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value. Enter a value between -1 and 32768`)
+          EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value. Enter a value between -1 and 32767`)
         }
       } else if (propertyName === 'Value') {
         const controlData = this.userformData[this.userFormId][this.getSelectedControlsDatas[0]]
@@ -804,7 +806,6 @@ export default class FDTable extends Vue {
     }
   }
   validateMultipleValueProperty (arg: IPropControl) {
-    debugger
     const selected = this.getSelectedControlsDatas!
     let isValid: boolean = true
     for (let i = 0; i < selected.length; i++) {

@@ -25,12 +25,12 @@
               src="../../../../assets/pop-up-caution.jpg"
               class="err-msg"
             />
-            <img v-else-if="invalid"
+            <img v-if="invalid"
               alt="Invalid"
               src="../../../../assets/invalid1.jpg"
               class="err-msg"
             />
-            <img v-else
+            <img v-if="info"
               alt="Info"
               src="../../../../assets/info-icon.png"
               class="err-msg"
@@ -72,10 +72,16 @@ export default class FDErrorPopup extends Vue {
         EventBus.$on('showErrorPopup', (show: boolean, type: string, message : string) => {
           if (type === 'invalid') {
             this.invalid = show
+            this.overflow = false
+            this.info = false
           } else if (type === 'overflow') {
             this.overflow = show
+            this.invalid = false
+            this.info = false
           } else {
             this.info = show
+            this.invalid = false
+            this.overflow = false
           }
           this.isOpen = show
           this.errorMessage = message

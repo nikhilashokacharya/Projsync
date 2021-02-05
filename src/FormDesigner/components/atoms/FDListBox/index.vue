@@ -47,7 +47,7 @@
           @blur.stop="clearMatchEntry"
           @keydown.stop="handleExtendArrowKeySelect"
           @mousedown="
-            isRunMode || isEditMode ? handleMousedown($event) : stopMousedown($event)
+            isRunMode || isEditMode ? handleMousedown($event) : ''
           "
         >
           <div
@@ -1085,11 +1085,6 @@ export default class FDListBox extends Mixins(FdControlVue) {
       if (!this.isActivated) {
         EventBus.$emit('focusUserForm')
       }
-    }
-  }
-  stopMousedown (event: MouseEvent) {
-    if (this.toolBoxSelectControl === 'Select') {
-      event.stopPropagation()
     }
   }
 }

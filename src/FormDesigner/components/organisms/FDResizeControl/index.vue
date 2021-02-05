@@ -391,14 +391,24 @@ export default class ResizeControl extends FdSelectVue {
         }
       }
     } else if (this.keyType === 'ctrlKey') {
-      let selected = [...this.selectedControls[this.userFormId].selected]
+      const userData = this.userformData[this.userFormId]
+      let selectedGroup = [this.controlId]
+      const currContainer = this.getContainerList(this.controlId)[0]
+      let selected: string[] = []
+      for (const control of this.getSelectedControlsDatas!) {
+        if (!userData[currContainer].controls.includes(control)) {
+          const getParent = this.getContainerList(control)[0]
+          selected.push(getParent)
+        } else {
+          selected.push(control)
+        }
+      }
       if (selected[0] === this.containerId) {
         selected = []
       } else {
         selected = [...selected]
       }
-      let selectedGroup = [this.controlId]
-      let combineArray = selected.filter(x => !selectedGroup.includes(x)).concat(selectedGroup.filter(x => !selected.includes(x)))
+      let combineArray = [...new Set(selected.concat(selectedGroup))]
       if (combineArray.length > 0) {
         this.selectControl({
           userFormId: this.userFormId,
@@ -474,7 +484,7 @@ export default class ResizeControl extends FdSelectVue {
         }
       }
     } else {
-      if (this.isMoving === false) {
+      if (this.isMoving === false || this.keyType === 'ctrlKey' || this.keyType === 'shiftKey') {
         this.isEditMode = false
       } else {
         this.isMoving = false
@@ -498,10 +508,18 @@ export default class ResizeControl extends FdSelectVue {
       this.selMultipleCtrl = val
       this.keyType = 'shiftKey'
     })
+    EventBus.$on('cycleForm', this.getEditModeValue)
     EventBus.$on('selectMultipleCtrl', (val: boolean) => {
       this.selMultipleCtrl = val
       this.keyType = 'ctrlKey'
     })
+  }
+  getEditModeValue (callBack: Function) {
+    const selCtrl = this.getSelectedControlsDatas!
+    const container = this.selectedControls[this.userFormId].container[0]
+    if ((selCtrl.length === 1 && this.controlId === selCtrl[0]) || container === this.controlId) {
+      callBack(this.controlId, this.isEditMode)
+    }
   }
   displayContextMenu (event: MouseEvent) {
     EventBus.$emit('contextMenuDisplay', event, this.containerId, this.controlId, 'control', this.isEditMode)

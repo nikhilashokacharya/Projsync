@@ -415,6 +415,7 @@ export default class FDFontDialog extends FdDialogDragVue {
     this.isFontUnderline = this.tempVal.FontUnderline!
     this.size = this.tempVal.FontSize!
     this.temp = this.newFont[this.font]
+    this.fontEffects()
     this.fontDialogRef.focus()
   }
 }

@@ -224,7 +224,7 @@ export default class FdContainerVue extends FdControlVue {
       item.properties.Top = (isNaN(sh!) || sh! === 0) ? e.offsetY : parseInt(this.selectedAreaStyle!.top)
       item.properties.Width = (isNaN(sw!) || sw! === 0) ? item.properties.Width : sw
       item.properties.Height = (isNaN(sh!) || sh! === 0) ? item.properties.Height : sh
-      if (container.type === 'UserForm' || container.type === 'Frame') {
+      if (container.type === 'Userform' || container.type === 'Frame') {
         item.properties.BackColor = this.backColorProp.includes(item.type) ? containerProp.BackColor : item.properties.BackColor
         item.properties.ForeColor = this.foreColorProp.includes(item.type) ? containerProp.ForeColor : item.properties.ForeColor
         item.properties.Font = this.fontProp.includes(item.type) ? { ...containerProp.Font } : { ...item.properties.Font }

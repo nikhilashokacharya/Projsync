@@ -153,7 +153,7 @@ export class ControlPropertyData {
           Top: 50,
           Visible: true,
           Width: 120,
-          WordWrap: true,
+          WordWrap: false,
           GroupID: ''
         },
         controls: [],
@@ -520,7 +520,7 @@ export class ControlPropertyData {
           Name: 'OptionButton1',
           ID: 'ID_OptionButton1',
           Picture: '',
-          PicturePosition: 12,
+          PicturePosition: 7,
           SpecialEffect: 1,
           TabIndex: 9,
           TabStop: true,

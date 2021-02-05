@@ -361,7 +361,8 @@ export default class Container extends FDCommonMethod {
             }
           )
         }
-        if (mainSelect && !this.getSelectedControlsDatas!.includes(this.containerId)) {
+        const isPageSelected = !(userData[this.containerId].type === 'Page' && this.getSelectedControlsDatas!.includes(this.getContainerList(this.containerId)[0]))
+        if (mainSelect && !this.getSelectedControlsDatas!.includes(this.containerId) && isPageSelected) {
           count = count + 1
           let frameCondition: boolean = false
           if (this.handler === 'frameDrag') {

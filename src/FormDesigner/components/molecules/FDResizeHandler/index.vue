@@ -154,6 +154,7 @@ export default class Resizehandler extends FDCommonMethod {
       if (this.getIsMoveTarget) {
         this.moveBorder(event)
         if (event.movementX !== 0 && event.movementY !== 0) {
+          this.updateIsMove(true)
           const containerType = this.userformData[this.userFormId][this.controlId].type
           if (containerType === 'Frame' || containerType === 'MultiPage') {
             EventBus.$emit('handleName', 'frameDrag')
@@ -163,7 +164,6 @@ export default class Resizehandler extends FDCommonMethod {
           } else {
             EventBus.$emit('handleName', 'drag')
             this.isMove = true
-            this.updateIsMove(true)
           }
         }
       }
@@ -181,6 +181,7 @@ export default class Resizehandler extends FDCommonMethod {
         this.isMove = false
       }
     }
+    this.updateIsMove(false)
   }
   /**
    * @description Implementation  of Logic for resize and drag the control and userform, it preserve initial position of control/userform position

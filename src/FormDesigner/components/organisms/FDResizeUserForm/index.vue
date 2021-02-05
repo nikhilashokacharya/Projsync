@@ -57,6 +57,7 @@ export default class ResizeUserForm extends FdSelectVue {
   $el: HTMLDivElement
 
   containerEditMode: boolean = false
+  isRepeat: boolean = false
   /**
    * @description To perform ContextMenu actions(for example: selectAll, paste etc.) on UserForm  and Control
    * @function handleKeyDown
@@ -105,7 +106,6 @@ export default class ResizeUserForm extends FdSelectVue {
     EventBus.$on('focusUserForm', () => {
       this.$el.focus()
     })
-    EventBus.$on('isEditMode', (isEditMode: boolean) => { this.containerEditMode = isEditMode })
   }
   destroyed () {
     EventBus.$off('isEditMode')
@@ -117,8 +117,21 @@ export default class ResizeUserForm extends FdSelectVue {
     const userData = this.userformData[this.userFormId]
     let selected = this.getSelectedControlsDatas![0]
     let container = this.selectedControls[this.userFormId].container[0]
+    EventBus.$emit(
+      'cycleForm',
+      (controlId: string, isEditMode: boolean) => {
+        const selCtrlType = userData[controlId].type
+        if ((selCtrlType === 'Frame' || selCtrlType === 'MultiPage')) {
+          this.containerEditMode = isEditMode
+        }
+      }
+    )
+    if ((userData[selected].controls.length < 1 || (this.isRepeat && userData[selected].properties.Cycle === 0)) && userData[selected].type === 'Page' && this.containerEditMode) {
+      selected = container
+      container = this.getContainerList(selected)[0]
+    }
     const selectType = userData[selected].type
-    if ((selectType === 'Frame' || selectType === 'Page') && this.containerEditMode) {
+    if ((selectType === 'Frame' || selectType === 'Page') && this.containerEditMode && userData[selected].controls.length > 0) {
       container = selected
       selected = userData[container].controls[0]
       this.selectControl({
@@ -155,6 +168,34 @@ export default class ResizeUserForm extends FdSelectVue {
         }
         if (cycleForm) {
           if (userData[container].type === 'Frame') {
+            containerControls = userData[this.getContainerList(container)[0]].controls
+            if (containerControls.length === 1) {
+              this.selectControl({
+                userFormId: this.userFormId,
+                select: {
+                  container: this.getContainerList(container),
+                  selected: [container]
+                }
+              })
+            } else {
+              const nextControlId = containerControls.findIndex((val) => {
+                const type = userData[val].type
+                if (type === 'FDImage') {
+                  return userData[val].extraDatas!.TabIndex! === selectedTab
+                } else {
+                  return userData[val].properties!.TabIndex! === selectedTab
+                }
+              })
+              this.selectControl({
+                userFormId: this.userFormId,
+                select: {
+                  container: this.getContainerList(containerControls[nextControlId]),
+                  selected: [containerControls[nextControlId]]
+                }
+              })
+            }
+          } else if (userData[container].type === 'Page') {
+            this.isRepeat = true
             this.selectControl({
               userFormId: this.userFormId,
               select: {
@@ -162,16 +203,9 @@ export default class ResizeUserForm extends FdSelectVue {
                 selected: [container]
               }
             })
-          } else if (userData[container].type === 'Page') {
-            this.selectControl({
-              userFormId: this.userFormId,
-              select: {
-                container: this.getContainerList(this.getContainerList(container)[0]),
-                selected: [this.getContainerList(container)[0]]
-              }
-            })
           }
         } else {
+          this.isRepeat = false
           const nextControlId = containerControls.findIndex((val) => {
             const type = userData[val].type
             if (type === 'FDImage') {
