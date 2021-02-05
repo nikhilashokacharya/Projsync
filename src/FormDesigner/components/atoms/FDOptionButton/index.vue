@@ -485,8 +485,6 @@ export default class FDOptionButton extends Mixins(FdControlVue) {
   width: 0px;
   left: 0px;
   top: 0px;
-  min-width: 14px;
-  min-height: 15px;
   background-color: rgb(238, 238, 238);
   box-shadow: -1px -1px gray;
   overflow: hidden;

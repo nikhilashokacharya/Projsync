@@ -480,8 +480,6 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
   width: 0px;
   left: 0px;
   top: 0px;
-  min-width: 12px;
-  min-height: 13px;
   background-color: rgb(238, 238, 238);
   box-shadow: -1px -1px gray;
   overflow: hidden;
