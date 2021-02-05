@@ -558,6 +558,7 @@ export default class FdControlVue extends Vue {
   * @param contentEditable
   */
   setContentEditable (event : KeyboardEvent, contentEditable : boolean) {
+    event.preventDefault()
     this.setEditMode(contentEditable)
   }
 

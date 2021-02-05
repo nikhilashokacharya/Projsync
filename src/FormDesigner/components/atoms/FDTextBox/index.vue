@@ -4,7 +4,7 @@
   @click="textBoxClick"
   @mousedown="controlEditMode"
   :tabindex="properties.TabIndex"
-  @keydown.enter="setContentEditable($event, true)"
+  @keydown.enter.self="setContentEditable($event, true)"
   @contextmenu="isEditMode ? openTextContextMenu($event): parentConextMenu($event)"
   >
     <textarea
