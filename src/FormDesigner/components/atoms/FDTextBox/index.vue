@@ -15,6 +15,7 @@
       :maxlength="properties.MaxLength !==0 ? properties.MaxLength : ''"
       :disabled="getDisableValue"
       :title="properties.ControlTipText"
+      @dblclick="dblclick($event)"
       :readonly="properties.Locked"
       @keydown.escape.exact="releaseEditMode"
       v-cursorDirective="{
@@ -118,6 +119,17 @@ export default class FDTextBox extends Mixins(FdControlVue) {
   $el: HTMLDivElement
   originalText: string = ''
   trimmedText: string = ''
+  dblclick (e: Event) {
+    let newSelectionStart = 0
+    const eTarget = e.target as HTMLTextAreaElement
+    for (let i = eTarget.selectionStart; i > 0; i--) {
+      if (eTarget.value[i - 1] === ' ' || eTarget.value[i - 1] === undefined) {
+        newSelectionStart = i
+        break
+      }
+    }
+    this.textareaRef.setSelectionRange(newSelectionStart, eTarget.selectionEnd)
+  }
   get getDisableValue () {
     if (this.isRunMode) {
       return this.properties.Enabled === false || this.properties.Locked

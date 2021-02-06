@@ -32,6 +32,7 @@
           ref="textareaRef"
           :style="cssStyleProperty"
           wrap="off"
+          @dblclick="dblclick($event)"
           :tabindex="properties.TabIndex"
           :readonly="getDisableValue || properties.Style === 1"
           :maxlength="properties.MaxLength !== 0 ? properties.MaxLength : ''"
@@ -786,6 +787,17 @@ export default class FDComboBox extends Mixins(FdControlVue) {
               : ''
 
     }
+  }
+  dblclick (e: Event) {
+    let newSelectionStart = 0
+    const eTarget = e.target as HTMLTextAreaElement
+    for (let i = eTarget.selectionStart; i > 0; i--) {
+      if (eTarget.value[i - 1] === ' ' || eTarget.value[i - 1] === undefined) {
+        newSelectionStart = i
+        break
+      }
+    }
+    this.textareaRef.setSelectionRange(newSelectionStart, eTarget.selectionEnd)
   }
 
   toFocus () {
