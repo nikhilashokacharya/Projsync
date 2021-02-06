@@ -295,10 +295,17 @@ export default class FDCommandButton extends Mixins(FdControlVue) {
       }
       this.$nextTick(() => {
         const { width, height } = this.getWidthHeight()
-        this.updateDataModel({
-          propertyName: 'Height',
-          value: height + 5
-        })
+        if (!this.properties.Picture && this.properties.Caption === '') {
+          this.updateDataModel({
+            propertyName: 'Height',
+            value: height + 20
+          })
+        } else {
+          this.updateDataModel({
+            propertyName: 'Height',
+            value: height + 5
+          })
+        }
         this.updateDataModel({
           propertyName: 'Width',
           value: width

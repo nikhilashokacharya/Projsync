@@ -1,5 +1,5 @@
 <template>
-<div ref="componentRef" :tabindex="properties.TabIndex">
+<div ref="componentRef" :tabindex="properties.TabIndex" :style="outerDivStyleObj">
   <button
     class="toggle-button"
     :style="styleObj"
@@ -78,7 +78,12 @@ export default class FDToggleButton extends Mixins(FdControlVue) {
       return true
     }
   }
-
+  get outerDivStyleObj () {
+    return {
+      backgroundColor: this.properties.BackStyle === 1 ? this.properties.Value !== 'False' ? 'white' : 'none' : 'none',
+      width: 'fit-content'
+    }
+  }
   /**
    * @description toggleButtonClick is a method to check the check the clicked functionality of the button tag.
    * Also It sets the variables isClicked and isFocus based on the Locked property
@@ -165,7 +170,8 @@ export default class FDToggleButton extends Mixins(FdControlVue) {
             ? '-1px -1px black'
             : '1px 1px gray'
         : '1px 1px gray',
-      backgroundColor: controlProp.BackStyle ? controlProp.BackColor : 'transparent',
+      backgroundColor: controlProp.BackStyle ? controlProp.Value !== 'False' ? controlProp.BackColor : controlProp.BackColor : 'transparent',
+      opacity: controlProp.BackStyle ? controlProp.Value !== 'False' ? 0.5 : 1 : 1,
       outline: controlProp.Enabled
         ? this.isFocus
           ? '1px dotted black'
@@ -335,10 +341,17 @@ export default class FDToggleButton extends Mixins(FdControlVue) {
        }
        this.$nextTick(() => {
          const { width, height } = this.getWidthHeight()
-         this.updateDataModel({
-           propertyName: 'Height',
-           value: height + 5
-         })
+         if (!this.properties.Picture && this.properties.Caption === '') {
+           this.updateDataModel({
+             propertyName: 'Height',
+             value: height + 20
+           })
+         } else {
+           this.updateDataModel({
+             propertyName: 'Height',
+             value: height + 5
+           })
+         }
          this.updateDataModel({
            propertyName: 'Width',
            value: width

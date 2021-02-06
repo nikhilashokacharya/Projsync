@@ -1592,7 +1592,7 @@ checkForWidthIncrease (controlArr:Array<string>) {
 setHeightWidthVariable () {
   const picPosLeftRight = [0, 1, 2, 3, 4, 5]
   const picPosTopBottom = [6, 7, 8, 9, 10, 11]
-  const controlWidthIncrease = ['optionbutton', 'checkbox']
+  const controlWidthIncrease = ['optionbutton', 'checkbox', 'commandbutton', 'togglebutton']
   const imgHeight = this.imageRef && this.imageRef.naturalHeight
   const imgWidth = this.imageRef && this.imageRef.naturalWidth
   let labelHeight = 0
@@ -1600,16 +1600,15 @@ setHeightWidthVariable () {
   // calcluate text height
   if (this.textSpanRef && this.textSpanRef.offsetHeight) {
     labelHeight = this.textSpanRef.offsetHeight
-  } else if ((this.editableTextRef.$el as HTMLSpanElement) && (this.editableTextRef.$el as HTMLSpanElement).offsetHeight) {
+  } else if ((this.editableTextRef && this.editableTextRef.$el as HTMLSpanElement) && (this.editableTextRef && this.editableTextRef.$el as HTMLSpanElement).offsetHeight) {
     labelHeight = (this.editableTextRef.$el as HTMLSpanElement).offsetHeight
   }
   // calcuate text width
   if (this.textSpanRef && this.textSpanRef.offsetWidth) {
     labelWidth = this.textSpanRef.offsetWidth
-  } else if ((this.editableTextRef.$el as HTMLSpanElement) && (this.editableTextRef.$el as HTMLSpanElement).offsetWidth) {
+  } else if ((this.editableTextRef && this.editableTextRef.$el as HTMLSpanElement) && (this.editableTextRef && this.editableTextRef.$el as HTMLSpanElement).offsetWidth) {
     labelWidth = (this.editableTextRef.$el as HTMLSpanElement).offsetWidth
   }
-
   return { picPosLeftRight, picPosTopBottom, controlWidthIncrease, imgHeight, imgWidth, labelHeight, labelWidth }
 }
 }
