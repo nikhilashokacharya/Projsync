@@ -80,7 +80,7 @@ export default class FDToggleButton extends Mixins(FdControlVue) {
   }
   get outerDivStyleObj () {
     return {
-      backgroundColor: this.properties.BackStyle === 1 ? this.properties.Value !== 'False' ? 'white' : 'none' : 'none',
+      backgroundColor: this.properties.BackStyle === 1 ? this.properties.Value !== 'False' ? 'white' : 'transparent' : 'transparent',
       width: 'fit-content'
     }
   }

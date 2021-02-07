@@ -65,7 +65,7 @@
                   ? 'checkbox'
                   : 'radio'
               "
-              @click.prevent.stop
+              @click.prevent
               class="inputClass"
             />
           </div>
@@ -281,7 +281,7 @@ export default class FDListBox extends Mixins(FdControlVue) {
                         const headWidth = this.listBoxTableRef.children[0].children[0].children[j] as HTMLDivElement
                         if (this.properties.ColumnCount !== -1) {
                           if (j === this.listBoxTableRef.children[0].children[0].children.length - 1) {
-                            headWidth.style.width = finalWidths[j] - 4 + 'px'
+                            headWidth.style.width = finalWidths[j] - 20 + 'px'
                           } else {
                             headWidth.style.width = '100px'
                           }
@@ -297,7 +297,7 @@ export default class FDListBox extends Mixins(FdControlVue) {
                       width.style.width = '100px'
                     }
                   } else if (j === 1 && this.properties.ColumnCount! === 1) {
-                    width.style.width = this.properties.Width! - 4 + 'px'
+                    width.style.width = this.properties.Width! - 20 + 'px'
                   } else if (j > this.properties.ColumnCount!) {
                     width.style.minWidth = '0px'
                     width.style.width = '0px'
@@ -365,13 +365,13 @@ export default class FDListBox extends Mixins(FdControlVue) {
                       width.style.display = 'inline-block'
                       if (this.properties.ColumnCount === 1) {
                         if (this.properties.Width! > finalWidths[0]) {
-                          width.style.width = this.properties.Width! - 4 + 'px'
+                          width.style.width = this.properties.Width! - 20 + 'px'
                         } else {
-                          width.style.width = finalWidths[0] - 4 + 'px'
+                          width.style.width = finalWidths[0] - 20 + 'px'
                         }
                       } else {
                         width.style.minWidth = '0px'
-                        width.style.width = finalWidths[j - 1] - 4 + 'px'
+                        width.style.width = finalWidths[j - 1] - 20 + 'px'
                       }
                     }
                     if (this.listBoxTableRef && this.listBoxTableRef.children[0] && this.listBoxTableRef.children[0].children[0] && this.listBoxTableRef.children[0].children[0].children[j]) {
@@ -379,19 +379,19 @@ export default class FDListBox extends Mixins(FdControlVue) {
                       if (this.properties.ColumnCount === -1) {
                         headWidth.style.display = 'inline-block'
                         headWidth.style.minWidth = '0px'
-                        headWidth.style.width = finalWidths[j] - 4 + 'px'
+                        headWidth.style.width = finalWidths[j] - 20 + 'px'
                       } else if (j >= this.properties.ColumnCount!) {
                         headWidth.style.display = 'none'
                       } else {
                         headWidth.style.display = 'inline-block'
                         if (this.properties.ColumnCount === 1) {
                           if (this.properties.Width! > finalWidths[0]) {
-                            headWidth.style.width = this.properties.Width! - 4 + 'px'
+                            headWidth.style.width = this.properties.Width! - 20 + 'px'
                           } else {
-                            headWidth.style.width = finalWidths[0] - 4 + 'px'
+                            headWidth.style.width = finalWidths[0] - 20 + 'px'
                           }
                         } else {
-                          headWidth.style.width = finalWidths[j] - 4 + 'px'
+                          headWidth.style.width = finalWidths[j] - 20 + 'px'
                         }
                       }
                     }
@@ -448,7 +448,7 @@ export default class FDListBox extends Mixins(FdControlVue) {
                       width.style.width = '100px'
                     }
                   } else if (j === 1 && this.properties.ColumnCount! === 1) {
-                    width.style.width = this.properties.Width! - 4 + 'px'
+                    width.style.width = this.properties.Width! - 20 + 'px'
                   } else if (j > this.properties.ColumnCount!) {
                     width.style.minWidth = '0px'
                     width.style.width = '0px'
@@ -495,13 +495,13 @@ export default class FDListBox extends Mixins(FdControlVue) {
                       width.style.display = 'inline-block'
                       if (this.properties.ColumnCount === 1) {
                         if (this.properties.Width! > finalWidths[0]) {
-                          width.style.width = this.properties.Width! - 4 + 'px'
+                          width.style.width = this.properties.Width! - 20 + 'px'
                         } else {
-                          width.style.width = finalWidths[0] - 4 + 'px'
+                          width.style.width = finalWidths[0] - 20 + 'px'
                         }
                       } else {
                         width.style.minWidth = '0px'
-                        width.style.width = finalWidths[j - 1] - 4 + 'px'
+                        width.style.width = finalWidths[j - 1] - 20 + 'px'
                       }
                     }
                   }
@@ -696,10 +696,12 @@ export default class FDListBox extends Mixins(FdControlVue) {
               }
 
               if (this.properties.ControlSource !== '') {
-                this.updateDataModel({
-                  propertyName: 'Text',
-                  value: this.selectionData[0]
-                })
+                if (this.properties.TextColumn === -1) {
+                  this.updateDataModel({
+                    propertyName: 'Text',
+                    value: this.selectionData[0]
+                  })
+                }
                 this.updateDataModel({
                   propertyName: 'Value',
                   value: this.selectionData[0]
@@ -712,8 +714,15 @@ export default class FDListBox extends Mixins(FdControlVue) {
           if (this.properties.MultiSelect === 0) {
             for (let i = 0; i < this.extraDatas.RowSourceData!.length; i++) {
               if (this.listStyleRef[i].style.backgroundColor !== '') {
-                const text = this.extraDatas.RowSourceData![i][0]
-                this.updateDataModel({ propertyName: 'Text', value: text })
+                if (this.properties.TextColumn === -1) {
+                  const text = this.extraDatas.RowSourceData![i][0]
+                  this.updateDataModel({ propertyName: 'Text', value: text })
+                } else if (this.properties.TextColumn === 0) {
+                  this.updateDataModel({ propertyName: 'Text', value: i })
+                } else if (this.properties.TextColumn! > 0 && this.properties.TextColumn! < this.extraDatas.RowSourceData![0].length) {
+                  const text = this.extraDatas.RowSourceData![i][this.properties.TextColumn! - 1]
+                  this.updateDataModel({ propertyName: 'Text', value: text })
+                }
                 const x = this.extraDatas.RowSourceData![i][this.properties.BoundColumn! - 1]
                 this.updateDataModel({ propertyName: 'Value', value: x })
               }
@@ -729,6 +738,25 @@ export default class FDListBox extends Mixins(FdControlVue) {
   }
   clearMatchEntry () {
     this.updateDataModelExtraData({ propertyName: 'MatchData', value: '' })
+  }
+
+  @Watch('properties.TextColumn')
+  textColumnValidate () {
+    for (let i = 0; i < this.extraDatas.RowSourceData!.length; i++) {
+      if (this.listStyleRef[i].style.backgroundColor !== '') {
+        if (this.properties.TextColumn === -1) {
+          const text = this.extraDatas.RowSourceData![i][0]
+          this.updateDataModel({ propertyName: 'Text', value: text })
+        } else if (this.properties.TextColumn === 0) {
+          this.updateDataModel({ propertyName: 'Text', value: i })
+        } else if (this.properties.TextColumn! > 0 && this.properties.TextColumn! < this.extraDatas.RowSourceData![0].length) {
+          const text = this.extraDatas.RowSourceData![i][this.properties.TextColumn! - 1]
+          this.updateDataModel({ propertyName: 'Text', value: text })
+        }
+        const x = this.extraDatas.RowSourceData![i][this.properties.BoundColumn! - 1]
+        this.updateDataModel({ propertyName: 'Value', value: x })
+      }
+    }
   }
 
   getSelectedStyle () {
@@ -953,7 +981,9 @@ export default class FDListBox extends Mixins(FdControlVue) {
           }
           if (tempData![0][this.properties.BoundColumn! - 1] === newVal) {
             this.updateDataModel({ propertyName: 'Value', value: newVal })
-            this.updateDataModel({ propertyName: 'Text', value: newVal })
+            if (this.properties.TextColumn === -1) {
+              this.updateDataModel({ propertyName: 'Text', value: newVal })
+            }
           }
         } else {
           return undefined
@@ -1008,6 +1038,7 @@ export default class FDListBox extends Mixins(FdControlVue) {
    */
   @Watch('properties.ListStyle', { deep: true })
   listCheck (newVal: number, oldVal: number) {
+    this.updateColumns()
     this.clearOptionBGColorAndChecked(this.tempListBoxComboBoxEvent)
   }
 
@@ -1170,7 +1201,6 @@ export default class FDListBox extends Mixins(FdControlVue) {
   width: 100%;
 }
 .theadClass {
-  /* border-bottom: 1px solid; */
   white-space: nowrap;
   position: sticky;
   top: 0px;
@@ -1181,7 +1211,8 @@ export default class FDListBox extends Mixins(FdControlVue) {
   border-right: 1px solid;
 }
 .tdClassIn {
-  width: 40px;
+  width: fit-content !important;
+  min-width: 0px !important;
 }
 .inputClass {
   margin: 0;

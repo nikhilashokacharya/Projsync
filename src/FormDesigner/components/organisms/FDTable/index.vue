@@ -444,6 +444,16 @@ export default class FDTable extends Vue {
       return 'Invalid'
     }
   }
+  validateTextColumnProperty (propertyValue : number, propertyName: string, controlId: string) {
+    const controlData = this.userformData[this.userFormId][controlId]
+    const rowSourceData = controlData.extraDatas!.RowSourceData!
+    if (rowSourceData.length > 0) {
+      if (propertyValue > rowSourceData[0].length || controlData.properties.Text === '') {
+        return false
+      }
+    }
+    return true
+  }
   updateAppearance (e: Event) {
     const propertyName: keyof controlProperties = (e.target as HTMLInputElement).name as keyof controlProperties
     const inputType = this.tableData[propertyName]!.type
@@ -624,11 +634,20 @@ export default class FDTable extends Vue {
           EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value. Enter a value between 0 and 2147483647`)
         }
       } else if (propertyName === 'TextColumn') {
-        if (checkPropertyValue(propertyName, value)) {
-          this.emitUpdateProperty(propertyName, value)
-        } else {
-          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
-          EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value. Enter a value between -1 and 32767`)
+        if (this.getSelectedControlsDatas.length === 1) {
+          if (checkPropertyValue(propertyName, value)) {
+            const isValid = this.validateTextColumnProperty(value, propertyName, this.getSelectedControlsDatas[0])
+            if (isValid) {
+              this.emitUpdateProperty(propertyName, value)
+            } else {
+              this.emitUpdateProperty(propertyName, value)
+              this.emitUpdateProperty('Text', '')
+              EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value`)
+            }
+          } else {
+            (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+            EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value. Enter a value between -1 and 32767`)
+          }
         }
       } else if (propertyName === 'Value') {
         const controlData = this.userformData[this.userFormId][this.getSelectedControlsDatas[0]]
