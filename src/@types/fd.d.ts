@@ -309,3 +309,7 @@ interface ICommonProp {
 interface ICommonPropVal {
   [propName: string]: string | number
 }
+interface IErrorRange {
+  from : number
+  to : number
+}

@@ -448,7 +448,7 @@ export default class FDTable extends Vue {
     const controlData = this.userformData[this.userFormId][controlId]
     const rowSourceData = controlData.extraDatas!.RowSourceData!
     if (rowSourceData.length > 0) {
-      if (propertyValue > rowSourceData[0].length || controlData.properties.Text === '') {
+      if (propertyValue > rowSourceData[0].length) {
         return false
       }
     }
@@ -473,11 +473,11 @@ export default class FDTable extends Vue {
         if (checkPropertyValue(propertyName, propertyValue)) {
           const isSuccess = this.updateProperty({ propertyName: propertyName, value: propertyValue })
           if (!isSuccess) {
-            (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+            this.updateInputBoxValueToPreviousValue(e, propertyName)
             EventBus.$emit('showErrorPopup', true, 'invalid', 'Could not set the Name property. Ambiguous name.')
           }
         } else {
-          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
           EventBus.$emit('showErrorPopup', true, 'invalid', `Not a legal object name: '${propertyValue}'`)
         }
       } else if (propertyName === 'Value') {
@@ -491,8 +491,8 @@ export default class FDTable extends Vue {
             if (isTextValid) {
               this.emitUpdateProperty(propertyName, propertyValue)
             } else {
-              EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property Value`);
-              (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+              this.setInvalidErrorMessage(propertyName, 2, null)
+              this.updateInputBoxValueToPreviousValue(e, propertyName)
             }
           } else {
             this.emitUpdateProperty(propertyName, propertyValue)
@@ -504,8 +504,8 @@ export default class FDTable extends Vue {
           } else if (this.resultArray[1] === true) {
             const isValueValid = this.updateValueProperty({ propertyName: propertyName, value: propertyValue })
             if (!isValueValid) {
-              EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property Value`);
-              (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+              this.setInvalidErrorMessage(propertyName, 2, null)
+              this.updateInputBoxValueToPreviousValue(e, propertyName)
             }
           } else if (this.resultArray[2] === true) {
 
@@ -519,8 +519,8 @@ export default class FDTable extends Vue {
           if (isTextValid) {
             this.emitUpdateProperty(propertyName, propertyValue)
           } else {
-            EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property Value`);
-            (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+            this.setInvalidErrorMessage(propertyName, 2, null)
+            this.updateInputBoxValueToPreviousValue(e, propertyName)
           }
         } else {
           this.emitUpdateProperty(propertyName, propertyValue)
@@ -530,33 +530,33 @@ export default class FDTable extends Vue {
         if (isValid) {
           this.emitUpdateProperty(propertyName, propertyValue)
         } else {
-          EventBus.$emit('showErrorPopup', true, 'invalid', 'Invalid property value.')
+          this.setInvalidErrorMessage(propertyName, 1, null)
         }
       } else if (propertyName === 'RowSource') {
         const isValid = this.validateRowSourceProperty(propertyValue)
         if (isValid) {
           this.emitUpdateProperty(propertyName, propertyValue)
         } else {
-          EventBus.$emit('showErrorPopup', true, 'invalid', 'Invalid property value.')
+          this.setInvalidErrorMessage(propertyName, 1, null)
         }
       } else if (propertyName === 'ColumnWidths') {
         const resultValue = this.validateColumnWidths(propertyName, propertyValue)
         if (resultValue !== 'Invalid') {
           this.emitUpdateProperty(propertyName, resultValue)
         } else {
-          EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Type mismatch`);
-          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+          this.setInvalidErrorMessage(propertyName, 4, null)
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
         }
       } else if (propertyName === 'ListWidth') {
         const resultValue = this.validateListWidth(propertyName, propertyValue)
         if (resultValue !== 'Invalid' && resultValue !== 'Negative') {
           this.emitUpdateProperty(propertyName, resultValue)
         } else if (resultValue === 'Negative') {
-          EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value`);
-          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+          this.setInvalidErrorMessage(propertyName, 2, null)
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
         } else {
-          EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Type mismatch`);
-          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+          this.setInvalidErrorMessage(propertyName, 4, null)
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
         }
       } else {
         this.emitUpdateProperty(propertyName, propertyValue)
@@ -572,7 +572,7 @@ export default class FDTable extends Vue {
             } else if (value > 9830) {
               this.emitUpdateProperty(propertyName, 9830)
             } else if (value < 0) {
-              (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+              this.updateInputBoxValueToPreviousValue(e, propertyName)
             } else {
               this.emitUpdateProperty(propertyName, value)
             }
@@ -583,7 +583,7 @@ export default class FDTable extends Vue {
             } else if (value > 9830) {
               this.emitUpdateProperty(propertyName, 9830)
             } else if (value < 0) {
-              (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+              this.updateInputBoxValueToPreviousValue(e, propertyName)
             } else {
               this.emitUpdateProperty(propertyName, value)
             }
@@ -591,47 +591,47 @@ export default class FDTable extends Vue {
         } else if (checkPropertyValue(propertyName, value)) {
           this.emitUpdateProperty(propertyName, value)
         } else {
-          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
           if (value > 32767) {
-            EventBus.$emit('showErrorPopup', true, 'overflow', 'Overflow')
+            this.setInvalidErrorMessage(propertyName, 6, null)
           } else {
-            EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value. Enter a value between 0 and 32767`)
+            this.setInvalidErrorMessage(propertyName, 5, { from: 0, to: 32767 })
           }
         }
       } else if (propertyName === 'Top' || propertyName === 'Left') {
         if (checkPropertyValue(propertyName, value)) {
           this.emitUpdateProperty(propertyName, value)
         } else {
-          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
-          EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value.`)
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
+          this.setInvalidErrorMessage(propertyName, 2, null)
         }
       } else if (propertyName === 'MaxLength') {
         if (checkPropertyValue(propertyName, value)) {
           this.emitUpdateProperty(propertyName, value)
         } else {
-          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
-          EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value. Enter a value between 0 and  2147483647`)
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
+          this.setInvalidErrorMessage(propertyName, 5, { from: 0, to: 2147483647 })
         }
       } else if (propertyName === 'BoundColumn') {
         if (checkPropertyValue(propertyName, value)) {
           this.emitUpdateProperty(propertyName, value)
         } else {
-          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
-          EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value. Enter a value between 0 and 65536`)
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
+          this.setInvalidErrorMessage(propertyName, 5, { from: 0, to: 65536 })
         }
       } else if (propertyName === 'ColumnCount') {
         if (checkPropertyValue(propertyName, value)) {
           this.emitUpdateProperty(propertyName, value)
         } else {
-          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
-          EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value. Enter a value between -1 and 2147483647`)
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
+          this.setInvalidErrorMessage(propertyName, 5, { from: -1, to: 2147483647 })
         }
       } else if (propertyName === 'ListRows') {
         if (checkPropertyValue(propertyName, value)) {
           this.emitUpdateProperty(propertyName, value)
         } else {
-          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
-          EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value. Enter a value between 0 and 2147483647`)
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
+          this.setInvalidErrorMessage(propertyName, 5, { from: 0, to: 2147483647 })
         }
       } else if (propertyName === 'TextColumn') {
         if (this.getSelectedControlsDatas.length === 1) {
@@ -642,39 +642,38 @@ export default class FDTable extends Vue {
             } else {
               this.emitUpdateProperty(propertyName, value)
               this.emitUpdateProperty('Text', '')
-              EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value`)
+              this.setInvalidErrorMessage(propertyName, 2, null)
             }
           } else {
-            (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
-            EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value. Enter a value between -1 and 32767`)
+            this.updateInputBoxValueToPreviousValue(e, propertyName)
+            this.setInvalidErrorMessage(propertyName, 5, { from: -1, to: 32767 })
           }
         }
       } else if (propertyName === 'Value') {
         const controlData = this.userformData[this.userFormId][this.getSelectedControlsDatas[0]]
         const controlType = controlData.type
         if (this.getSelectedControlsDatas.length === 1) {
-          if (controlType === 'TabStrip') {
-            if (value < -1 || value >= controlData.extraDatas!.Tabs!.length!) {
-              (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
-              EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value.`)
-            } else {
-              this.emitUpdateProperty(propertyName, value)
-            }
-          } else if (controlType === 'MultiPage') {
-            if (value < -1 || value >= controlData.controls.length) {
-              (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
-              EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value.`)
+          if (controlType === 'TabStrip' || controlType === 'MultiPage') {
+            if (value < -1) {
+              this.updateInputBoxValueToPreviousValue(e, propertyName)
+              this.setInvalidErrorMessage(propertyName, 5, { from: -1, to: 2147483647 })
+            } else if (value > 2147483647) {
+              this.updateInputBoxValueToPreviousValue(e, propertyName)
+              this.setInvalidErrorMessage(propertyName, 1, null)
+            } else if (controlType === 'TabStrip' ? value >= controlData.extraDatas!.Tabs!.length! : value >= controlData.controls.length) {
+              this.updateInputBoxValueToPreviousValue(e, propertyName)
+              this.setInvalidErrorMessage(propertyName, 2, null)
             } else {
               this.emitUpdateProperty(propertyName, value)
             }
           } else if (controlType === 'SpinButton' || controlType === 'ScrollBar') {
             if (this.isDecimalNumber(propertyValue)) {
-              (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+              this.updateInputBoxValueToPreviousValue(e, propertyName)
             } else {
               const isSuccess = this.updateSpinButtonScrollBarValueProp(this.getSelectedControlsDatas[0], value)
               if (!isSuccess) {
-                (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
-                EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value.`)
+                this.updateInputBoxValueToPreviousValue(e, propertyName)
+                this.setInvalidErrorMessage(propertyName, 2, null)
               }
             }
           } else {
@@ -682,12 +681,12 @@ export default class FDTable extends Vue {
           }
         } else {
           if (this.isDecimalNumber(propertyValue)) {
-            (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+            this.updateInputBoxValueToPreviousValue(e, propertyName)
           } else {
             const isSuccess = this.validateMultipleValueProperty({ propertyName: propertyName, value: propertyValue })
             if (!isSuccess) {
-              (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
-              EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value.`)
+              this.updateInputBoxValueToPreviousValue(e, propertyName)
+              this.setInvalidErrorMessage(propertyName, 2, null)
             } else {
               this.updateMultiSelectPropValue(propertyName, value)
             }
@@ -695,7 +694,7 @@ export default class FDTable extends Vue {
         }
       } else if (propertyName === 'Min' || propertyName === 'Max' || propertyName === 'SmallChange') {
         if (this.isDecimalNumber(propertyValue)) {
-          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
         } else if (checkPropertyValue(propertyName, value)) {
           if (propertyName === 'Min' || propertyName === 'Max') {
             this.updateProperty({ propertyName: propertyName, value: value })
@@ -703,79 +702,86 @@ export default class FDTable extends Vue {
             this.emitUpdateProperty(propertyName, value)
           }
         } else {
-          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
-          EventBus.$emit('showErrorPopup', true, 'invalid', `Invalid property value.`)
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
+          this.setInvalidErrorMessage(propertyName, 1, null)
         }
       } else if (propertyName === 'TabFixedHeight' || propertyName === 'TabFixedWidth') {
         if (checkPropertyValue(propertyName, value)) {
           this.emitUpdateProperty(propertyName, value)
         } else {
-          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
-          EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value. Enter a value between 0 and 7200`)
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
+          this.setInvalidErrorMessage(propertyName, 5, { from: 0, to: 7200 })
         }
       } else if (propertyName === 'TabIndex') {
         if (this.isDecimalNumber(propertyValue)) {
-          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
         } else if (checkPropertyValue(propertyName, value)) {
           const isSuccess = this.updateProperty({ propertyName: propertyName, value: value })
           if (!isSuccess) {
-            (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+            this.updateInputBoxValueToPreviousValue(e, propertyName)
           }
         } else {
-          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
-          EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value. Enter a value greater than or equal to zero.`)
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
+          this.setInvalidErrorMessage(propertyName, 3, null)
         }
       } else if (propertyName === 'Index') {
         if (this.isDecimalNumber(propertyValue)) {
-          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
         } else if (value < 0) {
-          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
-          EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value. Enter a value between 0 and 32767`)
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
+          this.setInvalidErrorMessage(propertyName, 5, { from: 0, to: 32767 })
         } else {
           const isSuccess = this.updateProperty({ propertyName: propertyName, value: propertyValue })
           if (!isSuccess) {
             (e.target as HTMLInputElement).value = this.tableData!.Index!.value! as string
-            EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value.`)
+            this.setInvalidErrorMessage(propertyName, 2, null)
           }
         }
       } else if (propertyName === 'Delay') {
         if (this.isDecimalNumber(propertyValue)) {
-          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
         } else if (checkPropertyValue(propertyName, propertyValue)) {
           this.emitUpdateProperty(propertyName, value)
         } else if (value < 0) {
-          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
-          EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value. Enter a value greater than or equal to zero.`)
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
+          this.setInvalidErrorMessage(propertyName, 3, null)
         } else {
-          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
-          EventBus.$emit('showErrorPopup', true, 'invalid', `Invalid property value.`)
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
+          this.setInvalidErrorMessage(propertyName, 1, null)
         }
       } else if (propertyName === 'Zoom') {
         if (this.isDecimalNumber(propertyValue)) {
-          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
         } else if (checkPropertyValue(propertyName, propertyValue)) {
           this.emitUpdateProperty(propertyName, value)
         } else {
-          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
-          EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value. Enter a value between 10 and 400.`)
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
+          this.setInvalidErrorMessage(propertyName, 5, { from: 10, to: 400 })
         }
       } else if (propertyName === 'DrawBuffer') {
         if (this.isDecimalNumber(propertyValue)) {
-          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
         } else if (checkPropertyValue(propertyName, propertyValue)) {
           this.emitUpdateProperty(propertyName, value)
         } else {
-          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
-          EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value. Enter a value between 16000 and 1048576.`)
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
+          this.setInvalidErrorMessage(propertyName, 5, { from: 16000, to: 1048576 })
         }
       } else if (propertyName === 'TransitionPeriod') {
         if (this.isDecimalNumber(propertyValue)) {
-          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
         } else if (checkPropertyValue(propertyName, propertyValue)) {
           this.emitUpdateProperty(propertyName, value)
         } else {
-          (e.target as HTMLInputElement).value = this.tableData![propertyName]!.value! as string
-          EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value. Enter a value between 0 and 10000.`)
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
+          this.setInvalidErrorMessage(propertyName, 5, { from: 0, to: 10000 })
+        }
+      } else if (propertyName === 'ScrollHeight' || propertyName === 'ScrollWidth') {
+        if (checkPropertyValue(propertyName, value)) {
+          this.emitUpdateProperty(propertyName, value)
+        } else {
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
+          this.setInvalidErrorMessage(propertyName, 2, null)
         }
       } else {
         this.emitUpdateProperty(propertyName, value)
@@ -818,6 +824,25 @@ export default class FDTable extends Vue {
       }
     }
   }
+  setInvalidErrorMessage (propertyName: keyof controlProperties | string, errorCode: number, range: IErrorRange | null) {
+    switch (errorCode) {
+      case 1: EventBus.$emit('showErrorPopup', true, 'invalid', `Invalid property value.`)
+        break
+      case 2: EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value.`)
+        break
+      case 3: EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value. Enter a value greater than or equal to zero.`)
+        break
+      case 4: EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Type mismatch.`)
+        break
+      case 5: EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value. Enter a value between ${range!.from} and ${range!.to}`)
+        break
+      case 6: EventBus.$emit('showErrorPopup', true, 'overflow', 'Overflow')
+        break
+    }
+  }
+  updateInputBoxValueToPreviousValue (event: Event, propertyName: keyof controlProperties) {
+    (event.target as HTMLInputElement).value = this.tableData![propertyName]!.value!.toString()
+  }
   updateMultiSelectPropValue (propertyName: keyof controlProperties, value: number) {
     const selected = this.getSelectedControlsDatas!
     for (let i = 0; i < selected.length; i++) {
@@ -847,7 +872,7 @@ export default class FDTable extends Vue {
   }
   isDecimalNumber (propValue : string) {
     if (propValue.indexOf('.') > -1) {
-      EventBus.$emit('showErrorPopup', true, 'invalid', `Invalid property value.`)
+      this.setInvalidErrorMessage('', 1, null)
       return true
     }
     return false
