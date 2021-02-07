@@ -10,7 +10,9 @@
   @mousedown="controlEditMode"
   >
     <div class="slidecontainer" :style="cssVars">
-      <button :style="scrollBarButtonStyleObj" @click="!getDisableValue?properties.Min > properties.Max ? increaseTheValue() : decreaseTheValue():''">
+      <button :style="scrollBarButtonStyleObj"
+      @mousedown="!getDisableValue?properties.Min > properties.Max ? increaseTheValue() : decreaseTheValue():''"
+      @mouseup="setIsSpinButtonScrollBarMouseDown">
         <FdSvgImage
           key="leftArrow"
           name="left-arrow.svg"
@@ -29,7 +31,9 @@
         @input="updateValueProperty"
         orient="vertical"
       />
-      <button :style="scrollBarButtonStyleObj" @click="!getDisableValue?properties.Min > properties.Max ? decreaseTheValue() : increaseTheValue():''">
+      <button :style="scrollBarButtonStyleObj"
+      @mousedown="!getDisableValue?properties.Min > properties.Max ? decreaseTheValue() : increaseTheValue():''"
+      @mouseup="setIsSpinButtonScrollBarMouseDown">
         <FdSvgImage
           key="rightArrow"
           name="right-arrow.svg"
@@ -85,7 +89,6 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
 
   @Watch('properties.ProportionalThumb')
   thumbValidate () {
-    debugger
     if (this.properties.ProportionalThumb) {
       if (this.properties.Max! > this.properties.LargeChange! && this.properties.LargeChange! > 0) {
         const z = this.checkOtherOrientations() ? this.properties.Height! - 40 : this.properties.Width! - 40
@@ -100,7 +103,6 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
     } else {
       this.thumbHeight = '25px'
     }
-    console.log('this.thumbHeight', this.thumbHeight)
   }
   @Watch('isEditMode')
   editModeValidate () {
@@ -218,14 +220,14 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
       border: !controlProp.Enabled && this.isRunMode ? '1px solid gray' : ''
     }
   }
-  @Watch('properties.Max')
+    @Watch('properties.Max')
   maxValidate () {
     this.thumbValidate()
   }
   @Watch('properties.Min')
-  minValidate () {
-    this.thumbValidate()
-  }
+    minValidate () {
+      this.thumbValidate()
+    }
   @Watch('properties.LargeChange')
   largeChangeValidate () {
     this.thumbValidate()
