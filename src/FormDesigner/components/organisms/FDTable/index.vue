@@ -707,7 +707,12 @@ export default class FDTable extends Vue {
         }
       } else if (propertyName === 'TabFixedHeight' || propertyName === 'TabFixedWidth') {
         if (checkPropertyValue(propertyName, value)) {
-          this.emitUpdateProperty(propertyName, value)
+          if (value >= 4) {
+            this.emitUpdateProperty(propertyName, value)
+          } else {
+            this.updateInputBoxValueToPreviousValue(e, propertyName)
+            this.emitUpdateProperty(propertyName, 0)
+          }
         } else {
           this.updateInputBoxValueToPreviousValue(e, propertyName)
           this.setInvalidErrorMessage(propertyName, 5, { from: 0, to: 7200 })
