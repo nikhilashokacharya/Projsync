@@ -256,10 +256,17 @@ export default class FDOptionButton extends Mixins(FdControlVue) {
       }
       this.$nextTick(() => {
         const { width, height } = this.getWidthHeight()
-        this.updateDataModel({
-          propertyName: 'Height',
-          value: height + 5
-        })
+        if (this.properties.Caption === '') {
+          this.updateDataModel({
+            propertyName: 'Height',
+            value: this.properties.Font!.FontSize! + 5
+          })
+        } else {
+          this.updateDataModel({
+            propertyName: 'Height',
+            value: height + 5
+          })
+        }
         this.updateDataModel({
           propertyName: 'Width',
           value: width

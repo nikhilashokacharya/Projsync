@@ -269,14 +269,25 @@ export default class FDLabel extends Mixins(FdControlVue) {
         }
         this.$nextTick(() => {
           const { width, height } = this.getWidthHeight()
-          this.updateDataModel({
-            propertyName: 'Height',
-            value: height + 5
-          })
-          this.updateDataModel({
-            propertyName: 'Width',
-            value: width
-          })
+          if (this.properties.Caption === '') {
+            this.updateDataModel({
+              propertyName: 'Height',
+              value: 20
+            })
+            this.updateDataModel({
+              propertyName: 'Width',
+              value: 20
+            })
+          } else {
+            this.updateDataModel({
+              propertyName: 'Height',
+              value: height + 5
+            })
+            this.updateDataModel({
+              propertyName: 'Width',
+              value: width
+            })
+          }
         })
       }
     } else {
