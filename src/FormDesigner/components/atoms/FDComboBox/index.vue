@@ -202,18 +202,18 @@
                   :style="emptyColHeads"
                 >
                 <div v-if="properties.ListStyle === 1" :style="{display:'inline-block', width:'20px'}">
-                  <span class="bar" :style="{float:'right'}">|</span>
+                  <span class="bar" :style="{float:'right', color: properties.ForeColor}">|</span>
                 </div>
                 <div v-for="(a, i) in properties.ColumnCount" :key="i" :style="{display:'inline-block', width:'100px'}">
-                  <span v-if="a>1" class="bar" :key="i">|</span>
+                  <span v-if="a>1" class="bar" :key="i" :style="{color: properties.ForeColor}">|</span>
                 </div>
                 </div>
                 <div v-else-if="properties.ColumnCount === -1 && properties.RowSource === ''">
                 <div v-for="i in 10" :key="i" :style="{display:'inline-block', width:'100px'}">
-                  <span v-if="i < 10" class="bar" :style="{ float: 'right'}" :key="i">|</span>
+                  <span v-if="i < 10" class="bar" :style="{ float: 'right', color: properties.ForeColor}" :key="i">|</span>
                 </div>
                 </div>
-                <hr v-if="properties.ColumnHeads" class="hrStyle"/>
+                <hr v-if="properties.ColumnHeads" class="hrStyle" :style="hrStyleObj"/>
               </div>
             </div>
             <div v-else></div>
@@ -313,6 +313,12 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   controlZIndex: number = -1;
   newColumnWidthsValue: string = '';
 
+  get hrStyleObj () {
+    const controlProp = this.properties
+    return {
+      borderTop: '1px solid' + controlProp.ForeColor
+    }
+  }
   mouseOverEvent (e: MouseEvent) {
     if (this.properties.Enabled) {
       const eTarget = e.target as HTMLDivElement
@@ -351,6 +357,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
       return {
         textAlign: controlProp.TextAlign === 0 ? 'left' : controlProp.TextAlign === 2 ? 'right' : 'center',
         borderRight: index >= this.extraDatas.ColumnHeadsValues!.length - 1 ? '' : (index < controlProp.ColumnCount! - 1) ? '1px solid' : controlProp.ColumnCount === -1 ? (index < this.extraDatas.RowSourceData![0].length - 1) ? '1px solid' : '' : '',
+        borderRightColor: controlProp.ForeColor,
         overflow: 'hidden'
       }
     } else {
