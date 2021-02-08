@@ -14,13 +14,14 @@
       @click="spinButtonClick"
     >
       <div
-        @click="
+        @mousedown="
           !getDisableValue
             ? checkOtherOrientations()
               ? increaseTheValue((isClicked = true))
               : decreaseTheValue((isClicked = true))
             : ''
         "
+        @mouseup="setIsSpinButtonScrollBarMouseDown"
       >
         <button
           class="button-element-top"
@@ -57,13 +58,14 @@
         </button>
       </div>
       <div
-        @click="
+        @mousedown="
           !getDisableValue
             ? checkOtherOrientations()
               ? decreaseTheValue((isClicked = true))
               : increaseTheValue((isClicked = true))
             : ''
         "
+        @mouseup="setIsSpinButtonScrollBarMouseDown"
       >
         <button
           class="button-element-bottom"
@@ -131,8 +133,10 @@ export default class FDSpinButton extends Mixins(FdControlVue) {
    * @function getDisableValue
    */
   get getDisableValue () {
-    if (this.isRunMode || this.isEditMode) {
+    if (this.isRunMode) {
       return this.properties.Enabled === false
+    } else if (this.isActivated || this.isEditMode) {
+      return false
     } else {
       return true
     }

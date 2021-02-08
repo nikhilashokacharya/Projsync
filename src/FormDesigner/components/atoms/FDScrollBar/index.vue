@@ -123,7 +123,7 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
   get getDisableValue () {
     if (this.isRunMode) {
       return this.properties.Enabled === false
-    } else if (this.isEditMode) {
+    } else if (this.isActivated || this.isEditMode) {
       return false
     } else {
       return true
