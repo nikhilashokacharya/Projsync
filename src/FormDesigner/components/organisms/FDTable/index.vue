@@ -325,21 +325,21 @@ export default class FDTable extends Vue {
     let validPropertyValue: boolean = false
     initialColWidths.forEach(element => {
       for (let index = 0; index < element.length; index++) {
-        if (element.includes('in')) {
+        if (element.toLowerCase().includes('in')) {
           if ((element.charCodeAt(index) > 47 && element.charCodeAt(index) < 58) || (element.charCodeAt(index) === 73 || element.charCodeAt(index) === 105 || element.charCodeAt(index) === 32) || (element.charCodeAt(index) === 78 || element.charCodeAt(index) === 110 || element.charCodeAt(index) === 32)) {
             validPropertyValue = true
           } else {
             validPropertyValue = false
             break
           }
-        } else if (element.includes('cm')) {
+        } else if (element.toLowerCase().includes('cm')) {
           if ((element.charCodeAt(index) > 47 && element.charCodeAt(index) < 58) || (element.charCodeAt(index) === 67 || element.charCodeAt(index) === 99 || element.charCodeAt(index) === 32) || (element.charCodeAt(index) === 77 || element.charCodeAt(index) === 109 || element.charCodeAt(index) === 32)) {
             validPropertyValue = true
           } else {
             validPropertyValue = false
             break
           }
-        } else if (element.includes('pt')) {
+        } else if (element.toLowerCase().includes('pt')) {
           if ((element.charCodeAt(index) > 47 && element.charCodeAt(index) < 58) || (element.charCodeAt(index) === 80 || element.charCodeAt(index) === 112 || element.charCodeAt(index) === 32) || (element.charCodeAt(index) === 84 || element.charCodeAt(index) === 116 || element.charCodeAt(index) === 32)) {
             validPropertyValue = true
           } else {
@@ -362,9 +362,9 @@ export default class FDTable extends Vue {
       let newColumnWidthsValue = ''
       a.forEach(element => {
         if (!isNaN(parseInt(element))) {
-          if (element.includes('in')) {
+          if (element.toLowerCase().includes('in')) {
             pointValue.push(parseInt(element) * 72)
-          } else if (element.includes('cm')) {
+          } else if (element.toLowerCase().includes('cm')) {
             pointValue.push(parseInt(element) * 28.35)
           } else {
             pointValue.push(parseInt(element))
@@ -394,21 +394,21 @@ export default class FDTable extends Vue {
     let validPropertyValue: boolean = false
     const element = initialListWidth
     for (let index = 0; index < initialListWidth.length; index++) {
-      if (element.includes('in') && (element.endsWith('in'))) {
+      if (element.toLowerCase().includes('in') && (element.toLowerCase().endsWith('in'))) {
         if ((element.charCodeAt(index) > 47 && element.charCodeAt(index) < 58) || (element.charCodeAt(index) === 73 || element.charCodeAt(index) === 105 || element.charCodeAt(index) === 32) || (element.charCodeAt(index) === 78 || element.charCodeAt(index) === 110 || element.charCodeAt(index) === 32)) {
           validPropertyValue = true
         } else {
           validPropertyValue = false
           break
         }
-      } else if (element.includes('cm') && (element.endsWith('cm'))) {
+      } else if (element.toLowerCase().includes('cm') && (element.toLowerCase().endsWith('cm'))) {
         if ((element.charCodeAt(index) > 47 && element.charCodeAt(index) < 58) || (element.charCodeAt(index) === 67 || element.charCodeAt(index) === 99 || element.charCodeAt(index) === 32) || (element.charCodeAt(index) === 77 || element.charCodeAt(index) === 109 || element.charCodeAt(index) === 32)) {
           validPropertyValue = true
         } else {
           validPropertyValue = false
           break
         }
-      } else if (element.includes('pt') && (element.endsWith('pt'))) {
+      } else if (element.toLowerCase().includes('pt') && (element.toLowerCase().endsWith('pt'))) {
         if ((element.charCodeAt(index) > 47 && element.charCodeAt(index) < 58) || (element.charCodeAt(index) === 80 || element.charCodeAt(index) === 112 || element.charCodeAt(index) === 32) || (element.charCodeAt(index) === 84 || element.charCodeAt(index) === 116 || element.charCodeAt(index) === 32)) {
           validPropertyValue = true
         } else {
@@ -430,9 +430,9 @@ export default class FDTable extends Vue {
       let newColumnWidthsValue = ''
       const element = a
       if (!isNaN(parseInt(element))) {
-        if (element.includes('in')) {
+        if (element.toLowerCase().includes('in')) {
           pointValue.push(parseInt(element) * 72)
-        } else if (element.includes('cm')) {
+        } else if (element.toLowerCase().includes('cm')) {
           pointValue.push(parseInt(element) * 28.35)
         } else {
           pointValue.push(parseInt(element))
