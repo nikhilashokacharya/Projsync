@@ -224,6 +224,7 @@
               <div
                 :tabindex="index"
                 class="tr"
+                @mouseover="mouseOverEvent"
                 :disabled="!properties.Enabled"
                 v-for="(item, index) of tempArray"
                 :key="index"
@@ -249,7 +250,7 @@
                       properties.ColumnCount === -1)
                   "
                 >
-                  <input name="radio" type="radio" class="inputClass" />
+                  <input name="radio" type="radio" class="inputClass" :disabled="!properties.Enabled"/>
                 </div>
                 <div
                   class="column-item"
@@ -311,6 +312,35 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   headWidth: string = '100%';
   controlZIndex: number = -1;
   newColumnWidthsValue: string = '';
+
+  mouseOverEvent (e: MouseEvent) {
+    if (this.properties.Enabled) {
+      const eTarget = e.target as HTMLDivElement
+      for (let i = 0; i < eTarget.parentElement!.parentElement!.children.length; i++) {
+        if (eTarget.parentElement!.className === 'tr') {
+          const a = eTarget.parentElement!.parentElement!.children[i] as HTMLDivElement
+          a.style.backgroundColor = ''
+        }
+      }
+      for (let i = 0; i < eTarget.parentElement!.parentElement!.parentElement!.children.length; i++) {
+        if (eTarget.parentElement!.parentElement!.className === 'tr') {
+          const a = eTarget.parentElement!.parentElement!.parentElement!.children[i] as HTMLDivElement
+          a.style.backgroundColor = ''
+        }
+      }
+      if (eTarget.parentElement!.children[0].className === 'tdClassIn') {
+        const input = eTarget.parentElement!.children[0].children[0] as HTMLInputElement
+        input.checked = true
+        if (eTarget.parentElement!.className === 'tr') {
+        eTarget.parentElement!.style.backgroundColor = 'rgb(59, 122, 231)'
+        }
+      } else if (eTarget.className === 'inputClass') {
+        const anotherInput = eTarget as HTMLInputElement
+        anotherInput.checked = true
+      }
+    }
+  }
+
   makeOpen () {
     this.open = true
   }
@@ -1624,20 +1654,6 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   margin-inline-start: 0px;
   margin-inline-end: 0px;
   padding-inline-start: 0px;
-}
-.li {
-  margin: 1px;
-  text-align: left;
-  font-size: 14px;
-  height: 16px;
-  border: 0.5px solid white;
-  cursor: pointer;
-}
-.li:hover {
-  margin: 1px;
-  border-color: rgb(52, 52, 255);
-  border-radius: 2px;
-  background-color: rgb(59, 122, 231);
 }
 .fa {
   margin-left: 4px;
