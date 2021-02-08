@@ -719,7 +719,7 @@ export default class FDListBox extends Mixins(FdControlVue) {
                   this.updateDataModel({ propertyName: 'Text', value: text })
                 } else if (this.properties.TextColumn === 0) {
                   this.updateDataModel({ propertyName: 'Text', value: i })
-                } else if (this.properties.TextColumn! > 0 && this.properties.TextColumn! < this.extraDatas.RowSourceData![0].length) {
+                } else if (this.properties.TextColumn! > 0 && this.properties.TextColumn! <= this.extraDatas.RowSourceData![0].length) {
                   const text = this.extraDatas.RowSourceData![i][this.properties.TextColumn! - 1]
                   this.updateDataModel({ propertyName: 'Text', value: text })
                 }
@@ -749,7 +749,7 @@ export default class FDListBox extends Mixins(FdControlVue) {
           this.updateDataModel({ propertyName: 'Text', value: text })
         } else if (this.properties.TextColumn === 0) {
           this.updateDataModel({ propertyName: 'Text', value: i })
-        } else if (this.properties.TextColumn! > 0 && this.properties.TextColumn! < this.extraDatas.RowSourceData![0].length) {
+        } else if (this.properties.TextColumn! > 0 && this.properties.TextColumn! <= this.extraDatas.RowSourceData![0].length) {
           const text = this.extraDatas.RowSourceData![i][this.properties.TextColumn! - 1]
           this.updateDataModel({ propertyName: 'Text', value: text })
         }
