@@ -562,7 +562,7 @@ export default class FDTabStrip extends FdControlVue {
               ? '-' + (this.topValue - 30) + 'px'
               : controlProp.TabFixedHeight! > 0
                 ? '0px'
-                : '-' + (this.topValue - 30) + 'px'
+                : '-6px'
             : '0px',
       height:
         controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1
