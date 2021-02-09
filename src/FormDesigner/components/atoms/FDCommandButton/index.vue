@@ -176,7 +176,7 @@ export default class FDCommandButton extends Mixins(FdControlVue) {
       whiteSpace: controlProp.WordWrap ? 'pre-wrap' : 'pre',
       wordBreak: controlProp.WordWrap ? 'break-all' : 'normal',
       paddingLeft: controlProp.AutoSize ? '0px' : '0px',
-      paddingRight: controlProp.WordWrap ? '0px' : '6px',
+      paddingRight: controlProp.WordWrap ? '0px' : '0px',
       alignItems: aignItems
     }
   }
