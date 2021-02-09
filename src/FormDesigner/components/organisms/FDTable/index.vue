@@ -693,7 +693,13 @@ export default class FDTable extends Vue {
           }
         }
       } else if (propertyName === 'Min' || propertyName === 'Max' || propertyName === 'SmallChange') {
-        if (this.isDecimalNumber(propertyValue)) {
+        if (isNaN(value)) {
+          this.updateProperty({ propertyName: propertyName, value: 0 })
+          if (e.target instanceof HTMLInputElement && (this.userformData[this.userFormId][this.getSelectedControlsDatas[0]].properties.Min === 0 || this.userformData[this.userFormId][this.getSelectedControlsDatas[0]].properties.Max === 0)) {
+            e.target.value = '0'
+          }
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
+        } else if (this.isDecimalNumber(propertyValue)) {
           this.updateInputBoxValueToPreviousValue(e, propertyName)
         } else if (checkPropertyValue(propertyName, value)) {
           if (propertyName === 'Min' || propertyName === 'Max') {
