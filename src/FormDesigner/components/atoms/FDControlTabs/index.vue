@@ -373,7 +373,6 @@ export default class FDControlTabs extends Vue {
   border-right: 2px solid gray;
   border-bottom: none;
   border-radius: 3px;
-  z-index: 2;
   overflow: hidden;
 }
 .active-item-tab-left {
