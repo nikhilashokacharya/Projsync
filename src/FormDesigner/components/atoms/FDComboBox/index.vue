@@ -1354,6 +1354,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   mounted () {
     this.controlZIndex = this.data.extraDatas!.zIndex!
     this.$el.focus()
+    this.updateColumns()
     if (this.properties.RowSource !== '') {
       const initialRowSourceData = this.extraDatas.RowSourceData!
       if (initialRowSourceData) {
@@ -1622,6 +1623,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   display: none;
 }
 .combobox {
+  white-space: normal;
   display: grid;
   grid-template-columns: auto 20px;
 }
@@ -1745,6 +1747,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   z-index: 1;
 }
 .column-item {
+  white-space: pre;
   display: flex;
 }
 .colHeadsClass {

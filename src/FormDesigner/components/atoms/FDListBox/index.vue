@@ -1010,6 +1010,7 @@ export default class FDListBox extends Mixins(FdControlVue) {
   mounted () {
     this.$el.focus()
     var event = new MouseEvent('mousedown.stop')
+    this.updateColumns()
     if (this.properties.RowSource !== '') {
       const initialRowSourceData = this.extraDatas.RowSourceData!
       this.updateDataModel({ propertyName: 'ControlSource', value: '' })
@@ -1135,6 +1136,7 @@ export default class FDListBox extends Mixins(FdControlVue) {
   border: 1px solid gray;
   overflow: auto;
   box-sizing: border-box;
+  white-space: normal;
 }
 .list-outer {
   border: 0.1px solid lightgray;
@@ -1243,5 +1245,8 @@ export default class FDListBox extends Mixins(FdControlVue) {
 }
 .bar {
   font-size: 13px;
+}
+.column-item {
+  white-space: pre;
 }
 </style>
