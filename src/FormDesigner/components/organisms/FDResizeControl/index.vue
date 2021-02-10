@@ -16,6 +16,7 @@
           : !isRunMode && dragGroupControl($event)
       "
       @contextmenu.stop="displayContextMenu"
+      @click.self="containerBorderClick"
     >
       <ResizeHandler
         v-if="!isRunMode"
@@ -394,13 +395,10 @@ export default class ResizeControl extends FdSelectVue {
       const userData = this.userformData[this.userFormId]
       let selectedGroup = [this.controlId]
       const currContainer = this.getContainerList(this.controlId)[0]
-      let selected: string[] = []
-      for (const control of this.getSelectedControlsDatas!) {
-        if (!userData[currContainer].controls.includes(control)) {
-          const getParent = this.getContainerList(control)[0]
-          selected.push(getParent)
-        } else {
-          selected.push(control)
+      let selected: string[] = this.selectedControls[this.userFormId].selected
+      for (let i = 0; i < selected.length; i++) {
+        if (!selected[i].startsWith('group') && userData[selected[i]].type === 'Page') {
+          selected.splice(i, 1, this.getContainerList(selected[i])[0])
         }
       }
       if (selected[0] === this.containerId) {
@@ -408,7 +406,7 @@ export default class ResizeControl extends FdSelectVue {
       } else {
         selected = [...selected]
       }
-      let combineArray = [...new Set(selected.concat(selectedGroup))]
+      let combineArray = selected.filter(x => !selectedGroup.includes(x)).concat(selectedGroup.filter(x => !selected.includes(x)))
       if (combineArray.length > 0) {
         this.selectControl({
           userFormId: this.userFormId,
@@ -522,7 +520,25 @@ export default class ResizeControl extends FdSelectVue {
     }
   }
   displayContextMenu (event: MouseEvent) {
+    if (this.isEditMode && (this.propControlData.type === 'MultiPage' || this.propControlData.type === 'Frame')) {
+      this.selectControl({
+        userFormId: this.userFormId,
+        select: { container: this.getContainerList(this.controlId), selected: [this.controlId] }
+      })
+      this.isEditMode = false
+    }
     EventBus.$emit('contextMenuDisplay', event, this.containerId, this.controlId, 'control', this.isEditMode)
+  }
+  containerBorderClick () {
+    if (this.isEditMode) {
+      if (this.propControlData.type === 'MultiPage' || this.propControlData.type === 'Frame') {
+        this.selectControl({
+          userFormId: this.userFormId,
+          select: { container: this.getContainerList(this.controlId), selected: [this.controlId] }
+        })
+        this.isEditMode = false
+      }
+    }
   }
 }
 </script>

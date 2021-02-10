@@ -438,8 +438,13 @@ export default class FdControlVue extends Vue {
       this.increaseTheValueAfterDelay()
     }
     if (this.getSpinButtonScrollBarClickCount === 1 && this.isSpinButtonScrollBarMouseDown) {
-      this.spinButtonDelayInterval = setInterval(() => {
+      setTimeout(() => {
         this.increaseTheValueAfterDelay()
+        if (this.getSpinButtonScrollBarClickCount === 2 && this.isSpinButtonScrollBarMouseDown) {
+          this.spinButtonDelayInterval = setInterval(() => {
+            this.increaseTheValueAfterDelay()
+          }, this.properties.Delay!)
+        }
       }, this.properties.Delay! * 5)
     }
   }
@@ -564,8 +569,13 @@ export default class FdControlVue extends Vue {
       this.decreaseTheValueAfterDelay()
     }
     if (this.getSpinButtonScrollBarClickCount === 1 && this.isSpinButtonScrollBarMouseDown) {
-      this.spinButtonDelayInterval = setInterval(() => {
+      setTimeout(() => {
         this.decreaseTheValueAfterDelay()
+        if (this.getSpinButtonScrollBarClickCount === 2 && this.isSpinButtonScrollBarMouseDown) {
+          this.spinButtonDelayInterval = setInterval(() => {
+            this.decreaseTheValueAfterDelay()
+          }, this.properties.Delay!)
+        }
       }, this.properties.Delay! * 5)
     }
   }

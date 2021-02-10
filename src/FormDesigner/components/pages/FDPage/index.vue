@@ -1,5 +1,5 @@
 <template>
-  <div id="app" tabindex="0" @focus="updatefocus">
+  <div id="app" tabindex="0" @focus="updatefocus" @contextmenu.stop="preventcontextMenu">
     <div
       id="right-click-menu"
       :style="contextMenuStyle"
@@ -335,15 +335,11 @@ export default class FDPage extends Vue {
       }
     }
     const controlType = this.userformData[this.userFormId][controlID].type
-    const containerType = this.userformData[this.userFormId][this.containerId].type
     if (type === 'container' && !groupId.startsWith('group') && selected.length <= 1) {
       this.contextMenuType = true
     } else {
       this.contextMenuType = false
     }
-    const targetElement = (e.target! as HTMLDivElement).style
-    const controlLeft: number | undefined = this.userformData[this.userFormId][controlID].properties.Left!
-    const controlTop: number | undefined = this.userformData[this.userFormId][controlID].properties.Top!
     this.top = e.y
     this.left = e.x
     this.contextMenuValue = this.contextMenuType ? userformContextMenu : controlContextMenu
@@ -548,6 +544,9 @@ export default class FDPage extends Vue {
       EventBus.$emit('focusUserForm')
     }
   }
+  preventcontextMenu (event: MouseEvent) {
+    event.preventDefault()
+  }
 }
 </script>
 
@@ -697,9 +696,6 @@ export default class FDPage extends Vue {
 }
 #right-click-menu {
   background: #fafafa;
-  border: 1px solid #bdbdbd;
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2),
-    0 1px 5px 0 rgba(0, 0, 0, 0.12);
   list-style: none;
   margin: 0;
   padding: 0;

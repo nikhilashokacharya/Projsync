@@ -178,6 +178,7 @@ export default class ResizeUserForm extends FdSelectVue {
                 }
               })
             } else {
+              selectedTab = (userData[container].properties.TabIndex! + 1) >= containerControls.length ? 0 : userData[container].properties.TabIndex! + 1
               const nextControlId = containerControls.findIndex((val) => {
                 const type = userData[val].type
                 if (type === 'FDImage') {
@@ -186,13 +187,15 @@ export default class ResizeUserForm extends FdSelectVue {
                   return userData[val].properties!.TabIndex! === selectedTab
                 }
               })
-              this.selectControl({
-                userFormId: this.userFormId,
-                select: {
-                  container: this.getContainerList(containerControls[nextControlId]),
-                  selected: [containerControls[nextControlId]]
-                }
-              })
+              if (nextControlId !== -1) {
+                this.selectControl({
+                  userFormId: this.userFormId,
+                  select: {
+                    container: this.getContainerList(containerControls[nextControlId]),
+                    selected: [containerControls[nextControlId]]
+                  }
+                })
+              }
             }
           } else if (userData[container].type === 'Page') {
             this.isRepeat = true

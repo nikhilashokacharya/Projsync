@@ -173,6 +173,8 @@ export default class GroupControl extends FDCommonMethod {
     // if (this.getIsMoveTarget) {
     this.positions.movementX = 0
     this.positions.movementY = 0
+    this.positions.clientX = 0
+    this.positions.clientY = 0
     this.isMove = false
     // }
   }
@@ -191,6 +193,7 @@ export default class GroupControl extends FDCommonMethod {
     return isGroupPrsent === -1
   }
   startGroupMoveControl (event: MouseEvent) {
+    // EventBus.$emit('groupDrag', 'groupdrag')
     if (this.getIsMoveTarget) {
       this.positions.clientX = event.clientX
       this.positions.clientY = event.clientY
@@ -662,16 +665,17 @@ export default class GroupControl extends FDCommonMethod {
   }
 
   closeDragElement (event:MouseEvent, handler: string): void {
-    this.elementDrag(event)
-    if (this.value !== 'same') {
+    if (handler !== 'drag') {
+      this.elementDrag(event)
+    }
+    if (this.value === 'same') {
+      this.elementDrag(event)
       this.value = 'different'
     }
     EventBus.$emit('updateIsControlMove', this.isMove)
     EventBus.$emit('groupDrag', 'NotDrag')
     EventBus.$emit('endMoveControl', 'groupEndMove')
     EventBus.$emit('endGroupMoveControl')
-    document.onmouseup = null
-    document.onmousemove = null
     if (handler === 'drag') {
       const selected = this.selectedControls[this.userFormId].selected
       for (const grpname in selected) {
@@ -686,6 +690,8 @@ export default class GroupControl extends FDCommonMethod {
         this.groupStyle(groupName)
       }
     }
+    document.onmouseup = null
+    document.onmousemove = null
   }
   getGroupEditStyle (groupName: string) {
     const selected = this.selectedControls[this.userFormId].selected

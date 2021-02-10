@@ -16,7 +16,7 @@
         :title="properties.ControlTipText"
         v-if="controls.length > 0"
       >
-        <div class="move" ref="scrolling" :style="styleMoveObj">
+        <div class="move" ref="scrolling" :style="styleMoveObj" @mouseup="mouseUpOnPage">
           <div
             ref="controlTabsRef"
             class="page"
@@ -1039,22 +1039,13 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
   }
 
   multiPageMouseDown (e: MouseEvent) {
-    EventBus.$emit('isEditMode', this.isEditMode)
-    this.selectedItem(e)
-    if (this.selMultipleCtrl === false && this.activateCtrl === false) {
-      const selContainer = this.selectedControls[this.userFormId].container[0]
-      const selected = this.selectedControls[this.userFormId].selected
-      if (this.controls.length > 0 && selected.length === 1) {
-        this.selectControl({
-          userFormId: this.userFormId,
-          select: {
-            container: this.getContainerList(this.selectedPageID),
-            selected: [this.selectedPageID]
-          }
-        })
-      }
-      if (selContainer === this.controlId) {
-        if (this.selMultipleCtrl === false && this.activateCtrl === false) {
+    if (e.which !== 3) {
+      EventBus.$emit('isEditMode', this.isEditMode)
+      this.selectedItem(e)
+      if (this.selMultipleCtrl === false && this.activateCtrl === false) {
+        const selContainer = this.selectedControls[this.userFormId].container[0]
+        const selected = this.selectedControls[this.userFormId].selected
+        if (this.controls.length > 0 && selected.length === 1) {
           this.selectControl({
             userFormId: this.userFormId,
             select: {
@@ -1062,6 +1053,17 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
               selected: [this.selectedPageID]
             }
           })
+        }
+        if (selContainer === this.controlId) {
+          if (this.selMultipleCtrl === false && this.activateCtrl === false) {
+            this.selectControl({
+              userFormId: this.userFormId,
+              select: {
+                container: this.getContainerList(this.selectedPageID),
+                selected: [this.selectedPageID]
+              }
+            })
+          }
         }
       }
     }
@@ -1078,7 +1080,11 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
     if (selected.length === 1 && selected[0] === this.controlId && this.controls.length > 0) {
       this.changeSelect(this.controls[0])
     }
-    EventBus.$emit('contextMenuDisplay', event, parentID, controlID, type, mode)
+    if (selected.length > 1) {
+      EventBus.$emit('contextMenuDisplay', event, this.controlId, this.controlId, type, mode)
+    } else {
+      EventBus.$emit('contextMenuDisplay', event, parentID, controlID, type, mode)
+    }
   }
   handleKeyDown (event: KeyboardEvent) {
     EventBus.$emit('handleKeyDown', event, this.selectedPageID)
@@ -1093,7 +1099,16 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
     })
   }
   handleContextMenu (e: MouseEvent) {
-    EventBus.$emit('editModeContextMenu', e, this.controlId, this.data, this.isEditMode, this.updatedValue)
+    e.preventDefault()
+    this.selectedItem(e)
+    const selected = this.selectedControls[this.userFormId].selected
+    if (selected.length === 1 && selected[0] === this.controlId && this.controls.length > 0) {
+      debugger
+      this.changeSelect(this.controls[0])
+      EventBus.$emit('editModeContextMenu', e, this.controlId, this.data, true, this.updatedValue)
+    } else {
+      this.showContextMenu(e, this.selectedPageID, this.selectedPageID, 'container', this.isEditMode)
+    }
   }
   deleteMultiPage (event: KeyboardEvent) {
     if (this.controlId === this.selectedControls[this.userFormId].selected[0]) {
@@ -1251,6 +1266,9 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
     if (this.selectedPageData) {
       return `url(${this.selectedPageData.properties!.Picture!})`
     }
+  }
+  mouseUpOnPage () {
+    EventBus.$emit('mouseUpOnPageTab', true)
   }
 }
 </script>

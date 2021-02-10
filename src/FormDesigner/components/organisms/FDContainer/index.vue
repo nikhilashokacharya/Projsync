@@ -127,6 +127,7 @@ export default class Container extends FDCommonMethod {
   updatedDragHeight: number = 0;
   updatedDragWidth: number = 0;
   isControlMove: boolean = false
+  mouseUpOnPageTab: boolean = false
 
   updateChildHeightWidth () {
     if (this.parentDivRef) {
@@ -244,14 +245,11 @@ export default class Container extends FDCommonMethod {
         this.addChildControls({
           userFormId: this.userFormId,
           containerId: this.containerId,
-          targetControls: selectedSelect
+          targetControls: [control]
         })
+        this.updateTabIndexValue(control)
+        this.updateZIndexValue(control)
       }
-    }
-
-    for (const id of selectedSelect) {
-      this.updateTabIndexValue(id)
-      this.updateZIndexValue(id)
     }
   }
 
@@ -362,7 +360,7 @@ export default class Container extends FDCommonMethod {
           )
         }
         const isPageSelected = !(userData[this.containerId].type === 'Page' && this.getSelectedControlsDatas!.includes(this.getContainerList(this.containerId)[0]))
-        if (mainSelect && !this.getSelectedControlsDatas!.includes(this.containerId) && isPageSelected) {
+        if (mainSelect && !this.getSelectedControlsDatas!.includes(this.containerId) && isPageSelected && !this.mouseUpOnPageTab) {
           count = count + 1
           let frameCondition: boolean = false
           if (this.handler === 'frameDrag') {
@@ -447,6 +445,7 @@ export default class Container extends FDCommonMethod {
         document.onmouseup(event)
       }
     }
+    EventBus.$emit('mouseUpOnPageTab', false)
   }
 
   /**
@@ -573,11 +572,15 @@ export default class Container extends FDCommonMethod {
         this.isControlPasted = true
       }
     })
+    EventBus.$on('mouseUpOnPageTab', (val: boolean) => {
+      this.mouseUpOnPageTab = val
+    })
   }
   destroyed () {
     // EventBus.$off('handleName')
     // EventBus.$off('groupDrag')
     EventBus.$off('afterPaste')
+    // EventBus.$off('mouseUpOnPageTab')
   }
   @Watch('selectedControls', { deep: true })
   updateGroupStyle () {

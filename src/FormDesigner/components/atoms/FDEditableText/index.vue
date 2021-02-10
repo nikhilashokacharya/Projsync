@@ -42,7 +42,7 @@ export default class FDEditableText extends Vue {
     if (e.key === 'Escape') {
       this.$emit('releaseEditMode')
     }
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' || e.key === 'Tab') {
       e.preventDefault()
     }
   }

@@ -46,6 +46,10 @@ export function checkPropertyValue (propertyName: keyof controlProperties, value
     case 'TransitionPeriod':
       result = value >= 0 && value <= 10000
       break
+    case 'ScrollHeight' :
+    case 'ScrollWidth' :
+      result = value >= 0 && value.toString().length < 9
+      break
   }
   return result
 }
