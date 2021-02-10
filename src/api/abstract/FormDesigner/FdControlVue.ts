@@ -318,8 +318,8 @@ export default class FdControlVue extends Vue {
   }
 
   protected increaseTheValueAfterDelay () {
-    this.spinButtonScrollBarClickCount = this.spinButtonScrollBarClickCount + 1
     if (this.isSpinButtonScrollBarMouseDown) {
+      this.spinButtonScrollBarClickCount = this.spinButtonScrollBarClickCount + 1
       let tempVal, tempMax
       if (this.properties.Max! >= 0 && this.properties.Min! >= 0) {
         if (this.properties.Max! < this.properties.Min!) {
@@ -449,8 +449,8 @@ export default class FdControlVue extends Vue {
     }
   }
   protected decreaseTheValueAfterDelay () {
-    this.spinButtonScrollBarClickCount = this.spinButtonScrollBarClickCount + 1
     if (this.isSpinButtonScrollBarMouseDown) {
+      this.spinButtonScrollBarClickCount = this.spinButtonScrollBarClickCount + 1
       let tempVal, tempMin
       if (this.properties.Max! >= 0 && this.properties.Min! >= 0) {
         if (this.properties.Max! < this.properties.Min!) {
