@@ -322,6 +322,8 @@ export default class FDTextBox extends Mixins(FdControlVue) {
     if (this.properties.MultiLine) {
       if (event.ctrlKey) {
         this.handleCtrlEnter(this.textareaRef, '\n')
+        const eTarget = event.target as HTMLTextAreaElement
+        this.updateDataModel({ propertyName: 'Value', value: eTarget.value })
         return true
       } else if (this.properties.EnterKeyBehavior && this.properties.MultiLine) {
         return true
