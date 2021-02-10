@@ -84,14 +84,14 @@ export default class FDImage extends Mixins(FdControlVue) {
     if (controlProp.SpecialEffect !== 0) {
       borderStyles = {
         borderStyle: controlProp.SpecialEffect === 3 || controlProp.SpecialEffect === 4 ? 'solid' : controlProp.SpecialEffect === 1 ? 'outset' : controlProp.SpecialEffect === 2 ? 'inset' : '',
-        borderLeftColor: controlProp.SpecialEffect === 1 ? 'white' : controlProp.SpecialEffect === 3 ? 'gray' : controlProp.SpecialEffect === 4 ? 'gray' : '',
-        borderTopColor: controlProp.SpecialEffect === 1 ? 'white' : controlProp.SpecialEffect === 3 ? 'gray' : controlProp.SpecialEffect === 4 ? 'gray' : '',
-        borderRightColor: controlProp.SpecialEffect === 2 ? 'white' : controlProp.SpecialEffect === 3 ? 'gray' : controlProp.SpecialEffect === 4 ? 'gray' : '',
-        borderBottomColor: controlProp.SpecialEffect === 2 ? 'white' : controlProp.SpecialEffect === 3 ? 'gray' : controlProp.SpecialEffect === 4 ? 'gray' : '',
-        borderLeftWidth: controlProp.SpecialEffect === 1 ? '2px' : controlProp.SpecialEffect === 2 ? '3px' : controlProp.SpecialEffect === 3 ? '2px' : controlProp.SpecialEffect === 4 ? '0.5px' : '',
-        borderTopWidth: controlProp.SpecialEffect === 1 ? '2px' : controlProp.SpecialEffect === 2 ? '3px' : controlProp.SpecialEffect === 3 ? '2px' : controlProp.SpecialEffect === 4 ? '0.5px' : '',
-        borderRightWidth: controlProp.SpecialEffect === 2 ? '2px' : controlProp.SpecialEffect === 1 ? '3px' : controlProp.SpecialEffect === 3 ? '0.5px' : controlProp.SpecialEffect === 4 ? '2px' : '',
-        borderBottomWidth: controlProp.SpecialEffect === 2 ? '2px' : controlProp.SpecialEffect === 1 ? '3px' : controlProp.SpecialEffect === 3 ? '0.5px' : controlProp.SpecialEffect === 4 ? '2px' : ''
+        borderLeftColor: controlProp.SpecialEffect === 1 ? 'white' : controlProp.SpecialEffect === 3 ? 'rgb(169,169,169)' : controlProp.SpecialEffect === 4 ? 'black' : '',
+        borderTopColor: controlProp.SpecialEffect === 1 ? 'white' : controlProp.SpecialEffect === 3 ? 'rgb(169,169,169)' : controlProp.SpecialEffect === 4 ? 'black' : '',
+        borderRightColor: controlProp.SpecialEffect === 2 ? 'white' : controlProp.SpecialEffect === 3 ? 'rgb(169,169,169)' : controlProp.SpecialEffect === 4 ? 'black' : '',
+        borderBottomColor: controlProp.SpecialEffect === 2 ? 'white' : controlProp.SpecialEffect === 3 ? 'rgb(169,169,169)' : controlProp.SpecialEffect === 4 ? 'black' : '',
+        borderLeftWidth: controlProp.SpecialEffect === 1 ? '2px' : controlProp.SpecialEffect === 2 ? '3px' : controlProp.SpecialEffect === 3 ? '1px' : controlProp.SpecialEffect === 4 ? '1px' : '',
+        borderTopWidth: controlProp.SpecialEffect === 1 ? '2px' : controlProp.SpecialEffect === 2 ? '3px' : controlProp.SpecialEffect === 3 ? '1px' : controlProp.SpecialEffect === 4 ? '1px' : '',
+        borderRightWidth: controlProp.SpecialEffect === 2 ? '2px' : controlProp.SpecialEffect === 1 ? '3px' : controlProp.SpecialEffect === 3 ? '1px' : controlProp.SpecialEffect === 4 ? '1px' : '',
+        borderBottomWidth: controlProp.SpecialEffect === 2 ? '2px' : controlProp.SpecialEffect === 1 ? '3px' : controlProp.SpecialEffect === 3 ? '1px' : controlProp.SpecialEffect === 4 ? '1px' : ''
       }
     } else if (controlProp.BorderStyle !== 0) {
       borderStyles = {
