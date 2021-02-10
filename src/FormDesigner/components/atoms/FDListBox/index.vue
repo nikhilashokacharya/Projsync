@@ -1048,7 +1048,9 @@ export default class FDListBox extends Mixins(FdControlVue) {
   @Watch('properties.ListStyle', { deep: true })
   listCheck (newVal: number, oldVal: number) {
     this.updateColumns()
-    this.clearOptionBGColorAndChecked(this.tempListBoxComboBoxEvent)
+    if (this.tempListBoxComboBoxEvent) {
+      this.clearOptionBGColorAndChecked(this.tempListBoxComboBoxEvent)
+    }
   }
 
   @Watch('isEditMode', { deep: true })

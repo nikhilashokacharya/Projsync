@@ -1285,6 +1285,10 @@ clearOptionBGColorAndChecked (e: any) {
         ) {
           const childNode = element.childNodes[childIndex] as HTMLDivElement
           childNode.style.backgroundColor = ''
+          for (let i = 0; i < childNode.children.length; i++) {
+            const a = childNode.children[i] as HTMLDivElement
+            a.style.backgroundColor = ''
+          }
           const ChildChecked = childNode.childNodes[0].childNodes[0] as HTMLInputElement
           if (ChildChecked && this.properties.ListStyle === 1) {
             ChildChecked.checked = false
