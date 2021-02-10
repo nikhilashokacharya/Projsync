@@ -1436,9 +1436,9 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     const controlProp = this.properties
     let gridTemplateColumns = ''
     if (controlProp.Width! > 21) {
-      gridTemplateColumns = `${controlProp.Width! - 20}px` + ' 21px'
+      gridTemplateColumns = `${controlProp.Width! - 20}px` + ' 23px'
     } else {
-      gridTemplateColumns = '0px ' + `${controlProp.Width!}px`
+      gridTemplateColumns = '1px ' + `${controlProp.Width! + 1}px`
     }
     return {
       gridTemplateColumns: gridTemplateColumns,
@@ -1625,7 +1625,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
 .combobox {
   white-space: normal;
   display: grid;
-  grid-template-columns: auto 20px;
+  grid-template-columns: auto 23px;
 }
 .columnHeads {
   height: 19.2px;
