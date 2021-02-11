@@ -101,10 +101,19 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
 
   get controlStyleObj () {
     const controlProp = this.properties
+    const a = ['left', 'right']
+    let leftRightStyle = {}
+    if (controlProp.Alignment === 1) {
+      leftRightStyle = { [a[0]]: '1px' }
+    } else if (controlProp.Alignment === 0) {
+      leftRightStyle = { [a[1]]: '0px' }
+    }
     return {
       order: controlProp.Alignment === 1 ? '0' : '1',
       position: 'sticky',
-      top: `${controlProp.Height! / 2 - 10}px`
+      top: `${controlProp.Height! / 2 - 10}px`,
+      ...leftRightStyle
+      // left: '1px'
     }
   }
   /**
@@ -300,7 +309,7 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
 
       display: display,
       overflow: 'hidden',
-      gridTemplateColumns: controlProp.Alignment === 1 ? '12px auto' : 'auto 12px',
+      gridTemplateColumns: controlProp.Alignment === 1 ? '12px ' + `${controlProp.Width! - 12}px` : `${controlProp.Width! - 12}px` + ' 12px',
       gridTemplateRows: '100%',
       gap: '2px',
       // alignItems: font.FontSize! > 17 ? 'center' : '',
@@ -549,8 +558,10 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
 }
 
 #logo{
+ position: relative;
  display: inline-flex;
  justify-content: center;
+ overflow: hidden;
 }
 #logo-main{
   display: flex;

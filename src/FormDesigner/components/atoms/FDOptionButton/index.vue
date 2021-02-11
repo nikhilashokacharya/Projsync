@@ -101,10 +101,18 @@ export default class FDOptionButton extends Mixins(FdControlVue) {
 
   get controlStyleObj () {
     const controlProp = this.properties
+    const a = ['left', 'right']
+    let leftRightStyle = {}
+    if (controlProp.Alignment === 1) {
+      leftRightStyle = { [a[0]]: '1px' }
+    } else if (controlProp.Alignment === 0) {
+      leftRightStyle = { [a[1]]: '1px' }
+    }
     return {
       order: controlProp.Alignment === 1 ? '0' : '1',
       position: 'sticky',
-      top: `${controlProp.Height! / 2 - 10}px`
+      top: `${controlProp.Height! / 2 - 10}px`,
+      ...leftRightStyle
     }
   }
 
@@ -400,7 +408,7 @@ export default class FDOptionButton extends Mixins(FdControlVue) {
       fontStretch: font.FontStyle !== '' ? this.tempStretch : '',
       display: display,
       overflow: 'hidden',
-      gridTemplateColumns: controlProp.Alignment === 1 ? '12px auto' : 'auto 12px',
+      gridTemplateColumns: controlProp.Alignment === 1 ? '12px ' + `${controlProp.Width! - 12}px` : `${controlProp.Width! - 12}px` + ' 12px',
       gridTemplateRows: '100%',
       gap: '2px',
       // alignItems: font.FontSize! > 17 ? 'center' : '',
@@ -570,8 +578,10 @@ export default class FDOptionButton extends Mixins(FdControlVue) {
   text-decoration-skip-ink: none;
 }
 #logo{
+  position: relative;
  display: inline-flex;
  justify-content: center;
+ overflow: hidden;
 }
 
 </style>
