@@ -916,6 +916,8 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
   multiRowValidate () {
     if (this.properties.MultiRow) {
       this.isScrollVisible = false
+    } else {
+      this.scrollButtonVerify()
     }
     this.updateMultiRowforLeftAndRight()
     if (this.scrolling) {

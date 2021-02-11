@@ -698,6 +698,8 @@ export default class FDTabStrip extends FdControlVue {
   multiRowValidate () {
     if (this.properties.MultiRow) {
       this.isScrollVisible = false
+    } else {
+      this.scrollButtonVerify()
     }
     this.updateMultiRowforLeftAndRight()
     if (this.scrolling) {
