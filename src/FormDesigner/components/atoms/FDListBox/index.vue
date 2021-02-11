@@ -1047,7 +1047,9 @@ export default class FDListBox extends Mixins(FdControlVue) {
    */
   @Watch('properties.ListStyle', { deep: true })
   listCheck (newVal: number, oldVal: number) {
-    this.updateColumns()
+    Vue.nextTick(() => {
+      this.updateColumns()
+    })
     if (this.tempListBoxComboBoxEvent) {
       this.clearOptionBGColorAndChecked(this.tempListBoxComboBoxEvent)
     }
