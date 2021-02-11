@@ -17,6 +17,7 @@
       tabindex="1"
       @click="toFocus"
     >
+    <div class="innerComboBox" :style="innerComboBoxStyleObj">
       <div
         :class="properties.SelectionMargin ? 'selectionDiv' : ''"
         :style="selectionStyle"
@@ -160,6 +161,7 @@
           </svg>
         </div>
       </div>
+    </div>
       <div class="items" :class="{ selectHide: !open }" :style="itemsStyleObj" ref="itemsRef">
         <div
           class="listStyle"
@@ -313,6 +315,12 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   controlZIndex: number = -1;
   newColumnWidthsValue: string = '';
 
+  get innerComboBoxStyleObj () {
+    return {
+      display: 'grid',
+      gridTemplateColumns: 'auto auto'
+    }
+  }
   get hrStyleObj () {
     const controlProp = this.properties
     return {
@@ -793,35 +801,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     const controlProp = this.properties
     return {
       width: controlProp.Width! > 21 ? 'fit-content' : '0px',
-      gridTemplateColumns: controlProp.Width! > 21 ? '5px auto' : '0px 0px',
-      borderLeft:
-        controlProp.BorderStyle === 1
-          ? '1px solid ' + controlProp.BorderColor
-          : controlProp.SpecialEffect === 2
-            ? '2px solid gray'
-            : controlProp.SpecialEffect === 3
-              ? '1.5px solid gray'
-              : controlProp.SpecialEffect === 4
-                ? '0.5px solid gray'
-                : '',
-      borderTop:
-        controlProp.BorderStyle === 1
-          ? '0.25px solid ' + controlProp.BorderColor
-          : controlProp.SpecialEffect === 2
-            ? '2px solid gray'
-            : controlProp.SpecialEffect === 3
-              ? '1.5px solid gray'
-              : controlProp.SpecialEffect === 4
-                ? '0.5px solid gray'
-                : '',
-      borderBottom: controlProp.BorderStyle === 1
-        ? '0.25px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 1
-          ? '2px solid gray'
-          : controlProp.SpecialEffect === 4
-            ? '1.5px solid gray'
-            : controlProp.SpecialEffect === 3
-              ? '0.5px solid gray'
-              : ''
+      gridTemplateColumns: controlProp.Width! > 21 ? '5px auto' : '0px 0px'
 
     }
   }
@@ -1436,16 +1416,55 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     const controlProp = this.properties
     let gridTemplateColumns = ''
     if (controlProp.Width! > 21) {
-      gridTemplateColumns = `${controlProp.Width! - 20}px` + ' 23px'
+      gridTemplateColumns = `${controlProp.Width! - 20}px` + ' 21px'
     } else {
       gridTemplateColumns = '1px ' + `${controlProp.Width! + 1}px`
     }
     return {
       gridTemplateColumns: gridTemplateColumns,
       display: 'grid',
-      gridTemplateRows: `${controlProp.Height! + 1}px`,
+      gridTemplateRows: `${controlProp.Height! - 1}px`,
       outline: 'none',
-      overflow: this.open ? '' : 'hidden'
+      overflow: this.open ? '' : 'hidden',
+      borderLeft:
+      controlProp.BorderStyle === 1
+        ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 1
+          ? '1px solid white'
+          : controlProp.SpecialEffect === 2
+            ? '2px solid gray'
+            : controlProp.SpecialEffect === 3
+              ? '1.5px solid gray'
+              : controlProp.SpecialEffect === 4
+                ? '0.5px solid gray'
+                : '',
+      borderTop: controlProp.BorderStyle === 1
+        ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 1
+          ? '1px solid white'
+          : controlProp.SpecialEffect === 2
+            ? '2px solid gray'
+            : controlProp.SpecialEffect === 3
+              ? '1.5px solid gray'
+              : controlProp.SpecialEffect === 4
+                ? '0.5px solid gray'
+                : '1px solid white',
+      borderBottom: controlProp.BorderStyle === 1
+        ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 1
+          ? '2px solid gray'
+          : controlProp.SpecialEffect === 4
+            ? '1.5px solid gray'
+            : controlProp.SpecialEffect === 3
+              ? '0.5px solid gray'
+              : '',
+      borderRight:
+        controlProp.BorderStyle === 1
+          ? '1px solid' + controlProp.BorderColor
+          : controlProp.SpecialEffect === 1
+            ? '2px solid gray'
+            : controlProp.SpecialEffect === 4
+              ? '1.5px solid gray'
+              : controlProp.SpecialEffect === 3
+                ? '0.5px solid gray'
+                : ''
     }
   }
 
@@ -1469,7 +1488,8 @@ export default class FDComboBox extends Mixins(FdControlVue) {
             ? this.getMouseCursorData
             : 'default'
           : 'default',
-      position: 'relative',
+      position: 'absolute',
+      top: `${controlProp.Height! + 1}px`,
       zIndex: '999'
     }
   }
@@ -1506,38 +1526,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
           : 'default',
       display: 'flex',
       justifyContent: 'center',
-      alignItems: controlProp.DropButtonStyle === 1 ? 'center' : 'flex-end',
-      borderTop:
-        controlProp.BorderStyle === 1
-          ? '0.25px solid ' + controlProp.BorderColor
-          : controlProp.SpecialEffect === 2
-            ? '2px solid gray'
-            : controlProp.SpecialEffect === 3
-              ? '1.5px solid gray'
-              : controlProp.SpecialEffect === 4
-                ? '0.5px solid gray'
-                : '0px',
-      borderColor: controlProp.BorderStyle === 1 ? controlProp.BorderColor : '',
-      borderRight:
-        controlProp.BorderStyle === 1
-          ? '1px solid' + controlProp.BorderColor
-          : controlProp.SpecialEffect === 1
-            ? '2px solid gray'
-            : controlProp.SpecialEffect === 4
-              ? '1.5px solid gray'
-              : controlProp.SpecialEffect === 3
-                ? '0.5px solid gray'
-                : '',
-      borderBottom:
-        controlProp.BorderStyle === 1
-          ? '1px solid' + controlProp.BorderColor
-          : controlProp.SpecialEffect === 1
-            ? '2px solid gray'
-            : controlProp.SpecialEffect === 4
-              ? '1.5px solid gray'
-              : controlProp.SpecialEffect === 3
-                ? '0.5px solid gray'
-                : '0.5px solid gray'
+      alignItems: controlProp.DropButtonStyle === 1 ? 'center' : 'flex-end'
     }
   }
   enabledCheck (e: MouseEvent) {
