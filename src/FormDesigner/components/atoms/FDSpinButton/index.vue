@@ -166,6 +166,8 @@ export default class FDSpinButton extends Mixins(FdControlVue) {
     if (this.checkOtherOrientations()) {
       if (controlProp.Width! < 20 && controlProp.Width! > 5) {
         return controlProp.Width! - 5
+      } else {
+        return 15
       }
     } else {
       if (controlProp.Width! < 70 && controlProp.Width! > 15) {
