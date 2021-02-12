@@ -187,6 +187,8 @@ export default class FDFrame extends Mixins(FdContainerVue) {
         : font.FontStyle !== ''
           ? this.tempWeight
           : '',
+      color:
+        controlProp.Enabled === true ? controlProp.ForeColor : this.getEnabled,
       fontStretch: font.FontStyle !== '' ? this.tempStretch : '',
       borderColor: controlProp.BorderStyle === 1 ? controlProp.BorderColor : '',
       borderLeft: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 2 ? '2px solid gray' : controlProp.SpecialEffect === 3 ? '1.5px solid gray' : controlProp.SpecialEffect === 4 ? '0.5px solid gray' : 'none',
@@ -212,8 +214,6 @@ export default class FDFrame extends Mixins(FdContainerVue) {
     return {
       position: 'sticky',
       top: '0px',
-      color:
-        controlProp.Enabled === true ? controlProp.ForeColor : this.getEnabled,
       background: controlProp.BackColor,
       whiteSpace: 'pre',
       wordBreak: 'normal',
