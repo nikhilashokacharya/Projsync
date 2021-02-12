@@ -30,7 +30,7 @@
           @blur="isClicked = false"
         >
           <div v-if="checkOtherOrientations()" >
-            <svg version="1.0" xmlns="http://www.w3.org/2000/svg" :height="(properties.Height/2 > 60 && properties.Height < 850) ? properties.Height/2 - 45 : properties.Height >= 850 ? 425 : 15" :width="(properties.Width/2 > 60 && properties.Width < 850) ? properties.Width/2 - 45  : properties.Width >= 850 ? 425 : 15"
+            <svg version="1.0" xmlns="http://www.w3.org/2000/svg" :style="svgStyleObj" :height="(properties.Height/2 > 60 && properties.Height < 850) ? properties.Height/2 - 45 : properties.Height >= 850 ? 425 : 15" :width="(properties.Width/2 > 60 && properties.Width < 850) ? properties.Width/2 - 45  : properties.Width >= 850 ? 425 : 15"
         viewBox="0 0 810.000000 460.000000"
         preserveAspectRatio="xMidYMid meet">
           <g :fill="properties.Enabled?properties.ForeColor:'rgb(200,200,200)'"
@@ -42,8 +42,8 @@
           </g>
       </svg>
           </div>
-          <div v-else>
-            <svg version="1.0" xmlns="http://www.w3.org/2000/svg" id="la" class="leftRightArrow"
+          <div v-else :style="svgDivObj">
+            <svg version="1.0" xmlns="http://www.w3.org/2000/svg" :style="svgStyleObj" id="la" class="leftRightArrow"
         viewBox="0 0 460.000000 810.000000"  :height="(properties.Height/2 > 60 && properties.Height < 850) ? properties.Height/2 - 45 : properties.Height >= 850 ? 425 : 15" :width="(properties.Width/2 > 60 && properties.Width < 850) ? properties.Width/2 - 45  : properties.Width >= 850 ? 425 : 15"
         preserveAspectRatio="xMidYMid meet">
           <g :fill="properties.Enabled?properties.ForeColor:'rgb(200,200,200)'"
@@ -74,7 +74,7 @@
           @blur="isClicked = false"
         >
           <div v-if="checkOtherOrientations()">
-            <svg version="1.0" xmlns="http://www.w3.org/2000/svg" :height="(properties.Height/2 > 60 && properties.Height < 850) ? properties.Height/2 - 45 : properties.Height >= 850 ? 425 : 15" :width="(properties.Width/2 > 60 && properties.Width < 850) ? properties.Width/2 - 45  : properties.Width >= 850 ? 425 : 15"
+            <svg version="1.0" xmlns="http://www.w3.org/2000/svg" :style="svgStyleObj" :height="(properties.Height/2 > 60 && properties.Height < 850) ? properties.Height/2 - 45 : properties.Height >= 850 ? 425 : 15" :width="(properties.Width/2 > 60 && properties.Width < 850) ? properties.Width/2 - 45  : properties.Width >= 850 ? 425 : 15"
         viewBox="0 0 810.000000 460.000000"
         preserveAspectRatio="xMidYMid meet">
           <g :fill="properties.Enabled?properties.ForeColor:'rgb(200,200,200)'"
@@ -86,8 +86,8 @@
           </g>
       </svg>
           </div>
-          <div v-else>
-            <svg version="1.0" xmlns="http://www.w3.org/2000/svg" id="ra" class="leftRightArrow" :height="(properties.Height/2 > 60 && properties.Height < 850) ? properties.Height/2 - 45 : properties.Height >= 850 ? 425 : 15" :width="(properties.Width/2 > 60 && properties.Width < 850) ? properties.Width/2 - 45  : properties.Width >= 850 ? 425 : 15"
+          <div v-else :style="svgDivObj">
+            <svg version="1.0" xmlns="http://www.w3.org/2000/svg" :style="svgStyleObj" id="ra" class="leftRightArrow" :height="(properties.Height/2 > 60 && properties.Height < 850) ? properties.Height/2 - 45 : properties.Height >= 850 ? 425 : 15" :width="(properties.Width/2 > 60 && properties.Width < 850) ? properties.Width/2 - 45  : properties.Width >= 850 ? 425 : 15"
         viewBox="0 0 460.000000 810.000000"
         preserveAspectRatio="xMidYMid meet">
           <g :fill="properties.Enabled?properties.ForeColor:'rgb(200,200,200)'"
@@ -127,6 +127,79 @@ export default class FDSpinButton extends Mixins(FdControlVue) {
   orientedValue: boolean = true;
   svgWidth: number = 0;
   $el: HTMLDivElement
+  get svgStyleObj () {
+    const controlProp = this.properties
+    return {
+      position: 'relative',
+      // top: !this.checkOtherOrientations ? '-' + this.svgHeightCalculate() + 'px' : '',
+      width: this.svgWidthCalculate + 'px',
+      height: this.svgHeightCalculate + 'px'
+    }
+  }
+
+  get svgDivObj () {
+    const controlProp = this.properties
+    return {
+      position: 'relative',
+      top: !this.checkOtherOrientations() ? this.svgDivTopCalculate + 'px' : '',
+      height: this.checkOtherOrientations() ? this.svgDivHeightCalculate + 'px' : ''
+    }
+  }
+
+  get svgDivHeightCalculate () {
+    const controlProp = this.properties
+    if (controlProp.Height! < 46) {
+      return controlProp.Height! / 2
+    }
+  }
+  get svgDivTopCalculate () {
+    const controlProp = this.properties
+    if (controlProp.Height! < 15) {
+      return -2
+    } else {
+      return 0
+    }
+  }
+
+  get svgWidthCalculate () {
+    const controlProp = this.properties
+    if (this.checkOtherOrientations()) {
+      if (controlProp.Width! < 20 && controlProp.Width! > 5) {
+        return controlProp.Width! - 5
+      }
+    } else {
+      if (controlProp.Width! < 70 && controlProp.Width! > 15) {
+        return controlProp.Width! / 5
+      } else if (controlProp.Width! < 15 && controlProp.Width! >= 10) {
+        return 1
+      } else if (controlProp.Width! < 10) {
+        return 0
+      } else {
+        return 15
+      }
+    }
+  }
+
+  get svgHeightCalculate () {
+    const controlProp = this.properties
+    if (this.checkOtherOrientations()) {
+      if (controlProp.Height! < 46 && controlProp.Height! > 15) {
+        return controlProp.Height! / 5
+      } else if (controlProp.Height! < 15 && controlProp.Height! >= 10) {
+        return 1
+      } else if (controlProp.Height! < 10) {
+        return 0
+      } else {
+        return 15
+      }
+    } else {
+      if (controlProp.Height! < 25) {
+        return controlProp.Height! - 10
+      } else {
+        return 15
+      }
+    }
+  }
 
   /**
    * @description getDisableValue checks for the RunMode or the EditMode of the control and then returns after checking for the Enabled  property
@@ -206,9 +279,10 @@ export default class FDSpinButton extends Mixins(FdControlVue) {
         : 'none',
       outlineOffset: this.isClicked ? '-5px' : '-5px',
       width: '100%',
-      height: '100%',
+      height: !this.checkOtherOrientations() ? `${controlProp.Height}px` : `${controlProp.Height! / 2}px`,
       justifyContent: 'center',
-      alignItems: 'center'
+      alignItems: 'center',
+      padding: '0px'
     }
   }
 
