@@ -18,6 +18,7 @@
           name="left-arrow.svg"
           @hook:mounted="changeForeColor"
           class="svgLeftRightStyle"
+          :style="svgLeftRightStyleObj"
         />
       </button>
       <input
@@ -39,6 +40,7 @@
           name="right-arrow.svg"
           @hook:mounted="changeForeColor"
           class="svgLeftRightStyle"
+          :style="svgLeftRightStyleObj"
         />
       </button>
     </div>
@@ -70,13 +72,33 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
     }
   }
 
+  get svgLeftRightStyleObj () {
+    const controlProp = this.properties
+    return {
+      position: 'relative',
+      top: this.svgWidthCalc() + 'px'
+    }
+  }
+
+  svgWidthCalc () {
+    if (this.properties.Width! < 20 && this.properties.Width! >= 10) {
+      return ((this.properties.Width! - 20) / 2)
+    } else if (this.properties.Width! < 10) {
+      return -5
+    } else if (this.properties.Height! < 20 && this.properties.Height! >= 10) {
+      return ((this.properties.Height! - 20) / 2)
+    } else if (this.properties.Width! < 10) {
+      return -5
+    }
+  }
+
   get cssVars () {
     const controlProp = this.properties
     return {
       position: 'relative',
       left: '0px',
       top: (this.properties.Min! > this.properties.Max!) ? this.checkOtherOrientations() ? `${controlProp.Height!}px` : '0px' : '0px',
-      gridTemplateColumns: this.checkOtherOrientations() ? '20px ' + `${controlProp.Height! - 40}px` + ' 20px' : '',
+      gridTemplateColumns: this.gridTemplateColumnsCalculate(),
       '--bg-color': this.properties.BackColor,
       '--height': this.checkOtherOrientations() ? `${this.properties.Width!}px` : `${this.properties.Height!}px`,
       transform: (this.properties.Min! > this.properties.Max!) ? this.scrollReAlign() : this.checkOtherOrientations() ? 'rotate(90deg)' : '',
@@ -84,6 +106,31 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
       '--invertValue': this.isEditMode ? this.isInvert ? '1' : '0' : '0',
       '--thumbHeight': this.thumbHeight,
       '--minHeight': this.minHeight
+    }
+  }
+
+  gridTemplateColumnsCalculate () {
+    const controlProp = this.properties
+    if (this.checkOtherOrientations()) {
+      if (controlProp.Height! <= 40) {
+        return `${controlProp.Height! / 2}px` + ' 0px ' + `${controlProp.Height! / 2}px`
+      } else if (controlProp.Height! > 40 && controlProp.Width! < 20) {
+        return '20px ' + `${controlProp.Height! - 40}px` + ' 20px'
+      } else if (controlProp.Height! < 40 && controlProp.Width! < 20) {
+        return `${controlProp.Width! / 2}px` + ' 0px ' + `${controlProp.Width! / 2}px`
+      } else {
+        return '20px ' + `${controlProp.Height! - 40}px` + ' 20px'
+      }
+    } else {
+      if (controlProp.Width! <= 40) {
+        return `${controlProp.Width! / 2}px` + ' 0px ' + `${controlProp.Width! / 2}px`
+      } else if (controlProp.Width! > 40 && controlProp.Height! < 20) {
+        return '20px ' + `${controlProp.Width! - 40}px` + ' 20px'
+      } else if (controlProp.Width! < 40 && controlProp.Height! < 20) {
+        return `${controlProp.Height! / 2}px` + ' 0px ' + `${controlProp.Height! / 2}px`
+      } else {
+        return '20px ' + `${controlProp.Width! - 40}px` + ' 20px'
+      }
     }
   }
 
@@ -183,9 +230,8 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
     } else {
       temprgba = this.hexToRgbA(controlProp.BackColor!)
     }
-
     return {
-      '--display': this.properties.Min === this.properties.Max ? 'none' : this.minHeight === '0px' ? 'none' : 'block',
+      '--display': this.inputDisplay(),
       width: this.checkOtherOrientations() ? `${controlProp.Height! - 40}px` : `${controlProp.Width! - 40}px`,
       height: this.checkOtherOrientations() ? `${controlProp.Width!}px` : `${controlProp.Height!}px`,
       cursor:
@@ -196,6 +242,28 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
       margin: '0px'
     }
   }
+
+  inputDisplay () {
+    if (this.checkOtherOrientations()) {
+      if (this.properties.Height! < 40) {
+        return 'none'
+      }
+    } else {
+      if (this.properties.Width! < 40) {
+        return 'none'
+      }
+    }
+    if (this.properties.Min === this.properties.Max) {
+      return 'none'
+    } else {
+      if (this.minHeight === '0px') {
+        return 'none'
+      } else {
+        return 'block'
+      }
+    }
+  }
+
   hexToRgbA (hex: string) {
     let c: any
     if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
@@ -217,7 +285,9 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
         controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''
           ? this.getMouseCursorData
           : 'default',
-      border: !controlProp.Enabled && this.isRunMode ? '1px solid gray' : ''
+      border: !controlProp.Enabled && this.isRunMode ? '1px solid gray' : '',
+      padding: '0px',
+      height: this.checkOtherOrientations() ? `${controlProp.Width!}px` : `${controlProp.Height!}px`
     }
   }
     @Watch('properties.Max')
@@ -312,5 +382,11 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
 .slider::-moz-range-thumb {
   background: rgb(139, 138, 138);
   cursor: pointer;
+}
+
+.svgLeftRightStyle {
+  width: 4px;
+  height: 16px;
+  margin: auto;
 }
 </style>
