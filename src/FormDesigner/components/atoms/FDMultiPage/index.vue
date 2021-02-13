@@ -784,16 +784,33 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
         const k = this.properties.Value
         let sum = 0
         let count = this.scrolling.children.length
-        const a = this.scrolling.children[0].children[0].children[1].clientHeight + 5 + 'px'
+        const a = this.properties.Value === 0 ? this.scrolling.children[1].children[0].clientHeight + 'px' : this.scrolling.children[0].children[0].clientHeight + 'px'
         for (let i = 0; i < this.scrolling.children.length; i++) {
-          sum += (this.scrolling.children[i].children[0].children[1].clientHeight + 5)
+          sum += (this.scrolling.children[i].children[0].clientHeight)
         }
         if (totalHeight < sum) {
-          count = totalHeight / (this.scrolling.children[0].children[0].children[1].clientHeight + 5)
+          count = totalHeight / (this.scrolling.children[0].children[0].clientHeight)
         }
         if (count < this.scrolling.children.length) {
           for (let j = 0; j < Math.trunc(count); j++) {
-            this.rowsCount = this.rowsCount + (parseInt(a) + 5 + 'px') + ' '
+            if (this.properties.Value! >= Math.trunc(count)) {
+              const columnsCount = Math.ceil(this.scrolling.children.length / (Math.trunc(count)))
+              let previousColumnsCount = Math.ceil((this.properties.Value! as number) / (Math.trunc(count))) - 1
+              for (let index = 1; index <= columnsCount; index++) {
+                if ((this.properties.Value as number + 1) === ((Math.trunc(count) * index) + 1)) {
+                  previousColumnsCount = previousColumnsCount + 1
+                }
+              }
+              if (j === (this.properties.Value! as number - (Math.trunc(count) * previousColumnsCount))) {
+                this.rowsCount = this.rowsCount + (parseInt(a) + 5 + 'px') + ' '
+              } else {
+                this.rowsCount = this.rowsCount + (parseInt(a) + 'px') + ' '
+              }
+            } else if (j === this.properties.Value) {
+              this.rowsCount = this.rowsCount + (parseInt(a) + 5 + 'px') + ' '
+            } else {
+              this.rowsCount = this.rowsCount + (parseInt(a) + 'px') + ' '
+            }
           }
         } else {
           for (let j = 0; j < Math.trunc(count); j++) {
@@ -1105,7 +1122,6 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
     this.selectedItem(e)
     const selected = this.selectedControls[this.userFormId].selected
     if (selected.length === 1 && selected[0] === this.controlId && this.controls.length > 0) {
-      debugger
       this.changeSelect(this.controls[0])
       EventBus.$emit('editModeContextMenu', e, this.controlId, this.data, true, this.updatedValue)
     } else {
