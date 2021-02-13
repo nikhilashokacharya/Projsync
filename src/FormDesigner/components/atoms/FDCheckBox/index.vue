@@ -25,7 +25,7 @@
         ref="spanRef"
       ></span
     ></label>
-      <div id="logo" ref="logoRef" :style="reverseStyle">
+      <div id="logo" ref="logoRef" :style="logoStyleObj">
       <img id="img" v-if="properties.Picture" :src="properties.Picture" :style="[imageProperty,imagePos]" ref="imageRef">
         <div ref="textSpanRef"
           v-if="!syncIsEditMode || isRunMode"
@@ -89,13 +89,16 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
   }
 
   get logoStyleObj (): Partial<CSSStyleDeclaration> {
-    return {
-      ...this.reverseStyle,
-      position: 'relative',
-      display: 'flex',
-      alignSelf: this.alignItem ? 'baseline' : 'center',
-      width: `${this.properties.Width! - 15}px`,
-      overflow: 'hidden'
+    if (!this.properties.Picture) {
+      return {
+        ...this.reverseStyle,
+        display: 'flex',
+        alignSelf: this.properties.WordWrap ? (this.alignItem ? 'baseline' : 'center') : 'center'
+      }
+    } else {
+      return {
+        ...this.reverseStyle
+      }
     }
   }
 
@@ -111,9 +114,8 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
     return {
       order: controlProp.Alignment === 1 ? '0' : '1',
       position: 'sticky',
-      top: `${controlProp.Height! / 2 - 10}px`,
+      top: `${(controlProp.Height! - 10) / 2}px`,
       ...leftRightStyle
-      // left: '1px'
     }
   }
   /**
@@ -124,6 +126,7 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
     deep: true
   })
   checkEnabled (newVal: boolean, oldVal: boolean) {
+    this.editableTextVerify()
     if (!this.properties.Enabled) {
       this.spanRef.style.backgroundColor = 'rgba(220, 220, 220, 1)'
       this.imageProperty.filter = 'sepia(0) grayscale(1) blur(3px) opacity(0.2)'
@@ -141,6 +144,7 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
     deep: true
   })
   verifyValue () {
+    this.editableTextVerify()
     if (this.isRunMode) {
       if (this.properties.Enabled && !this.properties.Locked) {
         this.handleValue(this.properties.Value! as string)
@@ -328,15 +332,13 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
 
   @Watch('setAlignment', { deep: true })
   editableTextVerify () {
-    if (this.isEditMode) {
-      Vue.nextTick(() => {
-        if (this.isEditMode && this.editableTextRef.$el.clientHeight > this.properties.Height!) {
-          this.alignItem = true
-        } else {
-          this.alignItem = false
-        }
-      })
-    }
+    Vue.nextTick(() => {
+      if (this.isEditMode && this.editableTextRef.$el.clientHeight > this.properties.Height!) {
+        this.alignItem = true
+      } else {
+        this.alignItem = false
+      }
+    })
   }
 
   /**
@@ -344,11 +346,13 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
    */
   @Watch('properties.AutoSize', { deep: true })
   autoSize () {
+    this.editableTextVerify()
     this.updateAutoSize()
   }
 
   @Watch('properties.Font.FontSize', { deep: true })
   autoSizeValidateOnFontChange () {
+    this.editableTextVerify()
     if (this.properties.AutoSize) {
       this.updateAutoSize()
     }
@@ -356,6 +360,7 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
 
   @Watch('properties.WordWrap', { deep: true })
   autoSizeValidateOnWordWrapChange () {
+    this.editableTextVerify()
     if (this.properties.AutoSize) {
       this.updateAutoSize()
     }
@@ -363,6 +368,7 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
 
   @Watch('properties.Caption', { deep: true })
   autoSizeValidateOnCaptionChange () {
+    this.editableTextVerify()
     if (this.properties.Picture) {
       Vue.nextTick(() => {
         this.labelAlignment()
@@ -375,6 +381,7 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
 
     @Watch('properties.Picture')
   setPictureSize () {
+    this.editableTextVerify()
     if (this.properties.Picture) {
       this.$nextTick(() => {
         this.onPictureLoad()
@@ -388,6 +395,7 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
 
   @Watch('properties.Height')
     updateImageSizeHeight () {
+      this.editableTextVerify()
       if (this.properties.Picture) {
         this.positionLogo(this.properties.PicturePosition)
         this.pictureSize()
@@ -395,6 +403,7 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
     }
   @Watch('properties.Width')
   updateImageSizeWidth () {
+    this.editableTextVerify()
     if (this.properties.Picture) {
       this.positionLogo(this.properties.PicturePosition)
       this.pictureSize()
@@ -402,6 +411,7 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
   }
   @Watch('properties.PicturePosition')
   updatePicturePosition () {
+    this.editableTextVerify()
     if (this.properties.Picture) {
       this.positionLogo(this.properties.PicturePosition)
       if (this.properties.AutoSize) {
@@ -411,12 +421,14 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
   }
   @Watch('properties.TextAlign')
   autoSizeOnTextAlignment () {
+    this.editableTextVerify()
     if (this.properties.AutoSize) {
       this.updateAutoSize()
     }
   }
   @Watch('properties.BorderStyle')
   autoSizeOnBorderStyleChange () {
+    this.editableTextVerify()
     if (this.properties.AutoSize) {
       this.updateAutoSize()
     }

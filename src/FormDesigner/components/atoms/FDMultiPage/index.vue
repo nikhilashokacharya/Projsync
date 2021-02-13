@@ -5,7 +5,7 @@
       :style="pageStyleObj"
       :title="properties.ControlTipText"
       @mousedown="multiPageMouseDown"
-      @contextmenu.stop="handleContextMenu"
+      @contextmenu="handleContextMenu"
       @keydown.delete.stop.exact="deleteMultiPage"
       @keyup.stop="selectMultipleCtrl($event, false)"
       :tabindex="properties.TabIndex"
@@ -64,7 +64,7 @@
             @keydown.ctrl.stop="handleKeyDown"
             @keydown.enter.exact="setContentEditable($event, true)"
             @keydown.shift.exact.stop="selectMultipleCtrl($event, true)"
-            @contextmenu.stop="
+            @contextmenu="
               showContextMenu($event, selectedPageID, selectedPageID, 'container', isEditMode)
             "
           >
@@ -1095,13 +1095,8 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
     mode: boolean
   ) {
     e.preventDefault()
-    const selected = this.selectedControls[this.userFormId].selected
-    if (selected.length === 1 && selected[0] === this.controlId && this.controls.length > 0) {
-      this.changeSelect(this.controls[0])
-    }
-    if (selected.length > 1) {
-      EventBus.$emit('contextMenuDisplay', event, this.controlId, this.controlId, type, mode)
-    } else {
+    if (this.isEditMode) {
+      e.stopPropagation()
       EventBus.$emit('contextMenuDisplay', event, parentID, controlID, type, mode)
     }
   }
@@ -1120,12 +1115,10 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
   handleContextMenu (e: MouseEvent) {
     e.preventDefault()
     this.selectedItem(e)
-    const selected = this.selectedControls[this.userFormId].selected
-    if (selected.length === 1 && selected[0] === this.controlId && this.controls.length > 0) {
-      this.changeSelect(this.controls[0])
+    if (this.isEditMode) {
+      e.stopPropagation()
+      this.changeSelect(this.selectedPageID)
       EventBus.$emit('editModeContextMenu', e, this.controlId, this.data, true, this.updatedValue)
-    } else {
-      this.showContextMenu(e, this.selectedPageID, this.selectedPageID, 'container', this.isEditMode)
     }
   }
   deleteMultiPage (event: KeyboardEvent) {
@@ -1172,18 +1165,21 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
   }
   updateValue () {
     {
-      const userData = this.userformData[this.userFormId]
-      let selectedPage = -1
-      if (this.controls.length > 0) {
-        selectedPage = this.controls.findIndex(
-          (val) => this.properties.Value === userData[val].properties.Index
-        )
-      }
-      if (this.data.controls.length > 0 && selectedPage !== -1) {
-        this.selectedPageID = this.controls[selectedPage]
-        this.changeSelect(this.controls[selectedPage])
-      } else {
-        this.changeSelect(this.controlId)
+      const container = this.selectedControls[this.userFormId].container
+      if (container[0] === this.controlId) {
+        const userData = this.userformData[this.userFormId]
+        let selectedPage = -1
+        if (this.controls.length > 0) {
+          selectedPage = this.controls.findIndex(
+            (val) => this.properties.Value === userData[val].properties.Index
+          )
+        }
+        if (this.data.controls.length > 0 && selectedPage !== -1) {
+          this.selectedPageID = this.controls[selectedPage]
+          this.changeSelect(this.controls[selectedPage])
+        } else {
+          this.changeSelect(this.controlId)
+        }
       }
     }
   }
