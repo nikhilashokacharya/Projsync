@@ -6,13 +6,14 @@
       :key="groupName.concat(index)"
       :style="getGroupStyle(groupName)"
       :id="groupName"
-      @mousedown.stop="handleMouseDown($event,'drag')"
+      @mousedown="handleMouseDown($event,'drag')"
       @contextmenu.self.stop="openMenu($event,'control')"
     >
     <div
     :style="getGroupStyle(groupName)"
     class="innerGroupStyle"
     :id="groupName"
+    @mousedown="innerGroupDivMouseDown"
     @contextmenu="openMenu($event,'container')"
     >
     <div class="handle handle-tl" :style="handlerStyle(groupName)" @mousedown.stop="handleMouseDown($event,'tl')"></div>
@@ -47,7 +48,7 @@ export default class GroupControl extends FDCommonMethod {
   @State((state) => state.fd.selectedControls)
   selectedControls!: fdState['selectedControls'];
   @State((state) => state.fd.userformData) userformData!: userformData;
-
+  @State((state:rootState) => state.fd.toolBoxSelect) toolBoxSelect!: fdState['toolBoxSelect']
   @Prop({ required: true, type: Array }) public currentSelectedGroup!: string[];
   @Prop({ required: true, type: String }) public userFormId!: string;
   @Prop({ required: true, type: String }) public containerId!: string;
@@ -59,6 +60,7 @@ export default class GroupControl extends FDCommonMethod {
 
   divStyleArray: Array<IGroupStyle> = [];
   resizeDiv: string = '';
+  isMouseDownProp: boolean = false
 
   positions: IMousePosition = {
     clientX: 0,
@@ -90,6 +92,9 @@ export default class GroupControl extends FDCommonMethod {
     EventBus.$on('updasteGroupSize', this.updasteGroupSize)
     EventBus.$on('getGroupSize', this.getGroupSize)
     EventBus.$on('groupElementDrag', this.elementDrag)
+    EventBus.$on('updateGroupStyle', (groupName: string) => {
+      this.groupStyle(groupName)
+    })
   }
   destroyed () {
     EventBus.$off('getGroupMoveValue', this.getGroupMoveValue)
@@ -100,6 +105,7 @@ export default class GroupControl extends FDCommonMethod {
     EventBus.$off('updasteGroupSize', this.updasteGroupSize)
     EventBus.$off('getGroupSize', this.getGroupSize)
     EventBus.$off('groupElementDrag', this.elementDrag)
+    EventBus.$off('updateGroupStyle')
   }
   convertToGridSize (val: number) {
     const gridSize = 9
@@ -342,32 +348,37 @@ export default class GroupControl extends FDCommonMethod {
   }
 
   handleMouseDown (event: CustomMouseEvent, handler: string) {
-    this.tempEvent = event
-    EventBus.$emit('groupDrag', 'NotDrag')
-    this.isMove = false
-    this.deActGroupControl()
-    this.resizeDiv = handler
-    this.positions.clientX = event.clientX
-    this.positions.clientY = event.clientY
-    this.currentMouseDownEvent = event
-    if (handler !== 'drag') {
-      EventBus.$emit('startGroupMoveControl', event)
-      EventBus.$emit('startResizeGroupControl', event, handler)
-      document.onmousemove = (event: MouseEvent) => {
-        EventBus.$emit('resizeGroupControl', event, this.positions)
+    if (this.toolBoxSelect === 'Select' && !this.isMouseDownProp) {
+      event.stopPropagation()
+      this.tempEvent = event
+      EventBus.$emit('groupDrag', 'NotDrag')
+      this.isMove = false
+      this.deActGroupControl()
+      this.resizeDiv = handler
+      this.positions.clientX = event.clientX
+      this.positions.clientY = event.clientY
+      this.currentMouseDownEvent = event
+      if (handler !== 'drag') {
+        EventBus.$emit('startGroupMoveControl', event)
+        EventBus.$emit('startResizeGroupControl', event, handler)
+        document.onmousemove = (event: MouseEvent) => {
+          EventBus.$emit('resizeGroupControl', event, this.positions)
+        }
+      } else {
+        this.positions.offsetX = event.offsetX
+        this.positions.offsetY = event.offsetY
+        this.isMainSelect = true
+        EventBus.$emit('startGroupMoveControl', event)
+        EventBus.$emit('startResizeGroupControl', event, handler)
+        document.onmousemove = (event: MouseEvent) => {
+          EventBus.$emit('moveGroupControl', event)
+        }
+      }
+      document.onmouseup = (event) => {
+        this.closeDragElement(event, handler)
       }
     } else {
-      this.positions.offsetX = event.offsetX
-      this.positions.offsetY = event.offsetY
-      this.isMainSelect = true
-      EventBus.$emit('startGroupMoveControl', event)
-      EventBus.$emit('startResizeGroupControl', event, handler)
-      document.onmousemove = (event: MouseEvent) => {
-        EventBus.$emit('moveGroupControl', event)
-      }
-    }
-    document.onmouseup = (event) => {
-      this.closeDragElement(event, handler)
+      this.isMouseDownProp = false
     }
   }
   elementMouseDrag (event: MouseEvent, containerX: number, containerY: number, previousEvent: MouseEvent): void {
@@ -528,7 +539,7 @@ export default class GroupControl extends FDCommonMethod {
           dragResizeControl.left = `${left}px`
         } else {
           if (this.resizeDiv.includes('t')) {
-            if (incHeight > 0) {
+            if (incHeight > -1) {
               dragResizeControl.top = `${top}px`
             }
             dragResizeControl.height = `${incHeight}px`
@@ -537,7 +548,7 @@ export default class GroupControl extends FDCommonMethod {
           }
 
           if (this.resizeDiv.includes('l')) {
-            if (incWidth > 0) {
+            if (incWidth > -1) {
               dragResizeControl.left = `${left}px`
             }
             dragResizeControl.width = `${incWidth}px`
@@ -545,6 +556,7 @@ export default class GroupControl extends FDCommonMethod {
             dragResizeControl.width = `${decWidth}px`
           }
         }
+        console.log('dragResizeControl', dragResizeControl)
         for (const j in this.userformData[this.userFormId][this.containerId]
           .controls) {
           const index = this.userformData[this.userFormId][this.containerId]
@@ -552,29 +564,29 @@ export default class GroupControl extends FDCommonMethod {
           const controlProp = this.userformData[this.userFormId][index]
             .properties
 
-          let top: number =
-            (parseInt(dragResizeControl.height!) * this.topArray[j]) /
+          let top: number = controlProp.Height! < 1 ? parseInt(dragResizeControl.top!)
+            : (parseInt(dragResizeControl.height!) * this.topArray[j]) /
               parseInt(this.initialArray[i].height!) +
             parseInt(this.initialArray[i].top!)
 
-          let height: number =
-            parseInt(dragResizeControl.height!) * this.percheightArray[j]
+          let height: number = controlProp.Height! < 1 ? parseInt(dragResizeControl.height!)
+            : parseInt(dragResizeControl.height!) * this.percheightArray[j]
 
-          let left: number =
-            (parseInt(dragResizeControl.width!) * this.leftArray[j]) /
+          let left: number = controlProp.Width! < 1 ? parseInt(dragResizeControl.left!)
+            : (parseInt(dragResizeControl.width!) * this.leftArray[j]) /
               parseInt(this.initialArray[i].width!) +
             parseInt(this.initialArray[i].left!)
 
-          let width: number =
-            parseInt(dragResizeControl.width!) * this.percwidthArray[j]
+          let width: number = controlProp.Width! < 1 ? parseInt(dragResizeControl.width!)
+            : parseInt(dragResizeControl.width!) * this.percwidthArray[j]
 
-          let right: number =
-            (parseInt(dragResizeControl.width!) * this.leftArray[j]) /
+          let right: number = controlProp.Width! < 1 ? parseInt(dragResizeControl.left!)
+            : (parseInt(dragResizeControl.width!) * this.leftArray[j]) /
               parseInt(this.initialArray[i].width!) +
             parseInt(dragResizeControl.left!)
 
-          let bottom: number =
-            (parseInt(dragResizeControl.height!) * this.topArray[j]) /
+          let bottom: number = controlProp.Height! < 1 ? parseInt(dragResizeControl.top!)
+            : (parseInt(dragResizeControl.height!) * this.topArray[j]) /
               parseInt(this.initialArray[i].height!) +
             parseInt(dragResizeControl.top!)
           if (
@@ -767,6 +779,9 @@ export default class GroupControl extends FDCommonMethod {
         this.divStyleArray[index].display = 'none'
       }
     }
+  }
+  innerGroupDivMouseDown () {
+    this.isMouseDownProp = true
   }
 }
 </script>

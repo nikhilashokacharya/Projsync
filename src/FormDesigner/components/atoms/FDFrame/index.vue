@@ -10,7 +10,7 @@
     @keydown.shift.exact.stop="selectMultipleCtrl($event,true)"
     @keydown.delete.stop.exact="deleteFrame"
     @keydown.enter.exact="setContentEditable($event, true)"
-    @contextmenu.stop="showContextMenu($event, controlId, controlId, 'container', isEditMode)"
+    @contextmenu="showContextMenu($event, controlId, controlId, 'container', isEditMode)"
     @keyup.stop="selectMultipleCtrl($event, false)"
   >
     <legend ref="fieldsetRef" :style="legendCssStyleProperty">{{ properties.Caption }}</legend>
@@ -214,6 +214,8 @@ export default class FDFrame extends Mixins(FdContainerVue) {
     return {
       position: 'sticky',
       top: '0px',
+      color:
+        controlProp.Enabled === true ? controlProp.ForeColor : this.getEnabled,
       background: controlProp.BackColor,
       whiteSpace: 'pre',
       wordBreak: 'normal',
@@ -240,7 +242,10 @@ export default class FDFrame extends Mixins(FdContainerVue) {
   }
 
   showContextMenu (e: MouseEvent, parentID: string, controlID: string, type: string, mode: boolean) {
-    EventBus.$emit('contextMenuDisplay', event, parentID, controlID, type, mode)
+    if (this.isEditMode) {
+      e.stopPropagation()
+      EventBus.$emit('contextMenuDisplay', e, parentID, controlID, type, mode)
+    }
   }
 
   dragSelectorControl (event: MouseEvent) {

@@ -38,7 +38,7 @@ export default class FdContainerVue extends FdControlVue {
   activateCtrl: boolean = false
   backColorProp = ['Frame', 'CheckBox', 'OptionButton', 'Label', 'MultiPage']
   foreColorProp = ['Frame', 'CheckBox', 'OptionButton', 'Label', 'MultiPage', 'TabStrip']
-  fontProp = ['Frame', 'CheckBox', 'OptionButton', 'Label', 'MultiPage', 'TabStrip', 'ToggleButton', 'CommandButton']
+  fontProp = ['Frame', 'CheckBox', 'OptionButton', 'Label', 'MultiPage', 'TabStrip', 'ToggleButton', 'CommandButton', 'TextBox', 'ListBox', 'ComboBox']
 
   get selConatiner () {
     return this.selectedControls[this.userFormId].container

@@ -59,7 +59,7 @@ export default class FDTable extends Vue {
     payload: IsetChildControls
   ) => void;
   @State((state) => state.fd.selectedControls) selectedControls!: fdState['selectedControls'];
-
+  eventObjectToAssignPreviousValue: Event
   get selectedContainer () {
     return this.selectedControls[this.userFormId].container
   }
@@ -165,25 +165,43 @@ export default class FDTable extends Vue {
   }
   updateProperty (arg: IPropControl) {
     const selected = this.getSelectedControlsDatas!
+    const userData = this.userformData[this.userFormId]
     for (let i = 0; i < selected.length; i++) {
+      const currentControlData = this.userformData[this.userFormId][selected[i]]
       if (arg.propertyName === 'TabIndex') {
         return this.updateTabIndexValue(parseInt(arg.value))
       } else if (arg.propertyName === 'Index') {
         return this.updatePageIndex(parseInt(arg.value))
       } else if (arg.propertyName === 'Name') {
         return this.updateName(selected[i], arg.value)
-      } else if (arg.propertyName === 'Value' && (this.userformData[this.userFormId][selected[i]].type === 'SpinButton' || this.userformData[this.userFormId][selected[i]].type === 'ScrollBar')) {
+      } else if (arg.propertyName === 'Value' && (currentControlData.type === 'SpinButton' || currentControlData.type === 'ScrollBar')) {
         return this.updateSpinButtonScrollBarValueProp(selected[i], arg.value)
-      } else if (arg.propertyName === 'Value' && (this.userformData[this.userFormId][selected[i]].type === 'OptionButton') && arg.value === 'True') {
-        const groupName = this.userformData[this.userFormId][selected[i]].properties.GroupName!
+      } else if (arg.propertyName === 'Value' && (currentControlData.type === 'OptionButton') && arg.value === 'True') {
+        const groupName = currentControlData.properties.GroupName!
         this.updateValueForCommonGroupName(selected[i], arg.value, groupName)
       } else if (arg.propertyName === 'Min' || arg.propertyName === 'Max') {
         this.updatePropValue(selected[i], arg.propertyName, arg.value)
         this.validateValueProperty(selected[i], arg.value)
       } else if (arg.propertyName === 'Cancel' || arg.propertyName === 'Default') {
         this.validateCancelDefaultProp(selected[i], arg.propertyName, arg.value)
+      } else if (arg.propertyName === 'SpecialEffect' && arg.value > 0 && (currentControlData.type === 'OptionButton' || currentControlData.type === 'CheckBox') && selected.length > 1) {
+        this.validateSpecialEffectForOptionButtonCheckBox(selected[i], arg.propertyName, arg.value)
+      } else if (arg.propertyName === 'Text' && currentControlData.type === 'ListBox' && selected.length > 1) {
+        const isValid = this.validateTextValueProperty(arg.value, arg.propertyName, selected[i])
+        if (isValid) {
+          this.updatePropValue(selected[i], arg.propertyName, arg.value)
+        } else {
+          this.setInvalidErrorMessage(arg.propertyName, 2, null)
+          this.updateInputBoxValueToPreviousValue(this.eventObjectToAssignPreviousValue, arg.propertyName)
+        }
       } else {
         this.updatePropValue(selected[i], arg.propertyName, arg.value)
+      }
+    }
+    for (let i = 0; i < selected.length; i++) {
+      const controlProp = userData[selected[i]].properties
+      if (controlProp.GroupID !== '') {
+        EventBus.$emit('updateGroupStyle', controlProp.GroupID)
       }
     }
   }
@@ -215,7 +233,7 @@ export default class FDTable extends Vue {
     this.updatePropValue(id, 'Value', 'True')
     for (let i = 0; i < userData.length; i++) {
       const controlData = this.userformData[this.userFormId][userData[i]]
-      if (controlData.type === 'OptionButton' && controlData.properties.GroupName === groupName && controlData.properties.ID !== id) {
+      if (controlData.type === 'OptionButton' && (controlData.properties.GroupName!.toLowerCase() === groupName.toLowerCase()) && controlData.properties.ID !== id) {
         this.updatePropValue(controlData.properties.ID, 'Value', 'False')
       }
     }
@@ -232,6 +250,23 @@ export default class FDTable extends Vue {
       return true
     }
     return false
+  }
+  validateSpecialEffectForOptionButtonCheckBox (id: string, propName: keyof controlProperties, value: number) {
+    const selected = this.getSelectedControlsDatas!
+    for (let i = 0; i < selected.length; i++) {
+      const currentControlData = this.userformData[this.userFormId][selected[i]]
+      if (['Label', 'TextBox', 'ComboBox', 'FDImage', 'ListBox', 'Frame'].includes(currentControlData.type)) {
+        if ([1, 3, 4].includes(value)) {
+          this.setInvalidErrorMessage(propName, 7, null)
+          return undefined
+        }
+      }
+    }
+    if (value === 2) {
+      this.updatePropValue(id, propName, 1)
+    } else if (value === 1) {
+      this.updatePropValue(id, propName, value)
+    }
   }
   validateCancelDefaultProp (id: string, propName: keyof controlProperties, value: boolean) {
     const userFormControls = Object.keys(this.userformData[this.userFormId])
@@ -513,16 +548,21 @@ export default class FDTable extends Vue {
           // this.updateValueProperty({ propertyName: propertyName, value: propertyValue })
         }
       } else if (propertyName === 'Text') {
-        const controlType = this.userformData[this.userFormId][this.getSelectedControlsDatas[0]].type
-        if (controlType === 'ListBox') {
-          const isTextValid = this.validateTextValueProperty(propertyValue, propertyName, this.getSelectedControlsDatas[0])
-          if (isTextValid) {
-            this.emitUpdateProperty(propertyName, propertyValue)
+        if (this.getSelectedControlsDatas.length === 1) {
+          const controlType = this.userformData[this.userFormId][this.getSelectedControlsDatas[0]].type
+          if (controlType === 'ListBox') {
+            const isTextValid = this.validateTextValueProperty(propertyValue, propertyName, this.getSelectedControlsDatas[0])
+            if (isTextValid) {
+              this.emitUpdateProperty(propertyName, propertyValue)
+            } else {
+              this.setInvalidErrorMessage(propertyName, 2, null)
+              this.updateInputBoxValueToPreviousValue(e, propertyName)
+            }
           } else {
-            this.setInvalidErrorMessage(propertyName, 2, null)
-            this.updateInputBoxValueToPreviousValue(e, propertyName)
+            this.emitUpdateProperty(propertyName, propertyValue)
           }
         } else {
+          this.eventObjectToAssignPreviousValue = e
           this.emitUpdateProperty(propertyName, propertyValue)
         }
       } else if (propertyName === 'ControlSource') {
@@ -543,6 +583,11 @@ export default class FDTable extends Vue {
         const resultValue = this.validateColumnWidths(propertyName, propertyValue)
         if (resultValue !== 'Invalid') {
           this.emitUpdateProperty(propertyName, resultValue)
+          if (this.userformData[this.userFormId][this.getSelectedControlsDatas[0]].properties.ColumnWidths === resultValue) {
+            if (e.target instanceof HTMLInputElement) {
+              e.target.value = resultValue
+            }
+          }
         } else {
           this.setInvalidErrorMessage(propertyName, 4, null)
           this.updateInputBoxValueToPreviousValue(e, propertyName)
@@ -570,6 +615,7 @@ export default class FDTable extends Vue {
               this.emitUpdateProperty(propertyName, 103);
               (e.target as HTMLInputElement).value = '103'
             } else if (value > 9830) {
+              (e.target as HTMLInputElement).value = '9830'
               this.emitUpdateProperty(propertyName, 9830)
             } else if (value < 0) {
               this.updateInputBoxValueToPreviousValue(e, propertyName)
@@ -581,6 +627,7 @@ export default class FDTable extends Vue {
               this.emitUpdateProperty(propertyName, 30);
               (e.target as HTMLInputElement).value = '30'
             } else if (value > 9830) {
+              (e.target as HTMLInputElement).value = '9830'
               this.emitUpdateProperty(propertyName, 9830)
             } else if (value < 0) {
               this.updateInputBoxValueToPreviousValue(e, propertyName)
@@ -848,6 +895,8 @@ export default class FDTable extends Vue {
       case 5: EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value. Enter a value between ${range!.from} and ${range!.to}`)
         break
       case 6: EventBus.$emit('showErrorPopup', true, 'overflow', 'Overflow')
+        break
+      case 7: EventBus.$emit('showErrorPopup', true, 'invalid', `Could not set the ${propertyName} property. Invalid property value. Enter a proper value.`)
         break
     }
   }

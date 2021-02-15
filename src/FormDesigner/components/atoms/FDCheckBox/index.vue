@@ -26,7 +26,7 @@
       ></span
     ></label>
       <div id="logo" ref="logoRef" :style="logoStyleObj">
-      <img id="img" v-if="properties.Picture" :src="properties.Picture" :style="[imageProperty,imagePos]" ref="imageRef">
+      <img id="img" v-if="properties.Picture" :src="properties.Picture" draggable="false" :style="[imageProperty,imagePos]" ref="imageRef">
         <div ref="textSpanRef"
           v-if="!syncIsEditMode || isRunMode"
           @click="isRunMode && makeChecked($event)"
@@ -153,7 +153,12 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
       this.handleValue(this.properties.Value! as string)
     }
   }
-
+  @Watch('isEditMode')
+  setCaretPositionInEditMode () {
+    if (this.isEditMode) {
+      this.setCaretPosition()
+    }
+  }
   handleValue (newVal: string) {
     let tempValue = newVal.toLowerCase()
     const checkDiv = this.checkboxInput
@@ -316,7 +321,6 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
       gridTemplateColumns: controlProp.Alignment === 1 ? '12px ' + `${controlProp.Width! - 12}px` : `${controlProp.Width! - 12}px` + ' 12px',
       gridTemplateRows: '100%',
       gap: '2px',
-      // alignItems: font.FontSize! > 17 ? 'center' : '',
       alignContent: 'center',
       boxShadow: 'none',
       alignItems: alignItems

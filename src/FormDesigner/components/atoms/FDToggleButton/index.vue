@@ -19,7 +19,7 @@
     @contextmenu="isEditMode ? openTextContextMenu($event): parentConextMenu($event)"
   >
     <div id="logo" ref="logoRef" :style="reverseStyle">
-    <img v-if="properties.Picture" id="img" :src="properties.Picture" :style="[imageProperty,imagePos]" ref="imageRef">
+    <img v-if="properties.Picture" id="img" :src="properties.Picture" draggable="false" :style="[imageProperty,imagePos]" ref="imageRef">
     <div v-if="!syncIsEditMode || isRunMode" :style="labelStyle" ref="textSpanRef">
       <span :style="spanStyleObj">{{ computedCaption.afterbeginCaption }}</span>
           <span class="spanClass" :style="spanStyleObj">{{
@@ -323,56 +323,62 @@ export default class FDToggleButton extends Mixins(FdControlVue) {
       this.imageProperty.filter = ''
     }
   }
+  @Watch('isEditMode')
+   setCaretPositionInEditMode () {
+     if (this.isEditMode) {
+       this.setCaretPosition()
+     }
+   }
   /**
    * @description updateAutoSize calls Vuex Actions to update object
    * @function updateAutoSize
    * @override
    */
-   updateAutoSize () {
-     if (this.properties.AutoSize === true) {
-       const imgStyle = {
-         width: 'fit-content',
-         height: 'fit-content',
-         filter: ''
-       }
-       this.imageProperty = imgStyle
-       if (this.properties.Picture) {
-         this.positionLogo(this.properties.PicturePosition)
-       }
-       this.$nextTick(() => {
-         const { width, height } = this.getWidthHeight()
-         if (!this.properties.Picture && this.properties.Caption === '') {
-           this.updateDataModel({
-             propertyName: 'Height',
-             value: height + 20
-           })
-         } else {
-           this.updateDataModel({
-             propertyName: 'Height',
-             value: height + 5
-           })
-         }
-         this.updateDataModel({
-           propertyName: 'Width',
-           value: width
-         })
-       })
-     } else {
-       return undefined
-     }
-   }
+  updateAutoSize () {
+    if (this.properties.AutoSize === true) {
+      const imgStyle = {
+        width: 'fit-content',
+        height: 'fit-content',
+        filter: ''
+      }
+      this.imageProperty = imgStyle
+      if (this.properties.Picture) {
+        this.positionLogo(this.properties.PicturePosition)
+      }
+      this.$nextTick(() => {
+        const { width, height } = this.getWidthHeight()
+        if (!this.properties.Picture && this.properties.Caption === '') {
+          this.updateDataModel({
+            propertyName: 'Height',
+            value: height + 20
+          })
+        } else {
+          this.updateDataModel({
+            propertyName: 'Height',
+            value: height + 5
+          })
+        }
+        this.updateDataModel({
+          propertyName: 'Width',
+          value: width
+        })
+      })
+    } else {
+      return undefined
+    }
+  }
 
-   /**
+  /**
    * @description mounted initializes the values which are required for the component
    */
-   mounted () {
-     this.$el.focus()
-     this.updateAutoSize()
-   }
-   releaseEditMode (event: KeyboardEvent) {
-     this.$el.focus()
-     this.setContentEditable(event, false)
-   }
+  mounted () {
+    this.$el.focus()
+    this.updateAutoSize()
+  }
+  releaseEditMode (event: KeyboardEvent) {
+    this.$el.focus()
+    this.setContentEditable(event, false)
+  }
 }
 </script>
 

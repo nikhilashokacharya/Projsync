@@ -143,7 +143,20 @@ export default class PropertiesList extends FDCommonMethod {
 
         // Generating the Object of common key : value pair and Intializing value as null
         for (const propName in commonProp) {
-          Vue.set(combinedObj, commonProp[propName], '')
+          if (commonProp[propName] === 'Font') {
+            const fontObj = {
+              FontName: '',
+              FontSize: '',
+              FontBold: '',
+              FontItalic: '',
+              FontUnderline: '',
+              FontStrikethrough: '',
+              FontStyle: ''
+            }
+            Vue.set(combinedObj, commonProp[propName], fontObj)
+          } else {
+            Vue.set(combinedObj, commonProp[propName], '')
+          }
         }
 
         // get the Object which include common key:[value] pair of selected control
@@ -151,7 +164,13 @@ export default class PropertiesList extends FDCommonMethod {
           const contolProp: controlProperties = this.userformData[this.userFormId][key].properties
           for (const propName in contolProp) {
             if (commonProp.indexOf(propName) > -1) {
-              combinedObj[propName] = [...combinedObj[propName], contolProp[propName as keyof controlProperties]]
+              if (propName === 'Font') {
+                for (const fontProp in contolProp[propName]) {
+                  combinedObj[propName][fontProp] = [...combinedObj[propName][fontProp], contolProp[propName][fontProp]]
+                }
+              } else {
+                combinedObj[propName] = [...combinedObj[propName], contolProp[propName as keyof controlProperties]]
+              }
             }
           }
         }
@@ -159,8 +178,25 @@ export default class PropertiesList extends FDCommonMethod {
 
         // get the common value
         for (const propName in combinedObj) {
-          const isSame: boolean = allEqual(combinedObj[propName])
-          commonPropValue[propName] = isSame ? combinedObj[propName][0] : ''
+          if (propName === 'Font') {
+            const fontObj = {
+              FontName: '',
+              FontSize: '',
+              FontBold: '',
+              FontItalic: '',
+              FontUnderline: '',
+              FontStrikethrough: '',
+              FontStyle: ''
+            }
+            for (const fontProp in combinedObj[propName]) {
+              const isSame: boolean = allEqual(combinedObj[propName][fontProp])
+              fontObj[fontProp] = isSame ? combinedObj[propName][fontProp][0] : ''
+            }
+            commonPropValue[propName] = fontObj
+          } else {
+            const isSame: boolean = allEqual(combinedObj[propName])
+            commonPropValue[propName] = isSame ? combinedObj[propName][0] : ''
+          }
         }
 
         const controlData: controlData = this.userformData[this.userFormId][this.getSelectedControlsDatas![0]]

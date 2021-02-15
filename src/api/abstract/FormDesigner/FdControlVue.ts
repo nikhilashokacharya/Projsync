@@ -50,7 +50,8 @@ export default class FdControlVue extends Vue {
     alignSelf: ''
   }
   isSpinButtonScrollBarMouseDown: boolean = false
-  spinButtonDelayInterval: number = 0
+  spinButtonScrollBarDelayInterval: number = 0
+  spinButtonScrollBarTimeout: number = 0
   spinButtonScrollBarClickCount: number = 0
    // global variable to keep track of TripleState when enabled
    protected tripleState:number = 0
@@ -438,10 +439,10 @@ export default class FdControlVue extends Vue {
       this.increaseTheValueAfterDelay()
     }
     if (this.getSpinButtonScrollBarClickCount === 1 && this.isSpinButtonScrollBarMouseDown) {
-      setTimeout(() => {
+      this.spinButtonScrollBarTimeout = setTimeout(() => {
         this.increaseTheValueAfterDelay()
         if (this.getSpinButtonScrollBarClickCount === 2 && this.isSpinButtonScrollBarMouseDown) {
-          this.spinButtonDelayInterval = setInterval(() => {
+          this.spinButtonScrollBarDelayInterval = setInterval(() => {
             this.increaseTheValueAfterDelay()
           }, this.properties.Delay!)
         }
@@ -569,10 +570,10 @@ export default class FdControlVue extends Vue {
       this.decreaseTheValueAfterDelay()
     }
     if (this.getSpinButtonScrollBarClickCount === 1 && this.isSpinButtonScrollBarMouseDown) {
-      setTimeout(() => {
+      this.spinButtonScrollBarTimeout = setTimeout(() => {
         this.decreaseTheValueAfterDelay()
         if (this.getSpinButtonScrollBarClickCount === 2 && this.isSpinButtonScrollBarMouseDown) {
-          this.spinButtonDelayInterval = setInterval(() => {
+          this.spinButtonScrollBarDelayInterval = setInterval(() => {
             this.decreaseTheValueAfterDelay()
           }, this.properties.Delay!)
         }
@@ -585,7 +586,8 @@ export default class FdControlVue extends Vue {
   setIsSpinButtonScrollBarMouseDown () {
     this.isSpinButtonScrollBarMouseDown = false
     this.spinButtonScrollBarClickCount = 0
-    clearInterval(this.spinButtonDelayInterval)
+    clearTimeout(this.spinButtonScrollBarTimeout)
+    clearInterval(this.spinButtonScrollBarDelayInterval)
   }
   /**
    * @description transformScrollButtonStyle returns string value from
@@ -1661,5 +1663,19 @@ setHeightWidthVariable () {
     labelWidth = (this.editableTextRef.$el as HTMLSpanElement).offsetWidth
   }
   return { picPosLeftRight, picPosTopBottom, controlWidthIncrease, imgHeight, imgWidth, labelHeight, labelWidth }
+}
+setCaretPosition () {
+  Vue.nextTick(() => {
+    (this.editableTextRef.$el as HTMLSpanElement).focus()
+    const el = this.editableTextRef.$el
+    const range = document.createRange()
+    const sel = window.getSelection()!
+    if (el.childNodes[0]) {
+      range.setStart(el.childNodes[0], this.properties.Caption!.length)
+      range.collapse(true)
+      sel.removeAllRanges()
+      sel.addRange(range)
+    }
+  })
 }
 }

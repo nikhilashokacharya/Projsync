@@ -12,7 +12,9 @@
     <div class="slidecontainer" :style="cssVars">
       <button :style="scrollBarButtonStyleObj"
       @mousedown="!getDisableValue?properties.Min > properties.Max ? increaseTheValue() : decreaseTheValue():''"
-      @mouseup="setIsSpinButtonScrollBarMouseDown">
+      @mouseup="setIsSpinButtonScrollBarMouseDown"
+      @mouseout="setIsSpinButtonScrollBarMouseDown"
+      >
         <FdSvgImage
           key="leftArrow"
           name="left-arrow.svg"
@@ -34,7 +36,9 @@
       />
       <button :style="scrollBarButtonStyleObj"
       @mousedown="!getDisableValue?properties.Min > properties.Max ? decreaseTheValue() : increaseTheValue():''"
-      @mouseup="setIsSpinButtonScrollBarMouseDown">
+      @mouseup="setIsSpinButtonScrollBarMouseDown"
+      @mouseout="setIsSpinButtonScrollBarMouseDown"
+      >
         <FdSvgImage
           key="rightArrow"
           name="right-arrow.svg"

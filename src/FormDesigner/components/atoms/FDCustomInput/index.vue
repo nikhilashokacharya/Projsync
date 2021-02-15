@@ -7,7 +7,7 @@
       />
         <button
           class="file-inpu-button-style"
-          @click="fileInputRef.click()"
+          @click="setInputValue()"
         >
           ...
           <input
@@ -89,6 +89,10 @@ export default class FDCustomInput extends Vue {
         }
       }
     }
+  }
+  setInputValue () {
+    this.fileInputRef.value = ''
+    this.fileInputRef.click()
   }
 }
 </script>

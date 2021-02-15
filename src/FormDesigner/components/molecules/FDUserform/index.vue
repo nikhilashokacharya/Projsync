@@ -222,7 +222,8 @@ export default class UserForm extends FdContainerVue {
   }
   get innerWindowHeaderStyle () {
     return {
-      textAlign: this.properties.RightToLeft ? 'right' : 'left'
+      textAlign: this.properties.RightToLeft ? 'right' : 'left',
+      direction: this.properties.RightToLeft ? 'rtl' : 'ltr'
     }
   }
   deActControl () {
@@ -264,7 +265,7 @@ export default class UserForm extends FdContainerVue {
 }
 .inner-userform-header {
   display: grid;
-  grid-template-columns: 9.5fr 0.5fr;
+  grid-template-columns: auto 30px ;
   width: 100%;
   height: 30px;
   background-color: rgba(153,180,209);

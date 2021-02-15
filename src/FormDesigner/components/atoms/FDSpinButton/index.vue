@@ -22,6 +22,7 @@
             : ''
         "
         @mouseup="setIsSpinButtonScrollBarMouseDown"
+        @mouseout="setIsSpinButtonScrollBarMouseDown"
       >
         <button
           class="button-element-top"
@@ -66,6 +67,7 @@
             : ''
         "
         @mouseup="setIsSpinButtonScrollBarMouseDown"
+        @mouseout="setIsSpinButtonScrollBarMouseDown"
       >
         <button
           class="button-element-bottom"

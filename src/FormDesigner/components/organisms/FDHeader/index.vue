@@ -1656,56 +1656,64 @@ export default class Header extends FDCommonMethod {
   }
   getdisableStyle (id: string) {
     let disabled: boolean = true
+    let controlEditMode: boolean = true
     const selected = this.selectedControls[this.userFormId].selected
     const selContainer = this.selectedControls[this.userFormId].container
     const userData = this.userformData[this.userFormId]
-    if (id === 'unGroup') {
-      let groupId: boolean = false
-      const selectedGroupArray = selected.filter(
-        (val: string) => val.startsWith('group') && val
-      )
-      if (selectedGroupArray.length === 1 && selected.length === 1) {
-        disabled = false
-      }
+    if (selected.length === 1 && !selected[0].startsWith('group')) {
+      EventBus.$emit('getEdiTMode', (editmode: boolean) => {
+        controlEditMode = editmode
+      })
     }
-    if (id === 'group') {
-      disabled = selected.length <= 1
-    }
-    if (id === 'sizeToGrid' || id === 'centreInForm') {
-      disabled = !(selected.length >= 1 && selected[0] !== selContainer[0])
-    }
-    if (id === 'sizeToFit') {
-      const selSelected = []
-      for (const control of this.selectedControls[this.userFormId].selected) {
-        if (!control.startsWith('group')) {
-          const type = this.userformData[this.userFormId][control].type
-          if (type !== 'MultiPage' && type !== 'Frame' && type !== 'ListBox' && type !== 'Page' && type !== 'TabStrip' && type !== 'Userform') {
-            selSelected.push(control)
-          }
+    if (!controlEditMode) {
+      if (id === 'unGroup') {
+        let groupId: boolean = false
+        const selectedGroupArray = selected.filter(
+          (val: string) => val.startsWith('group') && val
+        )
+        if (selectedGroupArray.length === 1 && selected.length === 1) {
+          disabled = false
         }
       }
-      disabled = !(selSelected.length >= 1)
-    }
-    if (id === 'order') {
-      disabled = !(selected.length >= 1 && userData[selContainer[0]].controls.length >= 2)
-    }
-    if (id === 'makeEqual') {
-      disabled = !(selected.length >= 3)
-    }
-    if (id === 'incDecspacing' || id === 'removeSpace') {
-      disabled = !(selected.length >= 2)
-    }
-    if (id === 'arrangeButton') {
-      const buttonArray = []
-      for (let index = 0; index < selected.length; index++) {
-        if (!selected[index].startsWith('group')) {
-          const controlprop = userData[selected[index]]
-          if (controlprop.type === 'CommandButton') {
-            buttonArray.push(selected[index])
+      if (id === 'group') {
+        disabled = selected.length <= 1
+      }
+      if (id === 'sizeToGrid' || id === 'centreInForm') {
+        disabled = !(selected.length >= 1 && selected[0] !== selContainer[0])
+      }
+      if (id === 'sizeToFit') {
+        const selSelected = []
+        for (const control of this.selectedControls[this.userFormId].selected) {
+          if (!control.startsWith('group')) {
+            const type = this.userformData[this.userFormId][control].type
+            if (type !== 'MultiPage' && type !== 'Frame' && type !== 'ListBox' && type !== 'Page' && type !== 'TabStrip' && type !== 'Userform') {
+              selSelected.push(control)
+            }
           }
         }
+        disabled = !(selSelected.length >= 1)
       }
-      disabled = !(buttonArray.length >= 1)
+      if (id === 'order') {
+        disabled = !(selected.length >= 1 && userData[selContainer[0]].controls.length >= 2)
+      }
+      if (id === 'makeEqual') {
+        disabled = !(selected.length >= 3)
+      }
+      if (id === 'incDecspacing' || id === 'removeSpace') {
+        disabled = !(selected.length >= 2)
+      }
+      if (id === 'arrangeButton') {
+        const buttonArray = []
+        for (let index = 0; index < selected.length; index++) {
+          if (!selected[index].startsWith('group')) {
+            const controlprop = userData[selected[index]]
+            if (controlprop.type === 'CommandButton') {
+              buttonArray.push(selected[index])
+            }
+          }
+        }
+        disabled = !(buttonArray.length >= 1)
+      }
     }
     return disabled
   }

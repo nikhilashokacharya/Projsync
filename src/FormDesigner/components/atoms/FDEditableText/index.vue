@@ -75,5 +75,6 @@ export default class FDEditableText extends Vue {
     white-space: inherit;
     word-break: inherit;
     caret-color: black;
+    min-width: 0.2px;
   }
 </style>

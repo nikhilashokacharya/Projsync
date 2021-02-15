@@ -18,7 +18,7 @@
     @contextmenu="isEditMode ? openTextContextMenu($event): parentConextMenu($event)"
   >
   <div id="logo" ref="logoRef" :style="reverseStyle">
-    <img v-if="properties.Picture" id="img" :src="properties.Picture" :style="[imageProperty,imagePos]" ref="imageRef">
+    <img v-if="properties.Picture" id="img" :src="properties.Picture" draggable="false" :style="[imageProperty,imagePos]" ref="imageRef">
     <div v-if="!syncIsEditMode || isRunMode" :style="labelStyle"  ref="textSpanRef">
       <span :style="spanStyleObj">{{ computedCaption.afterbeginCaption }}</span>
           <span class="spanClass" :style="spanStyleObj">{{
@@ -275,6 +275,12 @@ export default class FDCommandButton extends Mixins(FdControlVue) {
       this.imageProperty.filter = 'sepia(0) grayscale(1) blur(3px) opacity(0.2)'
     } else {
       this.imageProperty.filter = ''
+    }
+  }
+  @Watch('isEditMode')
+  setCaretPositionInEditMode () {
+    if (this.isEditMode) {
+      this.setCaretPosition()
     }
   }
   /**

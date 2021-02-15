@@ -225,26 +225,7 @@ export default class ResizeControl extends FdSelectVue {
     )
   }
   deleteItem (event: KeyboardEvent) {
-    const userData = this.userformData[this.userFormId]
-    const type = userData[this.controlId].type
-    const controlId = type === 'Page' ? this.containerId : this.controlId
-    const containerId = type === 'Page' ? this.getContainerList(controlId)[0] : this.containerId
-    if (event.key !== 'Backspace') {
-      this.deleteZIndex(controlId)
-      this.deleteTabIndex(controlId)
-      this.deleteControl({
-        userFormId: this.userFormId,
-        parentId: containerId,
-        targetId: controlId
-      })
-    }
-    this.selectControl({
-      userFormId: this.userFormId,
-      select: {
-        container: this.getContainerList(containerId),
-        selected: [containerId]
-      }
-    })
+    EventBus.$emit('handleKeyDown', event, this.controlId)
   }
   selectedItem (e: MouseEvent) {
     if (this.selMultipleCtrl === false) {
@@ -511,6 +492,13 @@ export default class ResizeControl extends FdSelectVue {
       this.selMultipleCtrl = val
       this.keyType = 'ctrlKey'
     })
+    EventBus.$on('getEdiTMode', this.getEditMode)
+  }
+  getEditMode (callBack: Function) {
+    const selected = this.selectedControls[this.userFormId].selected
+    if (selected[0] === this.controlId) {
+      callBack(this.isEditMode)
+    }
   }
   getEditModeValue (callBack: Function) {
     const selCtrl = this.getSelectedControlsDatas!

@@ -251,18 +251,16 @@ export default class ContextMenu extends FDCommonMethod {
   }
   created () {
     EventBus.$on('groupControl', (value: string) => {
-      if (this.selectedControls[this.userFormId].container[0] === this.containerId) {
-        if (value === 'group') {
-          this.groupControl()
-        } else if (value === 'ungroup') {
-          this.unGroupControl()
-        }
+      if (value === 'group') {
+        this.groupControl()
+      } else if (value === 'ungroup') {
+        this.unGroupControl()
       }
     })
   }
-  destroyed () {
-    EventBus.$off('groupControl')
-  }
+  // destroyed () {
+  //   EventBus.$off('groupControl')
+  // }
   @Emit('closeMenu')
   closeMenu () {
     return 0
@@ -1277,8 +1275,10 @@ export default class ContextMenu extends FDCommonMethod {
         this.updateControlProperty('GroupID', '', curSelect)
       }
     }
+    let container: string = ''
     for (let i = 0; i < selControl.length; i++) {
       const controlId = userData[selControl[i]].type === 'Page' ? selContainer[0] : selControl[i]
+      container = this.getContainerList(controlId)[0]
       this.deleteZIndex(controlId)
       this.deleteTabIndex(controlId)
       this.deleteControl({
@@ -1287,12 +1287,11 @@ export default class ContextMenu extends FDCommonMethod {
         targetId: controlId
       })
     }
-
     this.selectControl({
       userFormId: this.userFormId,
       select: {
-        container: userData[selContainer[0]].type === 'MultiPage' ? this.getContainerList(selContainer[0]) : selContainer,
-        selected: userData[selContainer[0]].type === 'MultiPage' ? [this.getContainerList(selContainer[0])[0]] : [selContainer[0]]
+        container: this.getContainerList(container),
+        selected: container === '' ? [this.userFormId] : [container]
       }
     })
     EventBus.$emit('focusUserForm')
@@ -1311,7 +1310,7 @@ export default class ContextMenu extends FDCommonMethod {
       controlActionName = 'ID_DELETE'
     } else if (event.ctrlKey && event.code === 'KeyV') {
       controlActionName = 'ID_PASTE'
-    } else if (event.keyCode && event.code === 'KeyX') {
+    } else if (event.ctrlKey && event.code === 'KeyX') {
       controlActionName = 'ID_CUT'
     }
     this.controlAction(event, controlActionName, '')
