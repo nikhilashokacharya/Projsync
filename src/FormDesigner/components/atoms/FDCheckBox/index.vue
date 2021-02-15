@@ -337,8 +337,18 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
   @Watch('setAlignment', { deep: true })
   editableTextVerify () {
     Vue.nextTick(() => {
-      if (this.isEditMode && this.editableTextRef.$el.clientHeight > this.properties.Height!) {
-        this.alignItem = true
+      if (this.editableTextRef) {
+        if (this.editableTextRef.$el.clientHeight > this.properties.Height!) {
+          this.alignItem = true
+        } else {
+          this.alignItem = false
+        }
+      } else if (this.textSpanRef) {
+        if (this.textSpanRef.clientHeight > this.properties.Height!) {
+          this.alignItem = true
+        } else {
+          this.alignItem = false
+        }
       } else {
         this.alignItem = false
       }
