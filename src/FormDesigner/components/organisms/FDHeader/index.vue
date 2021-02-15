@@ -354,6 +354,7 @@ import ObjectLogo from '../../../../assets/view-object.svg'
 import FDSVGImage from '@/FormDesigner/components/atoms/FDSVGImage/index.vue'
 import { EventBus } from '@/FormDesigner/event-bus'
 import FDCommonMethod from '@/api/abstract/FormDesigner/FDCommonMethod'
+import { controlProperties } from '@/FormDesigner/controls-properties'
 
 @Component({
   name: 'Header',
@@ -925,7 +926,21 @@ export default class Header extends FDCommonMethod {
     for (let index = 0; index < ctrlSel.length; index++) {
       if (!ctrlSel[index].startsWith('group')) {
         const controlprop = usrFrmData[ctrlSel[index]].properties
-        if ('AutoSize' in controlprop) {
+        if (usrFrmData[ctrlSel[index]].type === 'SpinButton') {
+          if (controlProperties.controlsOrientationProp(usrFrmData[ctrlSel[index]]) === true) {
+            this.updateControlProperty('Height', 43.5, ctrlSel[index])
+            this.updateControlProperty('Width', 21.6, ctrlSel[index])
+          } else {
+            this.updateControlProperty('Width', 52.5, ctrlSel[index])
+            this.updateControlProperty('Height', 21.6, ctrlSel[index])
+          }
+        } else if (usrFrmData[ctrlSel[index]].type === 'ScrollBar') {
+          if (controlProperties.controlsOrientationProp(usrFrmData[ctrlSel[index]]) === true) {
+            this.updateControlProperty('Width', 21.6, ctrlSel[index])
+          } else {
+            this.updateControlProperty('Height', 21.6, ctrlSel[index])
+          }
+        } else if ('AutoSize' in controlprop) {
           sizeToFitArr.push(ctrlSel[index])
           sizeToFitVal.push(controlprop.AutoSize!)
           this.updateControlProperty('AutoSize', true, ctrlSel[index])
