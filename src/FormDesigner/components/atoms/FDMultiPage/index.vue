@@ -247,7 +247,7 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
       alignSelf: controlProp.TabOrientation === 1 ? 'flex-end' : '',
       float: controlProp.TabOrientation === 3 ? 'right' : '',
       whiteSpace: controlProp.MultiRow === true ? 'break-spaces' : 'nowrap',
-      zIndex: controlProp.MultiRow === true ? '100' : '',
+      zIndex: '0',
       direction: (controlProp.MultiRow && controlProp.TabOrientation === 3) ? 'rtl' : 'ltr',
       display: controlProp.Style === 2 ? 'none' : (controlProp.MultiRow && controlProp.TabOrientation === 2) || (controlProp.MultiRow && controlProp.TabOrientation === 3) ? 'grid' : 'inline-block',
       gridAutoFlow: (controlProp.MultiRow && controlProp.TabOrientation === 2) || (controlProp.MultiRow && controlProp.TabOrientation === 3) ? 'column' : '',
