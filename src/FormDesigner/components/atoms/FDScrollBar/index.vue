@@ -141,7 +141,7 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
   @Watch('properties.ProportionalThumb')
   thumbValidate () {
     if (this.properties.ProportionalThumb) {
-      if (this.properties.Max! > this.properties.LargeChange! && this.properties.LargeChange! > 0) {
+      if (this.properties.Max! >= this.properties.LargeChange! && this.properties.LargeChange! > 0) {
         const z = this.checkOtherOrientations() ? this.properties.Height! - 40 : this.properties.Width! - 40
         this.thumbHeight = ((z / 2) - ((this.properties.Max! - this.properties.LargeChange!) / this.properties.Max!) * (z / 2)) + 'px'
         this.minHeight = '15px'
