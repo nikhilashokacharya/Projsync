@@ -252,6 +252,7 @@ export default class FDControlTabs extends Vue {
         : font.FontStyle !== ''
           ? this.tempWeight
           : '',
+      direction: 'ltr',
       fontStretch: font.FontStyle !== '' ? this.tempStretch : '',
       cursor:
         controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''

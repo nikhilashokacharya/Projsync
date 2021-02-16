@@ -213,8 +213,9 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
       height: `${controlProp.Height}px`,
       top: `${controlProp.Top}px`,
       display: display,
-      borderLeft: '2px solid whitesmoke',
-      borderBottom: controlProp.TabOrientation === 0 ? '1px solid gray' : ''
+      borderLeft: controlProp.Style === 0 ? '2px solid whitesmoke' : '',
+      borderBottom: controlProp.Style === 0 ? (controlProp.TabOrientation === 0 ? '1px solid gray' : '') : '',
+      borderRight: controlProp.Style === 0 ? (controlProp.TabOrientation === 2 ? '1px solid gray' : '') : ''
     }
   }
 
@@ -581,6 +582,65 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
    */
   protected get styleContentObj (): Partial<CSSStyleDeclaration> {
     const controlProp = this.properties
+    let width = ''
+    if (controlProp.Style !== 2) {
+      if (controlProp.Style === 1) {
+        if (controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1) {
+          width = `${controlProp.Width! - 9}px`
+        } else {
+          if (controlProp.TabFixedWidth! > 0) {
+            if (controlProp.MultiRow) {
+              width = (controlProp.Width! - this.widthValue) + 'px'
+            } else {
+              width = controlProp.Width! - controlProp.TabFixedWidth! - 16 + 'px'
+            }
+          } else {
+            if (controlProp.TabFixedWidth! === 0) {
+              if (controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3) {
+                if (controlProp.MultiRow) {
+                  width = (controlProp.Width! - this.widthValue) + 'px'
+                } else {
+                  width = `${controlProp.Width! - this.tempWidth - 19}px`
+                }
+              } else {
+                width = controlProp.Width! - controlProp.Font!.FontSize! - 26 + 'px'
+              }
+            } else {
+              width = 'calc(100% - 50px)'
+            }
+          }
+        }
+      } else {
+        if (controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1) {
+          width = `${controlProp.Width! - 3}px`
+        } else {
+          if (controlProp.TabFixedWidth! > 0) {
+            if (controlProp.TabOrientation === 3) {
+              width = (controlProp.Width! - this.widthValue) + 'px'
+            } else {
+              width = controlProp.Width! - controlProp.TabFixedWidth! - 10 + 'px'
+            }
+          } else {
+            if (controlProp.TabFixedWidth! === 0) {
+              if (controlProp.TabOrientation === 2 ||
+              controlProp.TabOrientation === 3) {
+                if (controlProp.MultiRow) {
+                  width = (controlProp.Width! - this.widthValue) + 'px'
+                } else {
+                  width = (controlProp.Width! - this.widthValue) + 'px'
+                }
+              } else {
+                width = controlProp.Width! - controlProp.Font!.FontSize! - 20 + 'px'
+              }
+            } else {
+              width = 'calc(100% - 44px)'
+            }
+          }
+        }
+      }
+    } else {
+      width = `${controlProp.Width! - 3}px`
+    }
     if (this.scrolling) {
       Vue.nextTick(() => {
         this.topValue = this.scrolling.offsetHeight!
@@ -653,20 +713,7 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
                       : `${controlProp.Height! - 35}px`
               : `${controlProp.Height! - 1}px`
           : `${controlProp.Height! - 1}px`,
-      width:
-        controlProp.Style !== 2
-          ? controlProp.Style === 1 ? controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1 ? `${controlProp.Width! - 9}px` : controlProp.TabFixedWidth! > 0 ? controlProp.Width! - controlProp.TabFixedWidth! - 16 + 'px' : controlProp.TabFixedWidth! === 0 ? controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3 ? controlProp.MultiRow ? (controlProp.Width! - this.widthValue) + 'px' : `${controlProp.Width! - this.tempWidth - 19}px` : controlProp.Width! - controlProp.Font!.FontSize! - 26 + 'px' : 'calc(100% - 50px)'
-            : controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1
-              ? `${controlProp.Width! - 3}px`
-              : controlProp.TabFixedWidth! > 0
-                ? controlProp.TabOrientation === 3 ? (controlProp.Width! - this.widthValue) + 'px' : controlProp.Width! - controlProp.TabFixedWidth! - 10 + 'px'
-                : controlProp.TabFixedWidth! === 0
-                  ? controlProp.TabOrientation === 2 ||
-              controlProp.TabOrientation === 3
-                    ? controlProp.MultiRow ? (controlProp.Width! - this.widthValue) + 'px' : `${controlProp.Width! - this.tempWidth - 13}px`
-                    : controlProp.Width! - controlProp.Font!.FontSize! - 20 + 'px'
-                  : 'calc(100% - 44px)'
-          : `${controlProp.Width! - 3}px`,
+      width: width,
       left:
         controlProp.Style !== 2
           ? controlProp.Style === 1 ? controlProp.TabOrientation === 2
@@ -691,8 +738,7 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
               : '0px'
           : '0px',
       padding: controlProp.MultiRow ? '0px' : '0px',
-      boxShadow:
-        controlProp.TabOrientation === 0 ? '1px 0px gray' : '1px 1px gray'
+      boxShadow: controlProp.Style === 0 ? (controlProp.TabOrientation === 0 ? '1px 0px gray' : '1px 1px gray') : 'none'
     }
   }
   /**
