@@ -647,15 +647,32 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
         this.widthValue = this.scrolling.clientWidth
       })
     }
+    let display = ''
+    if (controlProp.MultiRow) {
+      display = 'block'
+    } else {
+      if ((controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1) && (controlProp.Height! < controlProp.TabFixedHeight!)) {
+        display = 'none'
+      } else {
+        if ((controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3) && (controlProp.Width! < controlProp.TabFixedWidth!)) {
+          display = 'none'
+        } else {
+          if (controlProp.TabOrientation === 3) {
+            if (controlProp.Width! < (this.widthValue + 12)) {
+              display = 'none'
+            } else {
+              display = 'block'
+            }
+          } else {
+            display = 'block'
+          }
+        }
+      }
+    }
     return {
       position: 'absolute',
       backgroundColor: 'rgb(238, 238, 238)',
-      display:
-      controlProp.MultiRow ? 'block' : controlProp.Height! < controlProp.TabFixedHeight!
-        ? 'none'
-        : controlProp.Width! < controlProp.TabFixedWidth!
-          ? 'none'
-          : controlProp.TabOrientation === 3 ? controlProp.Width! < (this.widthValue + 12) ? 'none' : 'block' : 'block',
+      display: display,
       top:
         controlProp.Style !== 2
           ? controlProp.Style === 1
