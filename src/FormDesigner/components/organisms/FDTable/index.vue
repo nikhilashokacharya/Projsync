@@ -559,7 +559,12 @@ export default class FDTable extends Vue {
               this.updateInputBoxValueToPreviousValue(e, propertyName)
             }
           } else {
-            this.emitUpdateProperty(propertyName, propertyValue)
+            if (controlType === 'ComboBox' && this.userformData[this.userFormId][this.getSelectedControlsDatas[0]].properties.Style === 1) {
+              this.updateInputBoxValueToPreviousValue(e, propertyName)
+              this.setInvalidErrorMessage(propertyName, 2, null)
+            } else {
+              this.emitUpdateProperty(propertyName, propertyValue)
+            }
           }
         } else {
           this.eventObjectToAssignPreviousValue = e

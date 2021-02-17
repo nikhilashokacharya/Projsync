@@ -478,7 +478,190 @@ export default class FDComboBox extends Mixins(FdControlVue) {
           }
         }
       }
-      if (this.properties.ColumnWidths === '' && this.itemsRef && this.comboRef.children[1]) {
+      if (parseInt(this.properties.ListWidth!) > 0 && this.properties.ColumnWidths === '' && this.itemsRef && this.comboRef.children[1]) {
+        const listWidth = parseInt(this.properties.ListWidth!)
+        if (this.comboRef.children[1].children[0]) {
+          let tempWidth
+          if (this.properties.ColumnCount! <= this.extraDatas.RowSourceData![0].length) {
+            if (listWidth > 100) {
+              if (this.properties.ColumnCount! === -1) {
+                tempWidth = listWidth / this.extraDatas.RowSourceData![0].length
+              } else {
+                tempWidth = listWidth / this.properties.ColumnCount!
+              }
+            } else {
+              tempWidth = 100
+            }
+          } else {
+            if (listWidth > 100) {
+              tempWidth = listWidth / this.extraDatas.RowSourceData![0].length
+            } else {
+              tempWidth = 100
+            }
+          }
+          for (let i = 0; i < this.comboRef.children[1].children.length; i++) {
+            if (this.properties.ListStyle === 0) {
+              Vue.nextTick(() => {
+                if (this.comboRef && this.comboRef.children[0] && this.comboRef.children[0].children[0]) {
+                  for (let j = 0; j < this.comboRef.children[0].children[0].children.length; j++) {
+                    if (this.comboRef && this.comboRef.children[0] && this.comboRef.children[0].children[0] && this.comboRef.children[0].children[0].children[j]) {
+                      const headWidth = this.comboRef.children[0].children[0].children[j] as HTMLDivElement
+                      if (this.properties.ColumnCount !== -1) {
+                        if (j === this.comboRef.children[0].children[0].children.length - 1) {
+                          headWidth.style.width = finalWidths[j] - 3 + 'px'
+                        } else {
+                          headWidth.style.width = '100px'
+                        }
+                      }
+                    }
+                  }
+                }
+              })
+              for (let j = 0; j < this.comboRef.children[1].children[i].children.length; j++) {
+                const width = this.comboRef.children[1].children[i].children[j] as HTMLDivElement
+                if (this.properties.ColumnCount! === -1) {
+                  if (j >= 0 && j < this.extraDatas.RowSourceData!.length) {
+                    width.style.width = tempWidth - 3 + 'px'
+                  }
+                } else if (j + 1 > this.properties.ColumnCount!) {
+                  width.style.minWidth = '0px'
+                  width.style.width = '0px'
+                } else {
+                  if (j < this.extraDatas.RowSourceData!.length) {
+                    width.style.minWidth = '100px'
+                    width.style.width = tempWidth - 3 + 'px'
+                  }
+                }
+              }
+            } else {
+              Vue.nextTick(() => {
+                if (this.comboRef && this.comboRef.children[0] && this.comboRef.children[0].children[0]) {
+                  for (let j = 0; j < this.comboRef.children[0].children[0].children.length; j++) {
+                    if (this.comboRef && this.comboRef.children[0] && this.comboRef.children[0].children[0] && this.comboRef.children[0].children[0].children[j]) {
+                      const headWidth = this.comboRef.children[0].children[0].children[j] as HTMLDivElement
+                      if (this.properties.ColumnCount !== -1) {
+                        if (j === this.comboRef.children[0].children[0].children.length - 1) {
+                          headWidth.style.width = finalWidths[j] - 3 + 'px'
+                        } else {
+                          headWidth.style.width = '100px'
+                        }
+                      }
+                    }
+                  }
+                }
+              })
+              for (let j = 0; j < this.comboRef.children[1].children[i].children.length; j++) {
+                const width = this.comboRef.children[1].children[i].children[j] as HTMLDivElement
+                if (this.properties.ColumnCount! === -1) {
+                  if (j >= 0 && j < this.extraDatas.RowSourceData!.length) {
+                    width.style.width = '100px'
+                  }
+                } else if (j === 1 && this.properties.ColumnCount! === 1) {
+                  width.style.width = listWidth - 3 + 'px'
+                } else if (j > this.properties.ColumnCount!) {
+                  width.style.minWidth = '0px'
+                  width.style.width = '0px'
+                } else {
+                  if (j < this.extraDatas.RowSourceData!.length) {
+                    width.style.minWidth = '100px'
+                    width.style.width = (parseInt(this.itemsRef.style.width) / this.properties.ColumnCount!) + 'px'
+                  }
+                }
+              }
+            }
+          }
+        }
+      } else if (parseInt(this.properties.ListWidth!) > 0 && this.itemsRef && this.comboRef.children[1]) {
+        const listWidth = parseInt(this.properties.ListWidth!)
+        finalWidths = this.calculateColumnWidths()
+        if (this.comboRef.children[1].children[0]) {
+          for (let i = 0; i < this.comboRef.children[1].children.length; i++) {
+            if (this.properties.ListStyle === 0) {
+              for (let j = 0; j < this.comboRef.children[1].children[i].children.length; j++) {
+                const width = this.comboRef.children[1].children[i].children[j] as HTMLDivElement
+                if (j >= this.properties.ColumnCount! && this.properties.ColumnCount !== -1) {
+                  width.style.display = 'none'
+                } else {
+                  width.style.display = 'inline-block'
+                  if (this.properties.ColumnCount === 1) {
+                    if (listWidth > finalWidths[0]) {
+                      width.style.width = listWidth - 3 + 'px'
+                    } else {
+                      width.style.width = finalWidths[0] - 3 + 'px'
+                    }
+                  } else {
+                    width.style.minWidth = '0px'
+                    width.style.width = finalWidths[j] - 3 + 'px'
+                  }
+                }
+                if (this.comboRef && this.comboRef.children[0] && this.comboRef.children[0].children[0] && this.comboRef.children[0].children[0].children[j]) {
+                  const headWidth = this.comboRef.children[0].children[0].children[j] as HTMLDivElement
+                  if (this.properties.ColumnCount === -1) {
+                    headWidth.style.display = 'inline-block'
+                    headWidth.style.minWidth = '0px'
+                    headWidth.style.width = finalWidths[j] - 3 + 'px'
+                  } else if (j >= this.properties.ColumnCount!) {
+                    headWidth.style.display = 'none'
+                  } else {
+                    headWidth.style.display = 'inline-block'
+                    if (this.properties.ColumnCount === 1) {
+                      if (listWidth > finalWidths[0]) {
+                        headWidth.style.width = listWidth - 3 + 'px'
+                      } else {
+                        headWidth.style.width = finalWidths[0] - 3 + 'px'
+                      }
+                    } else {
+                      headWidth.style.width = finalWidths[j] - 3 + 'px'
+                    }
+                  }
+                }
+              }
+            } else {
+              for (let j = 0; j < this.comboRef.children[1].children[i].children.length; j++) {
+                const width = this.comboRef.children[1].children[i].children[j] as HTMLDivElement
+                if (j > 0) {
+                  if (j > this.properties.ColumnCount! && j > this.extraDatas.RowSourceData!.length - 1) {
+                    width.style.display = 'none'
+                  } else {
+                    width.style.display = 'inline-block'
+                    if (this.properties.ColumnCount === 1) {
+                      if (listWidth > finalWidths[0]) {
+                        width.style.width = listWidth - 3 + 'px'
+                      } else {
+                        width.style.width = finalWidths[0] - 3 + 'px'
+                      }
+                    } else {
+                      width.style.minWidth = '0px'
+                      width.style.width = finalWidths[j - 1] - 3 + 'px'
+                    }
+                  }
+                  if (this.comboRef && this.comboRef.children[0] && this.comboRef.children[0].children[0] && this.comboRef.children[0].children[0].children[j]) {
+                    const headWidth = this.comboRef.children[0].children[0].children[j] as HTMLDivElement
+                    if (this.properties.ColumnCount === -1) {
+                      headWidth.style.display = 'inline-block'
+                      headWidth.style.minWidth = '0px'
+                      headWidth.style.width = finalWidths[j] - 3 + 'px'
+                    } else if (j >= this.properties.ColumnCount!) {
+                      headWidth.style.display = 'none'
+                    } else {
+                      headWidth.style.display = 'inline-block'
+                      if (this.properties.ColumnCount === 1) {
+                        if (listWidth > finalWidths[0]) {
+                          headWidth.style.width = listWidth - 3 + 'px'
+                        } else {
+                          headWidth.style.width = finalWidths[0] - 3 + 'px'
+                        }
+                      } else {
+                        headWidth.style.width = finalWidths[j] - 3 + 'px'
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } else if (this.properties.ColumnWidths === '' && this.itemsRef && this.comboRef.children[1]) {
         if (this.comboRef.children[1].children[0]) {
           let tempWidth
           if (this.properties.ColumnCount! <= this.extraDatas.RowSourceData![0].length) {
@@ -669,7 +852,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     let a = (this.properties.ColumnWidths!.split(';'))
     let b = []
     let temp = 0
-    let totalWidth = this.properties.Width!
+    let totalWidth = (parseInt(this.properties.ListWidth!) > 0) ? parseInt(this.properties.ListWidth!) : this.properties.Width!
     let totalColumnWidths = 0
     let colWidths = this.properties.ColumnWidths!
     let columnWidthCount = colWidths.split(';').length
@@ -784,6 +967,12 @@ export default class FDComboBox extends Mixins(FdControlVue) {
         return false
       }
     } else {
+      return true
+    }
+  }
+
+  get isOpenForStyleProp () {
+    if (this.isActivated) {
       return true
     }
   }
@@ -1005,6 +1194,9 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     textareaRef: HTMLTextAreaElement,
     hideSelectionDiv: HTMLDivElement
   ) {
+    if (this.isOpenForStyleProp && this.properties.Style === 1) {
+      this.open = !this.open
+    }
     if (!this.properties.HideSelection) {
       hideSelectionDiv.style.display = 'none'
     } else {
