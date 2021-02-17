@@ -1124,6 +1124,8 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     textareaRef: HTMLTextAreaElement,
     hideSelectionDiv: HTMLDivElement
   ) {
+    this.getSelectionStart = this.textareaRef.selectionStart
+    this.getSelectionEnd = this.textareaRef.selectionEnd
     this.inBlur = false
     if (this.isScrolling) {
       this.open = true

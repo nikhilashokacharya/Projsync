@@ -592,6 +592,8 @@ export default class FDTextBox extends Mixins(FdControlVue) {
     textareaRef: HTMLTextAreaElement,
     hideSelectionDiv: HTMLDivElement
   ) {
+    this.getSelectionStart = this.textareaRef.selectionStart
+    this.getSelectionEnd = this.textareaRef.selectionEnd
     if (!this.properties.HideSelection) {
       if (event.target instanceof HTMLTextAreaElement) {
         const eventTarget = event.target

@@ -53,6 +53,8 @@ export default class FdControlVue extends Vue {
   spinButtonScrollBarDelayInterval: number = 0
   spinButtonScrollBarTimeout: number = 0
   spinButtonScrollBarClickCount: number = 0
+  getSelectionStart: number = 0
+  getSelectionEnd: number = 0
    // global variable to keep track of TripleState when enabled
    protected tripleState:number = 0
 
@@ -607,8 +609,17 @@ export default class FdControlVue extends Vue {
   * @param contentEditable
   */
   setContentEditable (event : KeyboardEvent, contentEditable : boolean) {
-    event.preventDefault()
-    this.setEditMode(contentEditable)
+    if (this.data.type === 'TextBox' || this.data.type === 'ComboBox') {
+      event.preventDefault()
+      this.setEditMode(contentEditable)
+      Vue.nextTick(() => {
+        this.textareaRef.focus()
+        this.textareaRef.setSelectionRange(this.getSelectionStart, this.getSelectionEnd)
+      })
+    } else {
+      event.preventDefault()
+      this.setEditMode(contentEditable)
+    }
   }
 
   /**
