@@ -41,7 +41,7 @@
           @click="handleClick($event, textareaRef, hideSelectionDiv)"
           @input="handleTextInput($event)"
           class="text-box-design"
-          :value="properties.Value"
+          :value="properties.Text"
           @dragstart="dragBehavior"
           @keydown.enter.prevent
         />
@@ -52,7 +52,7 @@
           :title="properties.ControlTipText"
           class="text-box-design"
         >
-          {{ properties.Value }}
+          {{ properties.Text }}
         </div>
         <label
           ref="autoSizeTextarea"
@@ -1489,18 +1489,30 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     }
     if (this.properties.RowSource !== '') {
       if (
-        this.properties.BoundColumn! > 0 &&
+        this.properties.BoundColumn! >= 0 &&
         this.properties.BoundColumn! < this.extraDatas.RowSourceData!.length
       ) {
         let tempData = [...this.extraDatas.RowSourceData!]
-        if (tempData![0][this.properties.BoundColumn! - 1] === newVal) {
-          this.updateDataModel({ propertyName: 'Value', value: newVal })
-        } else {
-          this.updateDataModel({ propertyName: 'Text', value: newVal })
+        for (let i = 0; i < tempData.length; i++) {
+          if (this.properties.BoundColumn! === 0 && tempData![i][0] === newVal) {
+            this.updateDataModel({ propertyName: 'Value', value: i })
+            break
+          } else if (tempData![i][0] === newVal) {
+            this.updateDataModel({ propertyName: 'Value', value: tempData![i][this.properties.BoundColumn! - 1] })
+            break
+          } else {
+            if (this.properties.BoundColumn! === 1) {
+              this.updateDataModel({ propertyName: 'Text', value: newVal })
+            }
+          }
         }
       }
       this.selectionData[0] = newVal
-      this.updateDataModel({ propertyName: 'Text', value: newVal })
+      if (this.properties.BoundColumn! === 1) {
+        this.updateDataModel({ propertyName: 'Text', value: newVal })
+      } else if (this.properties.BoundColumn! > this.extraDatas.RowSourceData![0].length) {
+        this.updateDataModel({ propertyName: 'Value', value: '' })
+      }
     } else {
       this.updateDataModel({ propertyName: 'Text', value: newVal })
     }

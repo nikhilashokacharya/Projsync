@@ -955,44 +955,58 @@ export default class FDListBox extends Mixins(FdControlVue) {
    * @param newVal  new/changed properties data
    */
   @Watch('properties.Value', { deep: true })
-  ValueData (newVal: string, oldVal: string) {
+  ValueData (newVal: string) {
     if (this.properties.RowSource !== '') {
       if (newVal !== '' && this.properties.MultiSelect === 0) {
         if (
-        this.properties.BoundColumn! > 0 &&
+        this.properties.BoundColumn! >= 0 &&
         this.properties.BoundColumn! < this.extraDatas.RowSourceData!.length
         ) {
-          let tempData = [...this.extraDatas.RowSourceData!]
-          let tempBoundColumn = this.properties.BoundColumn! - 1
-          for (let i = 0; i < this.extraDatas.RowSourceData!.length; i++) {
-            if (tempData[i][tempBoundColumn] === newVal) {
+          if (this.properties.BoundColumn! === 0) {
+            for (let i = 0; i < this.extraDatas.RowSourceData!.length; i++) {
               const x = this.listStyleRef[i] as HTMLInputElement
-              x.checked = true
-            } if (tempData[i][tempBoundColumn] !== newVal) {
-              const x = this.listStyleRef[i] as HTMLInputElement
-              x.checked = false
-            }
-            const x = this.listStyleRef[i] as HTMLInputElement
-            if (x.checked) {
-              this.listStyleRef[i].style.backgroundColor = 'rgb(59, 122, 231)'
-            }
-            if (!x.checked) {
-              this.listStyleRef[i].style.backgroundColor = ''
-              if (this.listStyleRef[i] && this.listStyleRef[i].children.length > 0) {
-                const y = this.listStyleRef[i] as HTMLDivElement
-                for (let j = 0; j < y.children.length; j++) {
-                  const z = this.listStyleRef[i].children[j] as HTMLDivElement
-                  z.style.backgroundColor = ''
+              if (this.listStyleRef[i].style.backgroundColor === 'rgb(59, 122, 231)') {
+                this.updateDataModel({ propertyName: 'Value', value: i })
+                if (this.properties.TextColumn === -1) {
+                  this.updateDataModel({ propertyName: 'Text', value: this.extraDatas.RowSourceData![i][0] })
                 }
               }
             }
-          }
-          if (tempData![0][this.properties.BoundColumn! - 1] === newVal) {
-            this.updateDataModel({ propertyName: 'Value', value: newVal })
-            if (this.properties.TextColumn === -1) {
-              this.updateDataModel({ propertyName: 'Text', value: newVal })
+          } else {
+            let tempData = [...this.extraDatas.RowSourceData!]
+            let tempBoundColumn = this.properties.BoundColumn! - 1
+            for (let i = 0; i < this.extraDatas.RowSourceData!.length; i++) {
+              if (tempData[i][tempBoundColumn] === newVal) {
+                const x = this.listStyleRef[i] as HTMLInputElement
+                x.checked = true
+              } if (tempData[i][tempBoundColumn] !== newVal) {
+                const x = this.listStyleRef[i] as HTMLInputElement
+                x.checked = false
+              }
+              const x = this.listStyleRef[i] as HTMLInputElement
+              if (x.checked) {
+                this.listStyleRef[i].style.backgroundColor = 'rgb(59, 122, 231)'
+              }
+              if (!x.checked) {
+                this.listStyleRef[i].style.backgroundColor = ''
+                if (this.listStyleRef[i] && this.listStyleRef[i].children.length > 0) {
+                  const y = this.listStyleRef[i] as HTMLDivElement
+                  for (let j = 0; j < y.children.length; j++) {
+                    const z = this.listStyleRef[i].children[j] as HTMLDivElement
+                    z.style.backgroundColor = ''
+                  }
+                }
+              }
+            }
+            if (tempData![0][this.properties.BoundColumn! - 1] === newVal) {
+              this.updateDataModel({ propertyName: 'Value', value: newVal })
+              if (this.properties.TextColumn === -1) {
+                this.updateDataModel({ propertyName: 'Text', value: newVal })
+              }
             }
           }
+        } else if (this.properties.BoundColumn! > this.extraDatas.RowSourceData!.length) {
+          this.updateDataModel({ propertyName: 'Value', value: '' })
         } else {
           return undefined
         }
@@ -1004,6 +1018,10 @@ export default class FDListBox extends Mixins(FdControlVue) {
     }
   }
 
+  @Watch('properties.BoundColumn')
+  setBoundColumnValues () {
+    this.ValueData(this.properties.Value! as string)
+  }
   /**
    * @description mounted initializes the values which are required for the component
    */
