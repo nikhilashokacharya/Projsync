@@ -79,7 +79,6 @@ import FdControlVue from '@/api/abstract/FormDesigner/FdControlVue'
 import { State, Action } from 'vuex-class'
 import ContextMenu from '../FDContextMenu/index.vue'
 import { tabsContextMenu } from '../../../models/tabsContextMenu'
-import { controlProperties } from '@/FormDesigner/controls-properties'
 import FDControlTabs from '@/FormDesigner/components/atoms/FDControlTabs/index.vue'
 import Vue from 'vue'
 import { EventBus } from '@/FormDesigner/event-bus'
@@ -115,6 +114,8 @@ export default class FDTabStrip extends FdControlVue {
   topValue: number = 0;
   widthValue: number = 40;
   rowsCount: string = '';
+  setPosition: string = 'initial';
+  isMoveGetterCalled: boolean = false;
   rightClickSelect (value: number) {
     this.updateDataModel({ propertyName: 'Value', value: value })
   }
@@ -265,13 +266,29 @@ export default class FDTabStrip extends FdControlVue {
     }
   }
 
+  @Watch('isMoveGetterCalled')
+  setPositionInMove () {
+    Vue.nextTick(() => {
+      if (this.setPosition === 'absolute') {
+        this.setPosition = 'initial'
+        this.isMoveGetterCalled = false
+        if (this.properties.MultiRow) {
+          this.updateDataModel({ propertyName: 'MultiRow', value: false })
+          this.updateDataModel({ propertyName: 'MultiRow', value: true })
+        }
+      }
+    })
+  }
   /**
    * @description style object is passed to :style attribute in div tag
    * dynamically changing the styles of the component based on propControlData
    * @function styleMoveObj
    *
    */
-  protected get styleMoveObj (): Partial<CSSStyleDeclaration> {
+  protected get styleMoveObj () {
+    if (this.isMoveGetterCalled === false && this.properties.MultiRow && this.setPosition === 'absolute') {
+      this.isMoveGetterCalled = true
+    }
     const controlProp = this.properties
     const a = ['bottom', 'top']
     let bottomTopStyle = {}
@@ -282,6 +299,7 @@ export default class FDTabStrip extends FdControlVue {
     }
     return {
       ...bottomTopStyle,
+      position: this.setPosition,
       direction: (controlProp.MultiRow && controlProp.TabOrientation === 3) ? 'rtl' : 'ltr',
       display: controlProp.Style === 2 ? 'none' : (controlProp.MultiRow && controlProp.TabOrientation === 2) || (controlProp.MultiRow && controlProp.TabOrientation === 3) ? 'grid' : 'inline-block',
       gridAutoFlow: (controlProp.MultiRow && controlProp.TabOrientation === 2) || (controlProp.MultiRow && controlProp.TabOrientation === 3) ? 'column' : '',
@@ -421,6 +439,11 @@ export default class FDTabStrip extends FdControlVue {
         this.topValue = this.scrolling.offsetHeight!
         this.widthValue = this.scrolling.clientWidth
       })
+      if (this.properties.MultiRow) {
+        this.setPosition = 'absolute'
+        this.updateDataModel({ propertyName: 'MultiRow', value: false })
+        this.updateDataModel({ propertyName: 'MultiRow', value: true })
+      }
     }
   }
 
@@ -552,7 +575,6 @@ export default class FDTabStrip extends FdControlVue {
    */
   protected get styleContentObj (): Partial<CSSStyleDeclaration> {
     const controlProp = this.properties
-    debugger
     let a = ''
     if (controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1) {
       a = `${controlProp.Width! - 3}px`
