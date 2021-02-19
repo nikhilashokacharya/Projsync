@@ -195,8 +195,7 @@ export default class FDTextBox extends Mixins(FdControlVue) {
       borderRight: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 1 ? '2px solid gray' : controlProp.SpecialEffect === 4 ? '1.5px solid gray' : controlProp.SpecialEffect === 3 ? '0.5px solid gray' : '',
       borderTop: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 2 ? '2px solid gray' : controlProp.SpecialEffect === 3 ? '1.5px solid gray' : controlProp.SpecialEffect === 4 ? '0.5px solid gray' : '',
       borderBottom: controlProp.BorderStyle === 1 ? '1px solid ' + controlProp.BorderColor : controlProp.SpecialEffect === 1 ? '2px solid gray' : controlProp.SpecialEffect === 4 ? '1.5px solid gray' : controlProp.SpecialEffect === 3 ? '0.5px solid gray' : '',
-      whiteSpace:
-        this.isEditMode ? controlProp.WordWrap && controlProp.MultiLine ? 'normal' : 'nowrap' : controlProp.WordWrap && controlProp.MultiLine ? 'pre-line' : 'pre',
+      whiteSpace: this.setWhiteSpace(),
       wordBreak:
         controlProp.WordWrap && controlProp.MultiLine ? 'break-word' : 'normal',
       color:
@@ -222,10 +221,33 @@ export default class FDTextBox extends Mixins(FdControlVue) {
       display: display,
       overflowX: this.getScrollBarX,
       overflowY: this.getScrollBarY
-      // position: 'relative'
     }
   }
 
+  setWhiteSpace () {
+    const controlProp = this.properties
+    if (this.isEditMode) {
+      if (controlProp.MultiLine) {
+        if (controlProp.WordWrap) {
+          return 'break-spaces'
+        } else {
+          return 'nowrap'
+        }
+      } else {
+        return 'nowrap'
+      }
+    } else {
+      if (controlProp.MultiLine) {
+        if (controlProp.WordWrap) {
+          return 'break-spaces'
+        } else {
+          return 'pre'
+        }
+      } else {
+        return 'pre'
+      }
+    }
+  }
   /**
    * @description updates the dataModel textBox object properties when user insert/delete text
    * inside textBox when passwordChar is set, updates text and values properties of textBox with entered character
@@ -361,6 +383,8 @@ export default class FDTextBox extends Mixins(FdControlVue) {
         }
         (event.target).selectionStart = selectionStart + 1;
         (event.target).selectionEnd = (event.target).selectionStart
+        const eTarget = event.target as HTMLTextAreaElement
+        this.updateDataModel({ propertyName: 'Value', value: eTarget.value })
         return false
       } else {
         throw new Error('Expected HTMLTextAreaElement but found different element')
