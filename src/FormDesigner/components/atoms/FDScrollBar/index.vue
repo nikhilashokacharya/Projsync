@@ -152,7 +152,7 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
         this.minHeight = '0px'
       }
     } else {
-      this.thumbHeight = '25px'
+      this.thumbHeight = '15px'
     }
   }
   @Watch('isEditMode')
