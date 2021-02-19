@@ -220,14 +220,14 @@
             </div>
             <div v-else></div>
             <div
-              @click="properties.Enabled ? (open = false) : (open = true)"
+              @click="checkBothEnabledAndLocked() ? (open = false) : (open = true)"
               v-if="properties.RowSource !== ''"
             >
               <div
                 :tabindex="index"
                 class="tr"
                 @mouseover="mouseOverEvent"
-                :disabled="!properties.Enabled"
+                :disabled="!properties.Enabled || properties.Locked"
                 v-for="(item, index) of tempArray"
                 :key="index"
                 ref="trRef"
@@ -236,7 +236,7 @@
                 @blur="clearMatchEntry"
                 @mousedown="
                   isRunMode || isEditMode
-                    ? properties.Enabled
+                    ? checkBothEnabledAndLocked()
                       ? handleMultiSelect($event)
                       : makeOpen()
                     : ''
@@ -252,7 +252,7 @@
                       properties.ColumnCount === -1)
                   "
                 >
-                  <input name="radio" type="radio" class="inputClass" :disabled="!properties.Enabled"/>
+                  <input name="radio" type="radio" class="inputClass" :disabled="!properties.Enabled || properties.Locked"/>
                 </div>
                 <div
                   class="column-item"
@@ -315,6 +315,17 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   controlZIndex: number = -1;
   newColumnWidthsValue: string = '';
 
+  get checkBothEnabledAndLocked () {
+    if (this.properties.Enabled) {
+      if (this.properties.Locked) {
+        return false
+      } else {
+        return true
+      }
+    } else {
+      return false
+    }
+  }
   get innerComboBoxStyleObj () {
     return {
       display: 'grid',
@@ -328,7 +339,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     }
   }
   mouseOverEvent (e: MouseEvent) {
-    if (this.properties.Enabled) {
+    if (this.properties.Enabled && !this.properties.Locked) {
       const eTarget = e.target as HTMLDivElement
       for (let i = 0; i < eTarget.parentElement!.parentElement!.children.length; i++) {
         if (eTarget.parentElement!.className === 'tr') {

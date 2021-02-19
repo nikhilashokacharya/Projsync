@@ -652,7 +652,7 @@ export default class FDListBox extends Mixins(FdControlVue) {
           let splitData = data.replace(/\t/g, ' ').split(' ')
 
           targetElement.focus()
-          if (this.properties.Enabled && this.properties.Locked === false) {
+          if (this.isRunMode && (this.properties.Enabled && this.properties.Locked === false)) {
             if (this.properties.MultiSelect === 0) {
               this.clearOptionBGColorAndChecked(e)
               this.setOptionBGColorAndChecked(e)
@@ -671,7 +671,7 @@ export default class FDListBox extends Mixins(FdControlVue) {
                 for (let i = 0; i < tempPath.length; i++) {
                   const ele = tempPath[i] as HTMLDivElement
                   if (ele.className === 'table-body') {
-                    // extend points start and end
+                  // extend points start and end
                     for (let j = 0; j < ele.childNodes.length; j++) {
                       const cd = ele.childNodes[j] as HTMLDivElement
                       if (cd.innerText === this.properties.Value) {
@@ -694,7 +694,73 @@ export default class FDListBox extends Mixins(FdControlVue) {
                         .childNodes[0] as HTMLInputElement
                       node.style.backgroundColor = 'rgb(59, 122, 231)'
                       if (this.properties.ListStyle === 1 && !tempNode.checked) {
-                        // tempNode.checked = !tempNode.checked
+                      // tempNode.checked = !tempNode.checked
+                        tempNode.checked = true
+                      }
+                    }
+                    break
+                  }
+                }
+              }
+
+              if (this.properties.ControlSource !== '') {
+                if (this.properties.TextColumn === -1) {
+                  this.updateDataModel({
+                    propertyName: 'Text',
+                    value: this.selectionData[0]
+                  })
+                }
+                this.updateDataModel({
+                  propertyName: 'Value',
+                  value: this.selectionData[0]
+                })
+              }
+              this.clearOptionBGColorAndChecked(e)
+              this.setOptionBGColorAndChecked(e)
+            }
+          } else {
+            if (this.properties.MultiSelect === 0) {
+              this.clearOptionBGColorAndChecked(e)
+              this.setOptionBGColorAndChecked(e)
+            } else if (this.properties.MultiSelect === 1) {
+              this.setOptionBGColorAndChecked(e)
+            } else if (this.properties.MultiSelect === 2) {
+              if (e.ctrlKey === true) {
+                if (targetElement.tagName === 'INPUT') {
+                  this.setOptionBGColorAndChecked(e)
+                } else {
+                  this.setOptionBGColorAndChecked(e)
+                }
+              } else if (e.shiftKey === true && this.properties.Value !== '') {
+                let startPoint = 0
+                let endPoint = 0
+                for (let i = 0; i < tempPath.length; i++) {
+                  const ele = tempPath[i] as HTMLDivElement
+                  if (ele.className === 'table-body') {
+                  // extend points start and end
+                    for (let j = 0; j < ele.childNodes.length; j++) {
+                      const cd = ele.childNodes[j] as HTMLDivElement
+                      if (cd.innerText === this.properties.Value) {
+                        startPoint = j + 1
+                      }
+                      if (cd.innerText === targetElement.innerText) {
+                        endPoint = j
+                      }
+                    }
+                    // upward selection start and end swap
+                    if (startPoint > endPoint) {
+                      let temp = startPoint
+                      startPoint = endPoint
+                      endPoint = temp
+                    }
+                    // setting selection
+                    for (let k = startPoint; k <= endPoint; k++) {
+                      const node = ele.childNodes[k] as HTMLDivElement
+                      const tempNode = node.childNodes[0]
+                        .childNodes[0] as HTMLInputElement
+                      node.style.backgroundColor = 'rgb(59, 122, 231)'
+                      if (this.properties.ListStyle === 1 && !tempNode.checked) {
+                      // tempNode.checked = !tempNode.checked
                         tempNode.checked = true
                       }
                     }
