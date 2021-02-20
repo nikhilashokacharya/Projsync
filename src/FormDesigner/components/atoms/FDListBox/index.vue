@@ -1209,7 +1209,6 @@ export default class FDListBox extends Mixins(FdControlVue) {
     }
     if (this.toolBoxSelectControl === 'Select') {
       e.stopPropagation()
-      this.selectedItem(e)
       if (!this.isActivated) {
         EventBus.$emit('focusUserForm')
       }

@@ -182,13 +182,16 @@ export default class ContextMenu extends FDCommonMethod {
         )
       } else if (controlActionName === 'ID_MOVE') {
         const type = this.userformData[this.userFormId][this.controlId].type
+        const selectedPageID = this.selectedControls[this.userFormId].selected[0]
         if (type === 'MultiPage') {
-          EventBus.$emit('userFormTabOrder', this.userFormId, this.controlId, type)
+          const value = this.userformData[this.userFormId][this.controlId].properties.Value
+          EventBus.$emit('userFormTabOrder', this.userFormId, this.controlId, type, value, selectedPageID)
         } else {
-          EventBus.$emit('tabStripTabOrder', this.userFormId, this.controlId, type)
+          const value = this.userformData[this.userFormId][this.controlId].properties.Value
+          EventBus.$emit('tabStripTabOrder', this.userFormId, this.controlId, type, value)
         }
       } else if (controlActionName === 'ID_TABORDER') {
-        EventBus.$emit('userFormTabOrder', this.userFormId, this.containerId, '')
+        EventBus.$emit('userFormTabOrder', this.userFormId, this.containerId, '', -1, '')
       } else if (
         controlActionName === 'ID_ALIGN' ||
       controlActionName === 'ID_MAKESAMESIZE'
@@ -1029,6 +1032,22 @@ export default class ContextMenu extends FDCommonMethod {
       }
     }
   }
+  generateUniqueName (controlName: string) {
+    let lastControlId = 0
+    const userformControlIds = Object.keys(this.userformData[this.userFormId])
+    for (let i = 0; i < userformControlIds.length; i++) {
+      const ctrlProp = this.userformData[this.userFormId][userformControlIds[i]].properties
+      if (ctrlProp.Name!.indexOf(controlName) !== -1) {
+        const IdNum =
+        ctrlProp.Name!.split(controlName).pop() || '-1'
+        const pasreId = parseInt(IdNum, 10)
+        if (!isNaN(pasreId) && lastControlId < pasreId) {
+          lastControlId = pasreId
+        }
+      }
+    }
+    return `${controlName}${lastControlId + 1}`
+  }
   /**
    * @description To paste controls in respective container present in respective userform
    * @function pasteControl
@@ -1061,7 +1080,6 @@ export default class ContextMenu extends FDCommonMethod {
           groupArray: groupArray!
         })
       }
-
       const recCopyControl = (daTarget: string) => {
         const daTargetControls = userFormData[daTarget].controls
         if (daTargetControls && daTargetControls.length > 0) {
@@ -1078,7 +1096,7 @@ export default class ContextMenu extends FDCommonMethod {
                 ...controlObj.properties,
                 ID: controlID!,
                 GroupID: groupIdIndex !== -1 ? newGroupId[groupIdIndex] : '',
-                Name: Name
+                Name: this.generateUniqueName(controlObj.properties.Name)
               }
             }
             this.removeChildControl(daTarget, key)

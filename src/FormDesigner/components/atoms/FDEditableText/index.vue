@@ -40,7 +40,7 @@ export default class FDEditableText extends Vue {
   keydownHandle (e: KeyboardEvent) {
     e.stopPropagation()
     if (e.key === 'Escape') {
-      this.$emit('releaseEditMode')
+      this.$emit('releaseEditMode', e)
     }
     if (e.key === 'Enter' || e.key === 'Tab') {
       e.preventDefault()

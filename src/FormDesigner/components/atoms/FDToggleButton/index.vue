@@ -115,7 +115,6 @@ export default class FDToggleButton extends Mixins(FdControlVue) {
           this.isClicked = false
         }
       }
-      this.selectedItem(e)
       if (this.isEditMode) {
         (this.editableTextRef.$el as HTMLSpanElement).focus()
       }
@@ -374,6 +373,10 @@ export default class FDToggleButton extends Mixins(FdControlVue) {
   mounted () {
     this.$el.focus()
     this.updateAutoSize()
+    if (this.properties.Picture) {
+      this.positionLogo(this.properties.PicturePosition)
+      this.pictureSize()
+    }
   }
   releaseEditMode (event: KeyboardEvent) {
     this.$el.focus()

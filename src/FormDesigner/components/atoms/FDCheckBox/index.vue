@@ -495,6 +495,10 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
     this.verifyValue()
     this.$el.focus()
     this.controlSource()
+    if (this.properties.Picture) {
+      this.positionLogo(this.properties.PicturePosition)
+      this.pictureSize()
+    }
   }
   releaseEditMode (event: KeyboardEvent) {
     this.$el.focus()
@@ -503,7 +507,6 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
   checkBoxClick (event: MouseEvent) {
     if (this.toolBoxSelectControl === 'Select') {
       event.stopPropagation()
-      this.selectedItem(event)
       if (this.isEditMode) {
         (this.editableTextRef.$el as HTMLSpanElement).focus()
       }

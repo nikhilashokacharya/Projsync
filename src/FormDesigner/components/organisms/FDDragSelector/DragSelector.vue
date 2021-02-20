@@ -112,9 +112,7 @@ export default {
           window.addEventListener('mousemove', this.handleMouseMoveThrottled)
         })
       }
-      setTimeout(() => {
-        this.$emit('deActiveControl', e)
-      }, 0)
+      this.$emit('deActiveControl', e)
     },
 
     handleMouseMove (e) {

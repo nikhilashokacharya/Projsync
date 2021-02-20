@@ -59,6 +59,9 @@ export default class FdSelectVue extends FDCommonMethod {
   }
 
   updateIsMove (value: boolean) {
+    if (value === true) {
+      this.isMoveWhenMouseDown = value
+    }
     this.isMoving = value
   }
   updateEditMode (value: boolean) {

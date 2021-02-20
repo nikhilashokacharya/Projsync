@@ -1119,7 +1119,6 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
   deActControl (event: MouseEvent) {
     this.multiPageMouseDown(event)
   }
-
   multiPageMouseDown (e: MouseEvent) {
     if (e.which !== 3) {
       EventBus.$emit('isEditMode', this.isEditMode)

@@ -30,7 +30,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch, Ref } from 'vue-property-decorator'
+import { Component, Prop, Watch } from 'vue-property-decorator'
 import {
   IselectControl,
   IupdateControl,
@@ -210,6 +210,7 @@ export default class GroupControl extends FDCommonMethod {
     if (this.getIsMoveTarget) {
       //   this.moveBorder(event)
       if (event.movementX !== 0 && event.movementY !== 0) {
+        EventBus.$emit('isMousedownMove', true)
         EventBus.$emit('moveControl', event, 'groupControlDrag')
         EventBus.$emit('groupDrag', 'groupdrag')
         this.isMove = true
@@ -353,7 +354,6 @@ export default class GroupControl extends FDCommonMethod {
       this.tempEvent = event
       EventBus.$emit('groupDrag', 'NotDrag')
       this.isMove = false
-      this.deActGroupControl()
       this.resizeDiv = handler
       this.positions.clientX = event.clientX
       this.positions.clientY = event.clientY
@@ -540,7 +540,12 @@ export default class GroupControl extends FDCommonMethod {
         } else {
           if (this.resizeDiv.includes('t')) {
             if (incHeight > -1) {
-              dragResizeControl.top = `${top}px`
+              const groupBottom = parseInt(dragResizeControl.height!) + parseInt(dragResizeControl.top!)
+              if (top < groupBottom) {
+                dragResizeControl.top = `${top}px`
+              } else {
+                dragResizeControl.top = `${groupBottom}px`
+              }
             }
             dragResizeControl.height = `${incHeight}px`
           } else if (this.resizeDiv.includes('b')) {
@@ -549,7 +554,12 @@ export default class GroupControl extends FDCommonMethod {
 
           if (this.resizeDiv.includes('l')) {
             if (incWidth > -1) {
-              dragResizeControl.left = `${left}px`
+              const groupRight = parseInt(dragResizeControl.width!) + parseInt(dragResizeControl.left!)
+              if (left < groupRight) {
+                dragResizeControl.left = `${left}px`
+              } else {
+                dragResizeControl.left = `${groupRight}px`
+              }
             }
             dragResizeControl.width = `${incWidth}px`
           } else if (this.resizeDiv.includes('r')) {

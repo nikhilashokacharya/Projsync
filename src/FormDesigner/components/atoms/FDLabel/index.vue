@@ -296,6 +296,10 @@ export default class FDLabel extends Mixins(FdControlVue) {
   }
   mounted () {
     this.$el.focus()
+    if (this.properties.Picture) {
+      this.positionLogo(this.properties.PicturePosition)
+      this.pictureSize()
+    }
   }
   releaseEditMode (event: KeyboardEvent) {
     this.$el.focus()
@@ -304,7 +308,6 @@ export default class FDLabel extends Mixins(FdControlVue) {
   labelClick (event: MouseEvent) {
     if (this.toolBoxSelectControl === 'Select') {
       event.stopPropagation()
-      this.selectedItem(event)
       if (this.isEditMode) {
         (this.editableTextRef.$el as HTMLSpanElement).focus()
       }

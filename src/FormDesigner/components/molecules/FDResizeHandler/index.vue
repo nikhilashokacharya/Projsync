@@ -154,6 +154,9 @@ export default class Resizehandler extends FDCommonMethod {
       if (this.getIsMoveTarget) {
         this.moveBorder(event)
         if (event.movementX !== 0 && event.movementY !== 0) {
+          if (this.currentMouseDownEvent && (event.movementX !== 0 || event.movementY !== 0)) {
+            this.currentMouseDownEvent.customCallBack && this.currentMouseDownEvent.customCallBack()
+          }
           this.updateIsMove(true)
           const containerType = this.userformData[this.userFormId][this.controlId].type
           if (containerType === 'Frame' || containerType === 'MultiPage') {

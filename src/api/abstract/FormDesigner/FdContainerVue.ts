@@ -360,6 +360,7 @@ export default class FdContainerVue extends FdControlVue {
         }
       }
     }
+    EventBus.$emit('getCtrlEditMode', this.isEditMode)
   }
   createPageName (pageList: string[]) {
     let lastControlId = 0

@@ -86,9 +86,6 @@ export default class FDCommandButton extends Mixins(FdControlVue) {
   commandButtonClick (e: Event) {
     if (this.toolBoxSelectControl === 'Select') {
       e.stopPropagation()
-      if (!this.isRunMode) {
-        this.selectedItem(e)
-      }
       if (this.isActivated) {
         if (this.properties.Locked) {
           this.isClicked = false
@@ -327,6 +324,10 @@ export default class FDCommandButton extends Mixins(FdControlVue) {
   mounted () {
     this.$el.focus()
     this.updateAutoSize()
+    if (this.properties.Picture) {
+      this.positionLogo(this.properties.PicturePosition)
+      this.pictureSize()
+    }
   }
   releaseEditMode (event: KeyboardEvent) {
     this.$el.focus()

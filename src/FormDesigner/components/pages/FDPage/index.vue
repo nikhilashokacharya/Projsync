@@ -1,5 +1,5 @@
 <template>
-  <div id="app" tabindex="0" @focus="updatefocus" @contextmenu.stop="preventcontextMenu">
+  <div id="app" tabindex="0" @focus="updatefocus" @contextmenu.stop="preventcontextMenu" @keydown.esc="closeMenu">
     <div
       id="right-click-menu"
       :style="contextMenuStyle"

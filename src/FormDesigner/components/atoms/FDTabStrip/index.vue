@@ -939,7 +939,6 @@ export default class FDTabStrip extends FdControlVue {
   tabStripClick (event: MouseEvent) {
     if (this.toolBoxSelectControl === 'Select') {
       event.stopPropagation()
-      this.selectedItem(event)
     }
   }
 

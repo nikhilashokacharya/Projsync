@@ -360,7 +360,7 @@ export default class Container extends FDCommonMethod {
           )
         }
         const isPageSelected = !(userData[this.containerId].type === 'Page' && this.getSelectedControlsDatas!.includes(this.getContainerList(this.containerId)[0]))
-        if (mainSelect && !this.getSelectedControlsDatas!.includes(this.containerId) && isPageSelected && !this.mouseUpOnPageTab) {
+        if (userData[mainSelect].type !== 'Userform' && mainSelect && !this.getSelectedControlsDatas!.includes(this.containerId) && isPageSelected && !this.mouseUpOnPageTab) {
           count = count + 1
           let frameCondition: boolean = false
           if (this.handler === 'frameDrag') {

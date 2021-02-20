@@ -125,7 +125,6 @@ export default class FDImage extends Mixins(FdControlVue) {
   imageClick (event: MouseEvent) {
     if (this.toolBoxSelectControl === 'Select') {
       event.stopPropagation()
-      this.selectedItem(event)
     }
   }
 }

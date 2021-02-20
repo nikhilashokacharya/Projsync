@@ -22,9 +22,11 @@
         v-model="selected"
         @change="updateSelected($event)"
       >
+      <template v-if="displayName">
         <option
-          :value="userFormId"
+          :value="containerData.properties.ID"
         >{{displayName ? containerData.properties.Name + ' '+ containerData.type : ''}}</option>
+      </template>
         <template v-if="displayName">
          <option  v-for="control in containerDataControl" :value="control" :key="userData[control].properties.Name">
           <b>{{displayName ?  userData[control].properties.Name + ' ' + userData[control].type : ''}}</b>
@@ -71,6 +73,7 @@ export default class PropertiesList extends FDCommonMethod {
   }
 
   selectedOption: Object= {}
+  ctrlEditMode: boolean = false
 
   selectOption () {
     if (this.displayName) {
@@ -246,12 +249,36 @@ export default class PropertiesList extends FDCommonMethod {
     return this.selectedControls[this.userFormId].container
   }
   get containerData () {
-    const type = this.userData[this.selectedContainer[0]].type
-    return type === 'Page' ? this.userData[this.selectedContainer[1]] : this.userData[this.selectedContainer[0]]
+    if (this.userData[this.selectedSelect[0]].type !== 'Userform' && this.ctrlEditMode) {
+      if (this.userData[this.selectedSelect[0]].type === 'Frame') {
+        return this.userData[this.selectedControls[this.userFormId].selected[0]]
+      } else {
+        const type = this.userData[this.selectedContainer[0]].type
+        return type === 'Page' ? this.userData[this.selectedContainer[1]] : this.userData[this.selectedContainer[0]]
+      }
+    } else {
+      const type = this.userData[this.selectedContainer[0]].type
+      return type === 'Page' ? this.userData[this.selectedContainer[1]] : this.userData[this.selectedContainer[0]]
+    }
   }
   get containerDataControl () {
-    const type = this.userData[this.selectedContainer[0]].type
-    return type === 'Page' ? this.getChildControl(this.selectedContainer[1]) : this.userData[this.selectedContainer[0]].controls
+    if (this.ctrlEditMode) {
+      if (this.userData[this.selectedSelect[0]].type === 'Frame') {
+        return this.userData[this.selectedControls[this.userFormId].selected[0]].controls.length > 0 ? this.userData[this.selectedControls[this.userFormId].selected[0]].controls : ''
+      } else {
+        const type = this.userData[this.selectedSelect[0]].type
+        const ctrls = this.userData[this.selectedContainer[0]].controls
+        const pageControls = this.userData[this.selectedSelect[0]].controls
+        const combinedControl = ctrls.concat(pageControls)
+        return type === 'Page' ? combinedControl : this.userData[this.selectedContainer[0]].controls
+      }
+    } else {
+      const type = this.userData[this.selectedContainer[0]].type
+      const ctrls = type === 'Page' ? this.userData[this.selectedContainer[1]].controls : []
+      const pageControls = this.userData[this.selectedContainer[0]].controls
+      const combinedControl = ctrls.concat(pageControls)
+      return type === 'Page' ? combinedControl : this.userData[this.selectedContainer[0]].controls
+    }
   }
   get userData () {
     return this.userformData[this.userFormId]
@@ -263,9 +290,31 @@ export default class PropertiesList extends FDCommonMethod {
   updateOption () {
     this.selectOption()
   }
+  getEditMode () {
+    const userData = this.userformData[this.userFormId]
+    const selected = this.selectedControls[this.userFormId].selected
+    if (
+      selected.length === 1 &&
+      !selected[0].startsWith('group') &&
+      userData[selected[0]].type !== 'Userform'
+    ) {
+      if (userData[selected[0]].type === 'Page' || userData[selected[0]].type === 'Frame' || userData[selected[0]].type === 'MultiPage') {
+        EventBus.$emit('getEdiTMode', (editmode: boolean) => {
+          this.ctrlEditMode = editmode
+        })
+      } else {
+        this.ctrlEditMode = false
+      }
+    } else {
+      this.ctrlEditMode = false
+    }
+  }
   created () {
     EventBus.$on('dispProp', (val: boolean) => {
       this.isTableVisible = val
+    })
+    EventBus.$on('getCtrlEditMode', () => {
+      this.getEditMode()
     })
   }
   destroyed () {

@@ -113,7 +113,7 @@
               </ul>
             </div>
           </li>
-          <li @click="subMenuDisplay">
+          <li @click="subMenuDisplay" @mouseover="getEditMode" @mouseleave="updateCtrlEditMode">
             <u>F</u>ormat
             <div class="sub-menu-1" v-if="displaySubMenu === true">
               <ul class="sub-menu-ul">
@@ -392,6 +392,7 @@ export default class Header extends FDCommonMethod {
   ) => void;
   propControlData = {};
   userFormId = 'ID_USERFORM1';
+  controlEditMode: boolean = false
   gridSize: number = 9
   insertUserForm () {
     this.propControlData = this.userformData
@@ -417,6 +418,17 @@ export default class Header extends FDCommonMethod {
         type: 'Userform'
       }
     })
+  }
+  getEditMode () {
+    const selected = this.selectedControls[this.userFormId].selected
+    if (selected.length === 1 && !selected[0].startsWith('group')) {
+      EventBus.$emit('getEdiTMode', (editmode: boolean) => {
+        this.controlEditMode = editmode
+      })
+    }
+  }
+  updateCtrlEditMode () {
+    this.controlEditMode = false
   }
   subMenuDisplay () {
     this.displaySubMenu = !this.displaySubMenu
@@ -1671,16 +1683,10 @@ export default class Header extends FDCommonMethod {
   }
   getdisableStyle (id: string) {
     let disabled: boolean = true
-    let controlEditMode: boolean = true
     const selected = this.selectedControls[this.userFormId].selected
     const selContainer = this.selectedControls[this.userFormId].container
     const userData = this.userformData[this.userFormId]
-    if (selected.length === 1 && !selected[0].startsWith('group')) {
-      EventBus.$emit('getEdiTMode', (editmode: boolean) => {
-        controlEditMode = editmode
-      })
-    }
-    if (!controlEditMode) {
+    if (!this.controlEditMode) {
       if (id === 'unGroup') {
         let groupId: boolean = false
         const selectedGroupArray = selected.filter(

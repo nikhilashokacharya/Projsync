@@ -10,13 +10,12 @@
       "
       :style="resizeControlStyle"
       :ref="'draRef'.concat(controlId)"
-      @mousedown="
-        mainSelected && !isRunMode
-          ? handleDrag($event)
-          : !isRunMode && dragGroupControl($event)
-      "
+      @mousedown="!isRunMode && isGroupSelected
+          ? handleDrag($event, controlId)
+          : !isRunMode && dragGroupControl($event, controlId)"
       @contextmenu.stop="displayContextMenu"
       @click.self="containerBorderClick"
+      @mouseup="handleMouseUp"
     >
       <ResizeHandler
         v-if="!isRunMode"
@@ -120,12 +119,17 @@ export default class ResizeControl extends FdSelectVue {
   @Ref('resize') readonly resize!: ResizeHandler;
   selMultipleCtrl: boolean = false
   keyType: string = ''
+  previousSel: string[] = []
+  isGroupActive: boolean = false
+  actvControl: string = ''
 
-  handleDrag (event: MouseEvent) {
+  handleDrag (event: MouseEvent, control: string) {
+    this.actvControl = control
     if (this.toolBoxSelect === 'Select') {
       event.stopPropagation()
-      if (this.selectedControls[this.userFormId].selected.length > 1 && this.selMultipleCtrl === false) {
-        if (event.which !== 3 && this.isMoveWhenMouseDown) {
+      if (this.selMultipleCtrl === false) {
+        if (event.which !== 3) {
+          this.previousSel = [...this.selectedControls[this.userFormId].selected]
           this.selectedItem(event)
         }
       }
@@ -134,7 +138,7 @@ export default class ResizeControl extends FdSelectVue {
     }
   }
   @Emit('muldragControl')
-  private muldragControl (val: IDragResizeGroup) {
+  muldragControl (val: IDragResizeGroup) {
     return val
   }
 
@@ -146,15 +150,23 @@ export default class ResizeControl extends FdSelectVue {
     this.selMultipleCtrl = val
   }
 
-  dragGroupControl (event: MouseEvent) {
+  dragGroupControl (event: MouseEvent, control: string) {
+    this.actvControl = control
+    this.isGroupActive = false
     if (this.toolBoxSelect === 'Select') {
       event.stopPropagation()
-      if (this.selectedControls[this.userFormId].selected.length > 1 && this.selMultipleCtrl === false) {
-        if (event.which !== 3 && this.isMoveWhenMouseDown) {
-          this.selectedItem(event)
+      if (this.selMultipleCtrl === false) {
+        if (event.which !== 3) {
+          const groupId = this.propControlData.properties.GroupID!
+          this.previousSel = [...this.selectedControls[this.userFormId].selected]
+          if (!this.previousSel.includes(groupId) && !this.previousSel.includes(this.controlId)) {
+            this.selectedItem(event)
+            this.isGroupActive = true
+          }
         }
       }
-      this.propControlData.properties.GroupID && this.dragControl(event)
+      this.isMoveWhenMouseDown = false
+      this.resize.handleMouseDown(event, 'drag', 'control', this.controlId)
     }
   }
   @Emit('openMenu')
@@ -224,6 +236,11 @@ export default class ResizeControl extends FdSelectVue {
           ))
     )
   }
+  get isGroupSelected () {
+    const userData = this.userformData[this.userFormId]
+    const groupId = userData[this.controlId].properties.GroupID
+    return groupId === ''
+  }
   deleteItem (event: KeyboardEvent) {
     EventBus.$emit('handleKeyDown', event, this.controlId)
   }
@@ -234,17 +251,7 @@ export default class ResizeControl extends FdSelectVue {
         ? this.propControlData.properties.GroupID
         : ''
       const currentSelect = this.selectedControls[this.userFormId].selected
-      if (currentSelect.length === 1 && currentSelect[0] === this.controlId) {
-        if (
-          this.isMoveWhenMouseDown !== true &&
-        this.propControlData.type !== 'FDImage' &&
-        this.propControlData.type !== 'Frame' &&
-        this.propControlData.type !== 'MultiPage'
-        ) {
-          this.isEditMode = true
-          this.isMoveWhenMouseDown = false
-        }
-      } else {
+      if (!(currentSelect.length === 1 && currentSelect[0] === this.controlId)) {
         if (currentSelect.length > 1 && (currentSelect.includes(this.controlId) || currentSelect.includes(this.userformData[this.userFormId][this.controlId].properties.GroupID!))) {
           if (currentSelect.includes(this.controlId)) {
             this.exchangeSelect()
@@ -407,6 +414,31 @@ export default class ResizeControl extends FdSelectVue {
         })
       }
     }
+    EventBus.$emit('getCtrlEditMode', this.isEditMode)
+  }
+  handleMouseUp (event: MouseEvent) {
+    if (event.which !== 3 && this.controlId === this.actvControl) {
+      const currentSelect = this.selectedControls[this.userFormId].selected
+      if (currentSelect.length === 1 && currentSelect[0] === this.controlId && this.previousSel.includes(currentSelect[0])) {
+        if (
+          this.isMoveWhenMouseDown !== true &&
+        this.propControlData.type !== 'FDImage' &&
+        this.propControlData.type !== 'Frame' &&
+        this.propControlData.type !== 'MultiPage'
+        ) {
+          this.isEditMode = true
+          this.isMoveWhenMouseDown = false
+        }
+      }
+      const userData = this.userformData[this.userFormId]
+      const selected = this.selectedControls[this.userFormId].selected
+      const groupId = (!selected[0].startsWith('group') && userData[selected[0]].properties.GroupID && userData[selected[0]].properties.GroupID !== '') || selected[0].startsWith('group')
+      if (groupId && this.isGroupActive !== true && this.isMoveWhenMouseDown !== true) {
+        this.selectedItem(event)
+        this.isGroupActive = false
+      }
+    }
+    this.actvControl = ''
   }
 
   exchangeSelect () {
@@ -452,7 +484,7 @@ export default class ResizeControl extends FdSelectVue {
   updateSelectedControls () {
     const type = this.userformData[this.userFormId][this.selectedContainer[0]].type
     const controlType = this.userformData[this.userFormId][this.controlId].type
-    if (type === 'Frame' || type === 'Page' || type === 'MultiPage') {
+    if ((type === 'Frame' || type === 'Page' || type === 'MultiPage') && this.selectedContainer.includes(this.controlId)) {
       if (controlType === 'Frame' || controlType === 'MultiPage') {
         this.isEditMode = true
       } else {
@@ -493,10 +525,15 @@ export default class ResizeControl extends FdSelectVue {
       this.keyType = 'ctrlKey'
     })
     EventBus.$on('getEdiTMode', this.getEditMode)
+    EventBus.$on('isMousedownMove', (val: boolean) => {
+      this.isMoveWhenMouseDown = val
+    })
   }
   getEditMode (callBack: Function) {
     const selected = this.selectedControls[this.userFormId].selected
-    if (selected[0] === this.controlId) {
+    const userData = this.userformData[this.userFormId]
+    const mainSel = userData[selected[0]].type === 'Page' ? this.getContainerList(selected[0])[0] : selected[0]
+    if (mainSel === this.controlId) {
       callBack(this.isEditMode)
     }
   }

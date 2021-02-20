@@ -216,7 +216,6 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
       left: `${controlProp.Left}px`,
       top: `${controlProp.Top}px`,
       display: display,
-      overflow: 'hidden',
       cursor:
         controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''
           ? this.getMouseCursorData
@@ -339,7 +338,6 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
   scrollBarClick (event: MouseEvent) {
     if (this.toolBoxSelectControl === 'Select') {
       event.stopPropagation()
-      this.selectedItem(event)
     }
   }
 }

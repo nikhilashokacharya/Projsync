@@ -1772,7 +1772,6 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   comBoxClick (event: MouseEvent) {
     if (this.toolBoxSelectControl === 'Select') {
       event.stopPropagation()
-      this.selectedItem(event)
     }
   }
 }

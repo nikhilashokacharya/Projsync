@@ -722,7 +722,6 @@ export default class FDTextBox extends Mixins(FdControlVue) {
   textBoxClick (event: MouseEvent) {
     if (this.toolBoxSelectControl === 'Select') {
       event.stopPropagation()
-      this.selectedItem(event)
     }
     Vue.nextTick(() => {
       if (this.isEditMode) {

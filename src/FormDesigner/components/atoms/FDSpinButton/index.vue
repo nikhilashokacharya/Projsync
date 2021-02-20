@@ -358,7 +358,6 @@ export default class FDSpinButton extends Mixins(FdControlVue) {
   spinButtonClick (event: MouseEvent) {
     if (this.toolBoxSelectControl === 'Select') {
       event.stopPropagation()
-      this.selectedItem(event)
     }
   }
 }
