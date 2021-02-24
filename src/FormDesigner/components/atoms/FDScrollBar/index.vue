@@ -220,7 +220,8 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
         controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''
           ? this.getMouseCursorData
           : 'default',
-      backgroundColor: 'white'
+      backgroundColor: 'white',
+      overflow: 'hidden'
     }
   }
 
