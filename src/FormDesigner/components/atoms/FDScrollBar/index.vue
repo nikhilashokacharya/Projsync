@@ -4,6 +4,7 @@
   @click="scrollBarClick"
   :style="outerScrollBarDivObj"
   :title="properties.ControlTipText"
+  @mouseover="updateMouseCursor"
   @keydown.enter="setContentEditable($event, true)"
   @keydown.esc="setContentEditable($event, false)"
   :tabindex="0"
@@ -11,6 +12,7 @@
   >
     <div class="slidecontainer" :style="cssVars">
       <button :style="scrollBarButtonStyleObj"
+      @mouseover="updateMouseCursor"
       @mousedown="!getDisableValue?properties.Min > properties.Max ? increaseTheValue() : decreaseTheValue():''"
       @mouseup="setIsSpinButtonScrollBarMouseDown"
       @mouseout="setIsSpinButtonScrollBarMouseDown"
@@ -33,8 +35,10 @@
         :style="inputStyleObj"
         @input="updateValueProperty"
         orient="vertical"
+        @mouseover="updateMouseCursor"
       />
       <button :style="scrollBarButtonStyleObj"
+      @mouseover="updateMouseCursor"
       @mousedown="!getDisableValue?properties.Min > properties.Max ? decreaseTheValue() : increaseTheValue():''"
       @mouseup="setIsSpinButtonScrollBarMouseDown"
       @mouseout="setIsSpinButtonScrollBarMouseDown"
@@ -216,10 +220,7 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
       left: `${controlProp.Left}px`,
       top: `${controlProp.Top}px`,
       display: display,
-      cursor:
-        controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''
-          ? this.getMouseCursorData
-          : 'default',
+      cursor: this.controlCursor,
       backgroundColor: 'white',
       overflow: 'hidden'
     }
@@ -238,10 +239,7 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
       '--display': this.inputDisplay(),
       width: this.checkOtherOrientations() ? `${controlProp.Height! - 40}px` : `${controlProp.Width! - 40}px`,
       height: this.checkOtherOrientations() ? `${controlProp.Width!}px` : `${controlProp.Height!}px`,
-      cursor:
-        controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''
-          ? this.getMouseCursorData
-          : 'default',
+      cursor: this.controlCursor,
       backgroundColor: controlProp.BackColor!.startsWith('rgb') ? `rgba(${a![0]},${a![1]},${a![2]},0.5)` : temprgba,
       margin: '0px'
     }
@@ -285,10 +283,7 @@ export default class FDScrollBar extends Mixins(FdControlVue) {
       backgroundColor: this.cssVars['--bg-color'],
       overflow: 'hidden',
       outline: 'none',
-      cursor:
-        controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''
-          ? this.getMouseCursorData
-          : 'default',
+      cursor: this.controlCursor,
       border: !controlProp.Enabled && this.isRunMode ? '1px solid gray' : '',
       padding: '0px',
       height: this.checkOtherOrientations() ? `${controlProp.Width!}px` : `${controlProp.Height!}px`

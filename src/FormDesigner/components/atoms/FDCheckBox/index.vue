@@ -5,6 +5,7 @@
     class="outer-check"
     :style="cssStyleProperty"
     @click="checkBoxClick"
+    @mouseover="updateMouseCursor"
     @keydown.enter.prevent="setContentEditable($event, true)"
     :tabindex="properties.TabIndex"
     @mousedown="controlEditMode"
@@ -33,7 +34,7 @@
           :style="labelStyle"
         >
           <span :style="spanStyleObj">{{ computedCaption.afterbeginCaption }}</span>
-          <span class="spanClass" :style="spanStyleObj">{{
+          <span class="spanClass" :style="spanClassStyleObj">{{
             computedCaption.acceleratorCaption
           }}</span>
           <span :style="spanStyleObj">{{ computedCaption.beforeendCaption }}</span>
@@ -129,7 +130,7 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
     this.editableTextVerify()
     if (!this.properties.Enabled) {
       this.spanRef.style.backgroundColor = 'rgba(220, 220, 220, 1)'
-      this.imageProperty.filter = 'sepia(0) grayscale(1) blur(3px) opacity(0.2)'
+      this.imageProperty.filter = 'sepia(0) grayscale(1) blur(4px)'
     } else {
       this.spanRef.style.backgroundColor = 'white'
       this.imageProperty.filter = ''
@@ -233,7 +234,8 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
     return {
       boxShadow:
       controlProp.SpecialEffect === 0 ? '' : '-1px -1px gray',
-      border: controlProp.SpecialEffect === 0 ? '2px solid gray' : ''
+      border: controlProp.SpecialEffect === 0 ? '2px solid gray' : '',
+      cursor: this.controlCursor
     }
   }
 
@@ -293,10 +295,7 @@ export default class FDCheckBox extends Mixins(FdControlVue) {
       wordBreak: controlProp.WordWrap ? 'break-all' : 'normal',
       color:
         controlProp.Enabled === true ? controlProp.ForeColor : this.getEnabled,
-      cursor:
-        controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''
-          ? this.getMouseCursorData
-          : 'default',
+      cursor: this.controlCursor,
       fontFamily: font.FontStyle! !== '' ? this.setFontStyle : font.FontName!,
       fontSize: `${font.FontSize}px`,
       fontStyle: font.FontItalic || this.isItalic ? 'italic' : '',

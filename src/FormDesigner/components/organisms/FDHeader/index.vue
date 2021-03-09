@@ -955,6 +955,7 @@ export default class Header extends FDCommonMethod {
         } else if ('AutoSize' in controlprop) {
           sizeToFitArr.push(ctrlSel[index])
           sizeToFitVal.push(controlprop.AutoSize!)
+          this.updateControlProperty('AutoSize', false, ctrlSel[index])
           this.updateControlProperty('AutoSize', true, ctrlSel[index])
         }
       }

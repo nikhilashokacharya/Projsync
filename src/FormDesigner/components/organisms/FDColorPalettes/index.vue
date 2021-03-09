@@ -36,15 +36,17 @@
             />
             <label for="color-1">Palette</label>
             <div class="content">
+              <div class="inner-content">
               <div class="grid-container">
                 <div
                   class="grid-item1"
                   v-for="(color, i) in colors"
                   :key="i"
                   @click="selectColor(color)"
-                  :style="{ backgroundColor: color.value }"
+                  :style="selectedPallete(color.value)"
                 ></div>
               </div>
+            </div>
             </div>
           </div>
           <div class="tab">
@@ -53,21 +55,26 @@
               type="radio"
               id="color-2"
               name="tab-color-1"
+              @click="handleDiv(divContainer)"
             />
             <label for="color-2">System</label>
             <div class="content">
-              <div class="gridcontainer">
+              <div class="gridcontainer"
+              ref="divContainer"
+              @scroll="getScrollTop(divContainer)"
+              >
                 <div
                   class="gridcontainerStyle"
                   v-for="(color, i) in colorSystem"
                   :key="i"
-                  @click="selectColor(color)"
+                  :style="selectedColor(color.value)"
+                  @click="selectColor(color, divContainer)"
                 >
                   <span
                     class="griditem1"
                     :style="{ backgroundColor: color.value }"
                   ></span
-                  >{{ color.displayName }}
+                  > <div class="displayNameClass">{{ color.displayName }}</div>
                 </div>
               </div>
             </div>
@@ -98,6 +105,8 @@ export default class FDColorPalettes extends Vue {
   @Prop() value: string;
   @Prop() name: string;
   @Ref('colorPalleteRef') readonly colorPalleteRef!: HTMLDivElement;
+  @Ref('divContainer') readonly divContainer!: HTMLDivElement;
+
   private isVisible = false;
   top: number = 0
   left: number = 0
@@ -117,6 +126,50 @@ export default class FDColorPalettes extends Vue {
       this.$nextTick(function () {
         this.colorPalleteRef.focus()
       })
+    }
+  }
+  divscrollTop = 0
+  count = 1
+  handleDiv (divContainer: HTMLDivElement) {
+    if (divContainer) {
+      divContainer.scrollTop = this.divscrollTop
+    }
+  }
+  getScrollTop (divContainer: HTMLDivElement) {
+    if (divContainer) {
+      this.divscrollTop = divContainer.scrollTop
+    }
+  }
+  selectedPallete (palleteColor: string) {
+    if (this.value === '#FFFFFF' && palleteColor === '#FFFFFE') {
+      return {
+        backgroundColor: palleteColor,
+        outline: '1px solid white'
+      }
+    } else if (this.value === palleteColor && this.value !== '#FFFFFF') {
+      return {
+        backgroundColor: palleteColor,
+        outline: '1px solid white'
+      }
+    } else {
+      return {
+        backgroundColor: palleteColor
+      }
+    }
+  }
+  selectedColor (val: string) {
+    let bgColor = ''
+    let textColor = ''
+    if (this.value === val) {
+      bgColor = 'rgb(15 121 206)'
+      textColor = 'white'
+    } else {
+      bgColor = ''
+      textColor = ''
+    }
+    return {
+      backgroundColor: bgColor,
+      color: textColor
     }
   }
 
@@ -230,16 +283,17 @@ export default class FDColorPalettes extends Vue {
 }
 .grid-container {
   display: grid;
+  position: absolute;
   grid-template-columns: auto auto auto auto auto auto auto auto;
-  width: 10px;
-  padding: 10px;
+  grid-gap: 1px;
+  padding-left: 2px;
+  padding-top: 1px;
 }
 .grid-item1 {
   border: 1px solid rgba(0, 0, 0, 0.8);
   width: 14px;
   height: 14px;
 }
-
 .gridcontainer {
   height: 150px;
   border: 1px solid gray;
@@ -251,11 +305,27 @@ export default class FDColorPalettes extends Vue {
   width: 14px;
   height: 14px;
   text-align: center;
+  vertical-align: middle;
   margin: 1px;
   display: inline-block;
-  cursor: none;
+  cursor: context-menu;
 }
 .gridcontainerStyle {
   cursor: "context-menu";
+  vertical-align: super;
+  display: grid;
+  grid-template-columns: 20px auto;
+}
+.displayNameClass {
+  position: relative;
+  top: 2px;
+}
+.inner-content {
+    background-color: black;
+    position: relative;
+    left: 10px;
+    top: 10px;
+    width: 139px;
+    height: 138px;
 }
 </style>

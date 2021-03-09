@@ -4,7 +4,8 @@
       class="outer-page"
       :style="pageStyleObj"
       :title="properties.ControlTipText"
-      @mousedown="multiPageMouseDown"
+      @mouseover="updateMouseCursor"
+      @mousedown="pageMouseDown"
       @contextmenu="handleContextMenu"
       @keydown.delete.stop.exact="deleteMultiPage"
       @keyup.stop="selectMultipleCtrl($event, false)"
@@ -13,18 +14,21 @@
       <div
         class="pages"
         :style="styleTabsObj"
+        @mouseover="updateMouseCursor"
         :title="properties.ControlTipText"
         v-if="controls.length > 0"
       >
-        <div class="move" ref="scrolling" :style="styleMoveObj" @mouseup="mouseUpOnPage">
+        <div class="move" ref="scrolling" :style="styleMoveObj" @mouseup="mouseUpOnPage" @mouseover="updateMouseCursor">
           <div
             ref="controlTabsRef"
             class="page"
             v-for="(value, key) in controls"
             :key="key"
             :style="getTabStyle"
+            @mouseover="updateMouseCursor"
           >
             <FDControlTabs
+              @isMouseDown="isMouseDownPageTab"
               @setValue="setValue"
               @isChecked="isChecked"
               :setFontStyle="setFontStyle"
@@ -43,6 +47,7 @@
               :isItalic="isItalic"
               :tempStretch="tempStretch"
               :tempWeight="tempWeight"
+              :controlCursor="controlCursor"
               :tempWidth="tempWidth"
               ref="controlTab"
             />
@@ -52,6 +57,7 @@
           class="content"
           :style="styleContentObj"
           ref="contentRef"
+          @mouseover="updateMouseCursor"
           :title="properties.ControlTipText"
         >
           <div
@@ -69,6 +75,7 @@
             "
           >
             <Container
+              v-if="properties.Value !== -1"
               :userFormId="userFormId"
               :controlId="selectedPageID"
               :containerId="selectedPageID"
@@ -84,6 +91,7 @@
               :getSizeMode="getSizeMode"
               :getRepeatData="getRepeatData"
               :getPosition="getPosition"
+              :dragSelctorWidthHeight="styleContentObj"
              @deActiveControl="deActControl"
              @dragSelectorControl="dragSelectorControl"
              @addControlObj="addContainerControl"
@@ -92,8 +100,8 @@
         </div>
         <div></div>
         <div :style="getScrollButtonStyleObj" ref="buttonStyleRef">
-          <button class="left-button" @click="leftmove"></button>
-          <button class="right-button" @click="rightmove"></button>
+          <button class="left-button" :style="scrollButtonStyle" @mousedown.stop @click="leftmove" @mouseover="updateMouseCursor"></button>
+          <button class="right-button" :style="scrollButtonStyle" @mousedown.stop @click="rightmove" @mouseover="updateMouseCursor"></button>
         </div>
       </div>
     </div>
@@ -146,6 +154,94 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
   topValue: number = 0;
   widthValue: number = 40;
   rowsCount: string = '';
+  scrollButtonHeight: number = 0;
+  scrollButtonWidth: number = 0;
+  pageValueIndex: selectedTab
+
+  get scrollButtonStyle () {
+    const controlProp = this.properties
+    return {
+      cursor: this.controlCursor,
+      opacity: this.scrolling ? ((this.scrolling.scrollLeft === (this.scrolling.scrollWidth - this.scrolling.clientWidth)) ? '0.4' : '1') : '1',
+      width: this.setSpinButtonWidth + 'px',
+      height: this.setSpinButtonHeight + 'px'
+    }
+  }
+  get setSpinButtonWidth () {
+    let spinButtonWidth: number = 0
+    const tabFixedHeight = this.properties.TabFixedHeight!
+    const tabFixedWidth = this.properties.TabFixedWidth!
+    if (this.properties.TabOrientation === 0) {
+      if (tabFixedHeight! > 13 || tabFixedHeight! === 0) {
+        spinButtonWidth = 22
+      } else {
+        if (tabFixedHeight === 4) { spinButtonWidth = 7 } else if (tabFixedHeight === 5) { spinButtonWidth = 8.5 } else if (tabFixedHeight === 6) { spinButtonWidth = 10 } else if (tabFixedHeight === 7) { spinButtonWidth = 11.5 } else if (tabFixedHeight === 8) { spinButtonWidth = 13 } else if (tabFixedHeight === 9) { spinButtonWidth = 14.5 } else if (tabFixedHeight === 10) { spinButtonWidth = 16 } else if (tabFixedHeight === 11) { spinButtonWidth = 17.5 } else if (tabFixedHeight === 12) { spinButtonWidth = 19 } else if (tabFixedHeight === 13) { spinButtonWidth = 20.5 }
+      }
+    } else if (this.properties.TabOrientation === 1) {
+      if (tabFixedHeight! > 22 || tabFixedHeight! === 0) {
+        spinButtonWidth = 22
+      } else {
+        if (tabFixedHeight! < 7) {
+          spinButtonWidth = 7
+        } else {
+          spinButtonWidth = tabFixedHeight
+        }
+      }
+    } else {
+      if (tabFixedWidth! > 13 || tabFixedWidth! === 0) {
+        spinButtonWidth = 22
+      } else {
+        if (tabFixedWidth === 4) { spinButtonWidth = 7 } else if (tabFixedWidth === 5) { spinButtonWidth = 8.5 } else if (tabFixedWidth === 6) { spinButtonWidth = 10 } else if (tabFixedWidth === 7) { spinButtonWidth = 11.5 } else if (tabFixedWidth === 8) { spinButtonWidth = 13 } else if (tabFixedWidth === 9) { spinButtonWidth = 14.5 } else if (tabFixedWidth === 10) { spinButtonWidth = 16 } else if (tabFixedWidth === 11) { spinButtonWidth = 17.5 } else if (tabFixedWidth === 12) { spinButtonWidth = 19 } else if (tabFixedWidth === 13) { spinButtonWidth = 20.5 }
+      }
+    }
+    this.scrollButtonWidth = spinButtonWidth
+    return spinButtonWidth
+  }
+
+  get setSpinButtonHeight () {
+    let spinButtonHeight: number = 0
+    const tabFixedHeight = this.properties.TabFixedHeight!
+    const tabFixedWidth = this.properties.TabFixedWidth!
+    if (this.properties.TabOrientation === 0) {
+      if (tabFixedHeight! > 13 || tabFixedHeight! === 0) {
+        spinButtonHeight = 18
+      } else {
+        if (tabFixedHeight === 4) { spinButtonHeight = 8 } else if (tabFixedHeight === 5) { spinButtonHeight = 9 } else if (tabFixedHeight === 6) { spinButtonHeight = 10 } else if (tabFixedHeight === 7) { spinButtonHeight = 11 } else if (tabFixedHeight === 8) { spinButtonHeight = 12 } else if (tabFixedHeight === 9) { spinButtonHeight = 13 } else if (tabFixedHeight === 10) { spinButtonHeight = 14 } else if (tabFixedHeight === 11) { spinButtonHeight = 15 } else if (tabFixedHeight === 12) { spinButtonHeight = 16 } else if (tabFixedHeight === 13) { spinButtonHeight = 17 }
+      }
+    } else if (this.properties.TabOrientation === 1) {
+      if (tabFixedHeight! >= 22 || tabFixedHeight! === 0) {
+        spinButtonHeight = 18
+      } else {
+        if (tabFixedHeight! < 8) {
+          spinButtonHeight = 8
+        } else if (tabFixedHeight! === 21) {
+          spinButtonHeight = 17.5
+        } else if (tabFixedHeight! === 20) {
+          spinButtonHeight = 17
+        } else if (tabFixedHeight! === 19) {
+          spinButtonHeight = 16.5
+        } else if (tabFixedHeight! === 18) {
+          spinButtonHeight = 16
+        } else if (tabFixedHeight! === 17) {
+          spinButtonHeight = 15.5
+        } else if (tabFixedHeight! === 16) {
+          spinButtonHeight = 15
+        } else if (tabFixedHeight! === 15) {
+          spinButtonHeight = 14.5
+        } else {
+          spinButtonHeight = tabFixedHeight
+        }
+      }
+    } else {
+      if (tabFixedWidth! > 13 || tabFixedWidth! === 0) {
+        spinButtonHeight = 18
+      } else {
+        if (tabFixedWidth === 4) { spinButtonHeight = 8 } else if (tabFixedWidth === 5) { spinButtonHeight = 9 } else if (tabFixedWidth === 6) { spinButtonHeight = 10 } else if (tabFixedWidth === 7) { spinButtonHeight = 11 } else if (tabFixedWidth === 8) { spinButtonHeight = 12 } else if (tabFixedWidth === 9) { spinButtonHeight = 13 } else if (tabFixedWidth === 10) { spinButtonHeight = 14 } else if (tabFixedWidth === 11) { spinButtonHeight = 15 } else if (tabFixedWidth === 12) { spinButtonHeight = 16 } else if (tabFixedWidth === 13) { spinButtonHeight = 17 }
+      }
+    }
+    this.scrollButtonHeight = spinButtonHeight
+    return spinButtonHeight
+  }
 
   /**
    * @description sets scrollbar left and top position
@@ -166,11 +262,13 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
   }
   focusPage () {
     Vue.nextTick(() => {
-      if (typeof this.properties.Value === 'number' && this.controls.length > 0) {
-        const value: number = this.properties.Value as number
-        (this.controlTab[value].$el.children[1] as HTMLSpanElement).focus()
-      } else {
-        (this.$el.children[0] as HTMLDivElement).focus()
+      if (this.properties.Value! > 0) {
+        if (typeof this.properties.Value === 'number' && this.controls.length > 0) {
+          const value: number = this.properties.Value as number
+          (this.controlTab[value].$el.children[1] as HTMLSpanElement).focus()
+        } else {
+          (this.$el.children[0] as HTMLDivElement).focus()
+        }
       }
     })
   }
@@ -212,10 +310,10 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
       width: `${controlProp.Width}px`,
       height: `${controlProp.Height}px`,
       top: `${controlProp.Top}px`,
+      cursor: this.controlCursor,
       display: display,
       borderLeft: controlProp.Style === 0 ? '2px solid whitesmoke' : '',
-      borderBottom: controlProp.Style === 0 ? (controlProp.TabOrientation === 0 ? '1px solid gray' : '') : '',
-      borderRight: controlProp.Style === 0 ? (controlProp.TabOrientation === 2 ? '1px solid gray' : '') : ''
+      borderBottom: controlProp.Style === 0 ? (controlProp.TabOrientation === 0 ? '1px solid gray' : '') : ''
     }
   }
 
@@ -230,6 +328,7 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
     return {
       overflow: 'hidden',
       display: 'flex',
+      cursor: this.controlCursor,
       backgroundColor: controlProp.BackColor,
       justifyContent: controlProp.TabOrientation === 3 ? 'flex-end' : '',
       height: `${controlProp.Height!}px`
@@ -244,6 +343,7 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
    */
   protected get styleMoveObj (): Partial<CSSStyleDeclaration> {
     const controlProp = this.properties
+    this.setScrollLeft()
     return {
       alignSelf: controlProp.TabOrientation === 1 ? 'flex-end' : '',
       float: controlProp.TabOrientation === 3 ? 'right' : '',
@@ -266,6 +366,7 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
             ? `${controlProp.Width}px`
             : `${controlProp.Width! - 60}px`,
       overflow: 'hidden',
+      cursor: this.controlCursor,
       gridAutoColumns: (controlProp.MultiRow && controlProp.TabOrientation === 2) || (controlProp.MultiRow && controlProp.TabOrientation === 3) ? 'max-content' : ''
     }
   }
@@ -308,14 +409,16 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
         ? this.controls.length * this.properties.TabFixedHeight! +
           this.properties.Font!.FontSize! * this.controls!.length
         : this.properties.Font!.FontSize! * 2.3 * this.controls!.length
+    this.updateDataModel({ propertyName: 'Width', value: this.properties.Width! + 1 })
+    this.updateDataModel({ propertyName: 'Width', value: this.properties.Width! - 1 })
     return {
       position: 'absolute',
       zIndex: '3',
       marginTop:
         controlProp.TabOrientation === 2 || controlProp.TabOrientation === 3
-          ? `${controlProp.Height! - 30}px`
+          ? `${controlProp.Height! - (this.scrollButtonWidth) - 10}px`
           : controlProp.TabOrientation === 1
-            ? `${controlProp.Height! - 22}px`
+            ? controlProp.TabFixedHeight! > 0 ? `${controlProp.Height! - this.scrollButtonHeight - 3}px` : `${controlProp.Height! - 22}px`
             : '0px',
       transform:
         controlProp.TabOrientation === 2
@@ -328,9 +431,9 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
         : 'none',
       right:
         controlProp.TabOrientation === 3
-          ? '-14px'
+          ? controlProp.TabFixedWidth! > 9 ? '-10px' : controlProp.TabFixedWidth! > 0 && controlProp.TabFixedWidth! < 10 ? '-6px' : '-14px'
           : controlProp.TabOrientation === 2
-            ? `${controlProp.Width! - 40}px`
+            ? controlProp.TabFixedWidth! > 0 ? `${controlProp.Width! - this.scrollButtonHeight - 14}px` : `${controlProp.Width! - 32}px`
             : '0px',
       top: '0px',
       backgroundColor: 'rgb(238, 238, 238)'
@@ -547,10 +650,7 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
         controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1
           ? 'inline-block'
           : 'block',
-      cursor:
-        controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''
-          ? this.getMouseCursorData
-          : 'default'
+      cursor: this.controlCursor
     }
   }
 
@@ -586,7 +686,7 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
     if (controlProp.Style !== 2) {
       if (controlProp.Style === 1) {
         if (controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1) {
-          width = `${controlProp.Width! - 9}px`
+          width = `${controlProp.Width! - 6}px`
         } else {
           if (controlProp.TabFixedWidth! > 0) {
             if (controlProp.MultiRow) {
@@ -618,19 +718,19 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
             if (controlProp.TabOrientation === 3) {
               width = (controlProp.Width! - this.widthValue) + 'px'
             } else {
-              width = controlProp.Width! - controlProp.TabFixedWidth! - 10 + 'px'
+              width = controlProp.Width! - controlProp.TabFixedWidth! - 16 + 'px'
             }
           } else {
             if (controlProp.TabFixedWidth! === 0) {
               if (controlProp.TabOrientation === 2 ||
               controlProp.TabOrientation === 3) {
                 if (controlProp.MultiRow) {
-                  width = (controlProp.Width! - this.widthValue) + 'px'
+                  width = (controlProp.Width! - this.widthValue - 6) + 'px'
                 } else {
-                  width = (controlProp.Width! - this.widthValue) + 'px'
+                  width = (controlProp.Width! - this.widthValue - 6) + 'px'
                 }
               } else {
-                width = controlProp.Width! - controlProp.Font!.FontSize! - 20 + 'px'
+                width = controlProp.Width! - controlProp.Font!.FontSize! - 26 + 'px'
               }
             } else {
               width = 'calc(100% - 44px)'
@@ -640,6 +740,108 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
       }
     } else {
       width = `${controlProp.Width! - 3}px`
+    }
+    let height = ''
+    if (controlProp.Style !== 2) {
+      if (controlProp.Style === 1) {
+        if (controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1) {
+          if (controlProp.MultiRow) {
+            if (this.scrolling) {
+              height = (controlProp.Height! - this.scrolling.clientHeight + 1) + 'px'
+            } else {
+              height = (controlProp.Height! -
+                this.topValue + 5) + 'px'
+            }
+          } else {
+            if (controlProp.TabFixedHeight! > 0) {
+              if (this.scrolling) {
+                if (controlProp.TabOrientation === 0) {
+                  height = (controlProp.Height! - this.scrolling.clientHeight + 1) + 'px'
+                } else {
+                  height = controlProp.Height! - controlProp.TabFixedHeight! - 5 + 'px'
+                }
+              } else {
+                if (controlProp.TabOrientation === 0) {
+                  height = controlProp.Height! - controlProp.TabFixedHeight! - 19 + 'px'
+                } else {
+                  height = controlProp.Height! - controlProp.TabFixedHeight! - 5 + 'px'
+                }
+              }
+            } else {
+              if (controlProp.TabFixedHeight! === 0) {
+                if (this.scrolling) {
+                  height = (controlProp.Height! - this.scrolling.clientHeight + 3) + 'px'
+                } else {
+                  if (controlProp.Font!.FontSize! === 72) {
+                    height = controlProp.Height! - controlProp.Font!.FontSize! - 27 + 'px'
+                  } else {
+                    height = controlProp.Height! - controlProp.Font!.FontSize! - 25 + 'px'
+                  }
+                }
+              } else {
+                if (controlProp.TabOrientation === 1) {
+                  height = `${controlProp.Height! - 30}px`
+                } else {
+                  height = `${controlProp.Height! - 44}px`
+                }
+              }
+            }
+          }
+        } else {
+          height = `${controlProp.Height! - 5}px`
+        }
+      } else {
+        if (controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1) {
+          if (controlProp.MultiRow) {
+            if (this.scrolling) {
+              height = (controlProp.Height! - this.scrolling.clientHeight + 3) + 'px'
+            } else {
+              height = (controlProp.Height! -
+                this.topValue + 5) + 'px'
+            }
+          } else {
+            if (controlProp.TabFixedHeight! > 0) {
+              if (this.scrolling) {
+                if (controlProp.TabOrientation === 0) {
+                  height = (controlProp.Height! - this.scrolling.clientHeight + 1) + 'px'
+                } else {
+                  height = controlProp.Height! - controlProp.TabFixedHeight! - 5 + 'px'
+                }
+              } else {
+                if (controlProp.TabOrientation === 0) {
+                  height = controlProp.Height! - controlProp.TabFixedHeight! - 10 + 'px'
+                } else {
+                  height = controlProp.Height! - controlProp.TabFixedHeight! - 5 + 'px'
+                }
+              }
+            } else {
+              if (controlProp.TabFixedHeight! === 0) {
+                if (this.scrolling) {
+                  height = (controlProp.Height! - this.scrolling.clientHeight + 3) + 'px'
+                } else {
+                  if (controlProp.Font!.FontSize! === 72) {
+                    height = controlProp.Height! - controlProp.Font!.FontSize! - 23 + 'px'
+                  } else if (controlProp.Font!.FontSize! > 24 && controlProp.Font!.FontSize! < 72) {
+                    height = controlProp.Height! - controlProp.Font!.FontSize! - 17 + 'px'
+                  } else {
+                    height = controlProp.Height! - controlProp.Font!.FontSize! - 15 + 'px'
+                  }
+                }
+              } else {
+                if (controlProp.TabOrientation === 1) {
+                  height = `${controlProp.Height! - 21}px`
+                } else {
+                  height = `${controlProp.Height! - 35}px`
+                }
+              }
+            }
+          }
+        } else {
+          height = `${controlProp.Height! + 2}px`
+        }
+      }
+    } else {
+      height = `${controlProp.Height! + 2}px`
     }
     if (this.scrolling) {
       Vue.nextTick(() => {
@@ -695,42 +897,8 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
                     : '33px'
               : '0px'
           : '0px',
-      height:
-        controlProp.Style !== 2
-          ? controlProp.Style === 1 ? controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1
-            ? controlProp.MultiRow
-              ? (controlProp.Height! -
-                this.topValue + 5) + 'px'
-              : controlProp.TabFixedHeight! > 0
-                ? controlProp.TabOrientation === 0
-                  ? controlProp.Height! - controlProp.TabFixedHeight! - 19 + 'px'
-                  : controlProp.Height! - controlProp.TabFixedHeight! - 5 + 'px'
-                : controlProp.TabFixedHeight! === 0
-                  ? controlProp.Font!.FontSize! === 72
-                    ? controlProp.Height! - controlProp.Font!.FontSize! - 27 + 'px'
-                    : controlProp.Height! - controlProp.Font!.FontSize! - 25 + 'px'
-                  : controlProp.TabOrientation === 1
-                    ? `${controlProp.Height! - 30}px`
-                    : `${controlProp.Height! - 44}px`
-            : `${controlProp.Height! - 10}px`
-            : controlProp.TabOrientation === 0 || controlProp.TabOrientation === 1
-              ? controlProp.MultiRow
-                ? (controlProp.Height! -
-                this.topValue + 5) + 'px'
-                : controlProp.TabFixedHeight! > 0
-                  ? controlProp.TabOrientation === 0
-                    ? controlProp.Height! - controlProp.TabFixedHeight! - 10 + 'px'
-                    : controlProp.Height! - controlProp.TabFixedHeight! - 5 + 'px'
-                  : controlProp.TabFixedHeight! === 0
-                    ? controlProp.Font!.FontSize! === 72
-                      ? controlProp.Height! - controlProp.Font!.FontSize! - 18 + 'px'
-                      : controlProp.Height! - controlProp.Font!.FontSize! - 16 + 'px'
-                    : controlProp.TabOrientation === 1
-                      ? `${controlProp.Height! - 21}px`
-                      : `${controlProp.Height! - 35}px`
-              : `${controlProp.Height! - 1}px`
-          : `${controlProp.Height! - 1}px`,
-      width: width,
+      height: controlProp.TabOrientation === 1 ? (parseInt(height) + 5) + 'px' : (parseInt(height) - 3) + 'px',
+      width: controlProp.TabOrientation === 3 ? (parseInt(width) + 4) + 'px' : width,
       left:
         controlProp.Style !== 2
           ? controlProp.Style === 1 ? controlProp.TabOrientation === 2
@@ -754,6 +922,7 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
                   : '40px'
               : '0px'
           : '0px',
+      cursor: this.controlCursor,
       padding: controlProp.MultiRow ? '0px' : '0px',
       boxShadow: controlProp.Style === 0 ? (controlProp.TabOrientation === 0 ? '1px 0px gray' : '1px 1px gray') : 'none'
     }
@@ -949,6 +1118,22 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
     }
   }
 
+  @Watch('properties.Style')
+  styleValidate () {
+    this.scrollButtonVerify()
+    this.scrollDisabledValidate()
+    this.updateMultiRowforLeftAndRight()
+    this.widthValue = this.scrolling.clientWidth
+    if (this.scrolling) {
+      Vue.nextTick(() => {
+        this.topValue = this.scrolling.offsetHeight!
+        this.widthValue = this.scrolling.clientWidth
+        this.updateDataModel({ propertyName: 'Height', value: this.properties.Height! + 1 })
+        this.updateDataModel({ propertyName: 'Height', value: this.properties.Height! - 1 })
+      })
+    }
+  }
+
   @Watch('properties.Height')
   heightValidate () {
     this.scrollButtonVerify()
@@ -1102,7 +1287,7 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
   mounted () {
     this.scrollButtonVerify()
     this.scrollLeftTop(this.data)
-    this.selectedPageID = this.controls[0]
+    this.selectedPageID = typeof (this.properties.Value!) === 'number' ? this.controls[this.properties.Value!] : this.controls[0]
     this.calculateWidthHeight()
   }
   dragSelectorControl (event: MouseEvent) {
@@ -1122,11 +1307,9 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
   multiPageMouseDown (e: MouseEvent) {
     if (e.which !== 3) {
       EventBus.$emit('isEditMode', this.isEditMode)
-      this.selectedItem(e)
-      if (this.selMultipleCtrl === false && this.activateCtrl === false) {
-        const selContainer = this.selectedControls[this.userFormId].container[0]
-        const selected = this.selectedControls[this.userFormId].selected
-        if (this.controls.length > 0 && selected.length === 1) {
+      const selContainer = this.selectedControls[this.userFormId].container[0]
+      if (this.getContainerList(selContainer)[0] === this.controlId) {
+        if (this.selMultipleCtrl === false && this.activateCtrl === false) {
           this.selectControl({
             userFormId: this.userFormId,
             select: {
@@ -1134,17 +1317,6 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
               selected: [this.selectedPageID]
             }
           })
-        }
-        if (selContainer === this.controlId) {
-          if (this.selMultipleCtrl === false && this.activateCtrl === false) {
-            this.selectControl({
-              userFormId: this.userFormId,
-              select: {
-                container: this.getContainerList(this.selectedPageID),
-                selected: [this.selectedPageID]
-              }
-            })
-          }
         }
       }
     }
@@ -1220,6 +1392,30 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
     EventBus.$on('focusTabStrip', () => {
       this.focusPage()
     })
+    EventBus.$on('setPage', this.setPageId)
+    EventBus.$on('conSelMouseDown', this.selPageDown)
+    EventBus.$on('getPageHeightWidth', this.getPageHeightWidth)
+  }
+  getPageHeightWidth (callback: Function) {
+    callback(parseInt(this.styleContentObj.height!), parseInt(this.styleContentObj.width!))
+  }
+  selPageDown (event: MouseEvent, control: string) {
+    if (control === this.controlId) {
+      Vue.nextTick(() => {
+        this.pageMouseDown(event)
+      })
+    }
+  }
+  setPageId (controlId: string) {
+    if (controlId === this.controlId) {
+      this.selectControl({
+        userFormId: this.userFormId,
+        select: {
+          container: this.getContainerList(this.selectedPageID),
+          selected: [this.selectedPageID]
+        }
+      })
+    }
   }
   destroyed () {
     EventBus.$off('updateMultiPageValue')
@@ -1333,9 +1529,39 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
   }
   addContainerControl (event: MouseEvent) {
     if (!this.isEditMode) {
-      this.selectedItem(event)
+      // this.selectedItem(event)
     } else {
       this.addControlObj(event, this.selectedPageID)
+    }
+  }
+  pageMouseDown (event: MouseEvent) {
+    if (this.containerRef.isPropChanged) {
+      this.containerRef.mouseDownEvent = event
+      this.containerRef.isControlMouseDown = true
+      this.containerRef.mouseDownContainer = this.controlId
+    }
+    if (this.containerRef.isPropChanged !== true) {
+      let editMode: boolean = this.isEditMode
+      if (this.selectedPageID) {
+        EventBus.$emit('getDragSelectorEdit', event, this.selectedPageID, (editmode: boolean) => {
+          editMode = editmode
+        })
+      }
+      if (editMode) {
+        event.stopPropagation()
+        this.setEditMode(editMode)
+        this.updatedValue = this.pageValueIndex.indexValue
+        this.selectedPageID = this.pageValueIndex.pageValue
+        this.updateDataModel({ propertyName: 'Value', value: this.pageValueIndex.indexValue })
+        this.selectControl({
+          userFormId: this.userFormId,
+          select: {
+            container: this.getContainerList(this.selectedPageID),
+            selected: [this.selectedPageID]
+          }
+        })
+        this.focusPage()
+      }
     }
   }
   get getPicture () {
@@ -1345,6 +1571,9 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
   }
   mouseUpOnPage () {
     EventBus.$emit('mouseUpOnPageTab', true)
+  }
+  isMouseDownPageTab (value: selectedTab) {
+    this.pageValueIndex = value
   }
 }
 </script>
@@ -1505,7 +1734,7 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
   z-index: 1;
 }
 .content {
-  overflow: auto;
+  overflow: hidden;
 }
 .spanClass {
   text-decoration: underline;

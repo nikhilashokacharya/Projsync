@@ -7,6 +7,7 @@ import { PropType } from 'vue'
 import { Component, Emit, Prop, PropSync, Vue, Watch } from 'vue-property-decorator'
 import { EventBus } from '@/FormDesigner/event-bus'
 import FDEditableText from '@/FormDesigner/components/atoms/FDEditableText/index.vue'
+import { State } from 'vuex-class'
 
 @Component({
   name: 'FdControlVue'
@@ -16,7 +17,7 @@ export default class FdControlVue extends Vue {
   @Prop({ required: true, type: Boolean }) public isEditMode!: boolean
   @PropSync('isEditMode') public syncIsEditMode!: boolean
   @Prop() toolBoxSelectControl: string
-
+  @State((state: rootState) => state.fd.toolBoxSelect) toolBoxSelect!: fdState['toolBoxSelect']
   @Prop({ required: true, type: Object as PropType<controlData> }) public data! : controlData
   @Prop({ required: true, type: String }) public controlId! : string
   @Prop({ default: false }) isActivated: boolean
@@ -55,6 +56,7 @@ export default class FdControlVue extends Vue {
   spinButtonScrollBarClickCount: number = 0
   getSelectionStart: number = 0
   getSelectionEnd: number = 0
+  controlCursor: string = 'context-menu'
    // global variable to keep track of TripleState when enabled
    protected tripleState:number = 0
 
@@ -866,6 +868,40 @@ topIndexCheck (newVal:number, oldVal:number) {
   }
 }
 
+@Watch('isEditMode', { immediate: false })
+callingImage () {
+  this.pictureSize()
+}
+
+imageView () {
+  const picPosLeftRight = [0, 1, 2, 3, 4, 5]
+  if (this.textSpanRef && this.imageRef && this.imageRef.parentElement) {
+    if (this.properties.Width! <= this.imageRef.naturalWidth! && picPosLeftRight.includes(this.properties.PicturePosition!)) {
+      this.textSpanRef.style.display = 'none'
+      this.imageRef.parentElement!.style.alignSelf = ''
+    } else if (this.properties.Width! > this.imageRef.naturalWidth! && picPosLeftRight.includes(this.properties.PicturePosition!)) {
+      this.imageRef.parentElement!.style.alignSelf = 'center'
+      this.textSpanRef.style.display = 'flex'
+      document.removeEventListener('keypress', this.onKeyPress)
+    }
+  }
+  if (this.editableTextRef && this.imageRef && this.imageRef.parentElement) {
+    const el = this.editableTextRef.$el as HTMLSpanElement
+    if (this.properties.Width! <= this.imageRef.naturalWidth && picPosLeftRight.includes(this.properties.PicturePosition!)) {
+      el.style.display = 'none'
+      this.imageRef.parentElement!.style.alignSelf = ''
+      document.addEventListener('keypress', this.onKeyPress)
+    } else if (this.properties.Width! > this.imageRef.naturalWidth && picPosLeftRight.includes(this.properties.PicturePosition!)) {
+      this.imageRef.parentElement!.style.alignSelf = 'center'
+      el.style.display = 'flex'
+      document.removeEventListener('keypress', this.onKeyPress)
+    }
+  }
+}
+onKeyPress (e: KeyboardEvent) {
+  this.updateCaption(this.properties.Caption + e.key)
+}
+
 /**
  * @description updates the dataModel listBox object properties when user clicks
  * @function handleMultiSelect
@@ -1456,6 +1492,32 @@ get spanStyleObj () {
     color: !this.properties.Enabled ? 'gray' : ''
   }
 }
+
+get spanClassStyleObj () {
+  const controlProp = this.properties
+  const font: font = controlProp.Font
+    ? controlProp.Font
+    : {
+      FontName: 'Arial',
+      FontSize: 20,
+      FontItalic: true,
+      FontBold: true,
+      FontUnderline: true,
+      FontStrikethrough: true
+    }
+  return {
+    textDecoration:
+      font.FontStrikethrough === true && font.FontUnderline === true
+        ? 'underline line-through'
+        : font.FontUnderline === true
+          ? 'underline'
+          : font.FontStrikethrough === true && controlProp.Accelerator !== ''
+            ? 'line-through underline'
+            : font.FontStrikethrough === true ? 'line-through' : '',
+    color: !this.properties.Enabled ? 'gray' : ''
+  }
+}
+
 positionLogo (value:any) {
   let style = {
     order: Number(),
@@ -1543,12 +1605,15 @@ pictureSize () {
   }
   if (this.properties.Picture) {
     Vue.nextTick(() => {
-      imgStyle.width = this.properties.Width! <= this.imageRef!.naturalWidth ? `${this.properties.Width}px` : 'fit-content'
-      imgStyle.height = this.properties.Height! <= this.imageRef!.naturalHeight ? `${this.properties.Height}px` : 'fit-content'
-      if (this.properties.PicturePosition === 9 || this.properties.PicturePosition === 10 || this.properties.PicturePosition === 11) {
-        this.imageRef.scrollIntoView(true)
+      if (this.imageRef) {
+        imgStyle.width = this.properties.Width! <= this.imageRef!.naturalWidth ? `${this.properties.Width}px` : 'fit-content'
+        imgStyle.height = this.properties.Height! <= this.imageRef!.naturalHeight ? `${this.properties.Height}px` : 'fit-content'
+        if (this.properties.PicturePosition === 9 || this.properties.PicturePosition === 10 || this.properties.PicturePosition === 11) {
+          this.imageRef.scrollIntoView(true)
+        }
+        imgStyle.filter = !this.properties.Enabled ? 'sepia(0) grayscale(1) blur(4px)' : ''
+        this.imageView()
       }
-      imgStyle.filter = !this.properties.Enabled ? 'sepia(0) grayscale(1) blur(3px) opacity(0.2)' : ''
     })
   }
   this.imageProperty = imgStyle
@@ -1654,7 +1719,7 @@ setHeightWidthVariable () {
   if (this.textSpanRef && this.textSpanRef.offsetWidth) {
     labelWidth = this.textSpanRef.offsetWidth
   } else if ((this.editableTextRef && this.editableTextRef.$el as HTMLSpanElement) && (this.editableTextRef && this.editableTextRef.$el as HTMLSpanElement).offsetWidth) {
-    labelWidth = (this.editableTextRef.$el as HTMLSpanElement).offsetWidth
+    labelWidth = (this.editableTextRef.$el as HTMLSpanElement).scrollWidth
   }
   return { picPosLeftRight, picPosTopBottom, controlWidthIncrease, imgHeight, imgWidth, labelHeight, labelWidth }
 }
@@ -1671,5 +1736,29 @@ setCaretPosition () {
       sel.addRange(range)
     }
   })
+}
+updateMouseCursor () {
+  const controlProp = this.properties
+  if (this.toolBoxSelect !== 'Select') {
+    this.controlCursor = 'crosshair !important'
+  } else if (this.data.type === 'Page' || this.data.type === 'MultiPage') {
+    EventBus.$emit('getMouseCursor', this.properties.ID, (pointer: string) => {
+      if (controlProp.ID === this.controlId) {
+        this.controlCursor = pointer
+      }
+    })
+  } else {
+    if (controlProp.MousePointer !== 0 || controlProp.MouseIcon !== '') {
+      this.controlCursor = this.getMouseCursorData
+    } else if (controlProp.MousePointer === 0) {
+      EventBus.$emit('getMouseCursor', this.properties.ID, (pointer: string) => {
+        if (controlProp.ID === this.controlId) {
+          this.controlCursor = pointer
+        }
+      })
+    } else {
+      this.controlCursor = 'default'
+    }
+  }
 }
 }

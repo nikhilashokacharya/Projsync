@@ -38,7 +38,9 @@
     <FDTable v-if="selectedSelect.length > 0" :tableData="propertyTableData"
       :userFormId="userFormId"
       :getSelectedControlsDatas="getSelectedControlsDatas"
-      :resultArray="resultArray" />
+      :resultArray="resultArray"
+      :isPropChanged="isPropChanged"
+    />
   </div>
 </template>
 
@@ -113,6 +115,7 @@ export default class PropertiesList extends FDCommonMethod {
       } else if (this.getSelectedControlsDatas!.length > 1) {
         let ctrlKeys = []
         let selCntrlType = []
+        const userData = this.userformData[this.userFormId]
         const checkValArr = [['CheckBox', 'OptionButton', 'ToggleButton'],
           ['TextBox', 'ListBox', 'ComboBox'],
           ['TabStrip', 'MultiPage', 'SpinButton', 'ScrollBar']]
@@ -124,9 +127,9 @@ export default class PropertiesList extends FDCommonMethod {
 
         // get array of Object which property Object of selected Controls
         for (const controlIndex in this.getSelectedControlsDatas!) {
-          const controlData = this.userformData[this.userFormId][this.getSelectedControlsDatas![controlIndex]]
+          const controlData = userData[this.getSelectedControlsDatas![controlIndex]]
           const defineList = this.propList.data[controlData.type]
-          selCntrlType.push(this.userformData[this.userFormId][this.getSelectedControlsDatas![controlIndex]].type)
+          selCntrlType.push(userData[this.getSelectedControlsDatas![controlIndex]].type)
           ctrlKeys.push(Object.keys(defineList))
         }
         const uniqueSelType = selCntrlType.filter((v, i, a) => a.indexOf(v) === i)
@@ -148,13 +151,13 @@ export default class PropertiesList extends FDCommonMethod {
         for (const propName in commonProp) {
           if (commonProp[propName] === 'Font') {
             const fontObj = {
-              FontName: '',
-              FontSize: '',
-              FontBold: '',
-              FontItalic: '',
-              FontUnderline: '',
-              FontStrikethrough: '',
-              FontStyle: ''
+              FontName: [],
+              FontSize: [],
+              FontBold: [],
+              FontItalic: [],
+              FontUnderline: [],
+              FontStrikethrough: [],
+              FontStyle: []
             }
             Vue.set(combinedObj, commonProp[propName], fontObj)
           } else {
@@ -169,7 +172,7 @@ export default class PropertiesList extends FDCommonMethod {
             if (commonProp.indexOf(propName) > -1) {
               if (propName === 'Font') {
                 for (const fontProp in contolProp[propName]) {
-                  combinedObj[propName][fontProp] = [...combinedObj[propName][fontProp], contolProp[propName][fontProp]]
+                  combinedObj[propName][fontProp].push(contolProp![propName]![fontProp]!)
                 }
               } else {
                 combinedObj[propName] = [...combinedObj[propName], contolProp[propName as keyof controlProperties]]
@@ -180,22 +183,24 @@ export default class PropertiesList extends FDCommonMethod {
         const allEqual = (arr: string[]): boolean => { return arr.every((v: string) => v === arr[0]) }
 
         // get the common value
+        const initialFont = { ...userData[this.getSelectedControlsDatas![0]].properties.Font! }
         for (const propName in combinedObj) {
           if (propName === 'Font') {
             const fontObj = {
               FontName: '',
-              FontSize: '',
+              FontSize: -1,
               FontBold: '',
               FontItalic: '',
               FontUnderline: '',
               FontStrikethrough: '',
               FontStyle: ''
             }
+
             for (const fontProp in combinedObj[propName]) {
               const isSame: boolean = allEqual(combinedObj[propName][fontProp])
-              fontObj[fontProp] = isSame ? combinedObj[propName][fontProp][0] : ''
+              initialFont[fontProp] = isSame ? combinedObj[propName][fontProp][0] : fontObj[fontProp]
             }
-            commonPropValue[propName] = fontObj
+            commonPropValue[propName] = { ...initialFont }
           } else {
             const isSame: boolean = allEqual(combinedObj[propName])
             commonPropValue[propName] = isSame ? combinedObj[propName][0] : ''

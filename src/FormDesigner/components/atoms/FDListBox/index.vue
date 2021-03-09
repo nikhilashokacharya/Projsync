@@ -1,4 +1,5 @@
 <template>
+<div class="outerListBoxDiv" :style="outerListBoxStyleObj" @mouseover="updateMouseCursor">
   <div
     class="listStyle"
     ref="listStyleOuterRef"
@@ -9,6 +10,7 @@
     :tabindex="properties.TabIndex"
     @keydown="forMatchEntry"
     v-on="eventStoppers()"
+    @scroll="updateScrollLeft"
     @keydown.esc="setContentEditable($event, false)"
   >
     <div class="table-style" :style="tableStyleObj" ref="listBoxTableRef" v-if="properties.RowSource !== ''">
@@ -85,7 +87,7 @@
         </div>
       </div>
     </div>
-    <div v-else>
+    <div v-else :style="{cursor: controlCursor}">
         <div v-if="properties.ColumnHeads === true" class="theadClass">
                 <div
                   v-if="properties.RowSource === '' && properties.ColumnCount !== -1"
@@ -107,6 +109,7 @@
         <div></div>
       </div>
     </div>
+  </div>
   </div>
 </template>
 
@@ -632,180 +635,182 @@ export default class FDListBox extends Mixins(FdControlVue) {
     return finalWidths
   }
   handleMousedown (e: MouseEvent) {
-    if (this.toolBoxSelectControl === 'Select') {
-      e.stopPropagation()
-      if (this.properties.RowSource !== '') {
-        if (
-          e.target instanceof HTMLDivElement ||
+    if (e.which !== 3) {
+      if (this.toolBoxSelectControl === 'Select') {
+        e.stopPropagation()
+        if (this.properties.RowSource !== '') {
+          if (
+            e.target instanceof HTMLDivElement ||
       e.target instanceof HTMLTableRowElement ||
       e.target instanceof HTMLInputElement
-        ) {
-          this.tempListBoxComboBoxEvent = e
-          const targetElement = e.target
-          const tempData = targetElement!.parentElement!
-            .children[0] as HTMLDivElement
-          const tempDataOption = targetElement.parentElement!
-            .children[1] as HTMLDivElement
-          const tempPath = e.composedPath()
-          targetElement.focus()
-          let data = targetElement.innerText
-          let splitData = data.replace(/\t/g, ' ').split(' ')
+          ) {
+            this.tempListBoxComboBoxEvent = e
+            const targetElement = e.target
+            const tempData = targetElement!.parentElement!
+              .children[0] as HTMLDivElement
+            const tempDataOption = targetElement.parentElement!
+              .children[1] as HTMLDivElement
+            const tempPath = e.composedPath()
+            targetElement.focus()
+            let data = targetElement.innerText
+            let splitData = data.replace(/\t/g, ' ').split(' ')
 
-          targetElement.focus()
-          if (this.isRunMode && (this.properties.Enabled && this.properties.Locked === false)) {
-            if (this.properties.MultiSelect === 0) {
-              this.clearOptionBGColorAndChecked(e)
-              this.setOptionBGColorAndChecked(e)
-            } else if (this.properties.MultiSelect === 1) {
-              this.setOptionBGColorAndChecked(e)
-            } else if (this.properties.MultiSelect === 2) {
-              if (e.ctrlKey === true) {
-                if (targetElement.tagName === 'INPUT') {
-                  this.setOptionBGColorAndChecked(e)
-                } else {
-                  this.setOptionBGColorAndChecked(e)
-                }
-              } else if (e.shiftKey === true && this.properties.Value !== '') {
-                let startPoint = 0
-                let endPoint = 0
-                for (let i = 0; i < tempPath.length; i++) {
-                  const ele = tempPath[i] as HTMLDivElement
-                  if (ele.className === 'table-body') {
-                  // extend points start and end
-                    for (let j = 0; j < ele.childNodes.length; j++) {
-                      const cd = ele.childNodes[j] as HTMLDivElement
-                      if (cd.innerText === this.properties.Value) {
-                        startPoint = j + 1
+            targetElement.focus()
+            if (this.isRunMode && (this.properties.Enabled && this.properties.Locked === false)) {
+              if (this.properties.MultiSelect === 0) {
+                this.clearOptionBGColorAndChecked(e)
+                this.setOptionBGColorAndChecked(e)
+              } else if (this.properties.MultiSelect === 1) {
+                this.setOptionBGColorAndChecked(e)
+              } else if (this.properties.MultiSelect === 2) {
+                if (e.ctrlKey === true) {
+                  if (targetElement.tagName === 'INPUT') {
+                    this.setOptionBGColorAndChecked(e)
+                  } else {
+                    this.setOptionBGColorAndChecked(e)
+                  }
+                } else if (e.shiftKey === true && this.properties.Value !== '') {
+                  let startPoint = 0
+                  let endPoint = 0
+                  for (let i = 0; i < tempPath.length; i++) {
+                    const ele = tempPath[i] as HTMLDivElement
+                    if (ele.className === 'table-body') {
+                      // extend points start and end
+                      for (let j = 0; j < ele.childNodes.length; j++) {
+                        const cd = ele.childNodes[j] as HTMLDivElement
+                        if (cd.innerText === this.properties.Value) {
+                          startPoint = j + 1
+                        }
+                        if (cd.innerText === targetElement.innerText) {
+                          endPoint = j
+                        }
                       }
-                      if (cd.innerText === targetElement.innerText) {
-                        endPoint = j
+                      // upward selection start and end swap
+                      if (startPoint > endPoint) {
+                        let temp = startPoint
+                        startPoint = endPoint
+                        endPoint = temp
                       }
-                    }
-                    // upward selection start and end swap
-                    if (startPoint > endPoint) {
-                      let temp = startPoint
-                      startPoint = endPoint
-                      endPoint = temp
-                    }
-                    // setting selection
-                    for (let k = startPoint; k <= endPoint; k++) {
-                      const node = ele.childNodes[k] as HTMLDivElement
-                      const tempNode = node.childNodes[0]
-                        .childNodes[0] as HTMLInputElement
-                      node.style.backgroundColor = 'rgb(59, 122, 231)'
-                      if (this.properties.ListStyle === 1 && !tempNode.checked) {
-                      // tempNode.checked = !tempNode.checked
-                        tempNode.checked = true
+                      // setting selection
+                      for (let k = startPoint; k <= endPoint; k++) {
+                        const node = ele.childNodes[k] as HTMLDivElement
+                        const tempNode = node.childNodes[0]
+                          .childNodes[0] as HTMLInputElement
+                        node.style.backgroundColor = 'rgb(59, 122, 231)'
+                        if (this.properties.ListStyle === 1 && !tempNode.checked) {
+                          // tempNode.checked = !tempNode.checked
+                          tempNode.checked = true
+                        }
                       }
+                      break
                     }
-                    break
                   }
                 }
-              }
 
-              if (this.properties.ControlSource !== '') {
-                if (this.properties.TextColumn === -1) {
+                if (this.properties.ControlSource !== '') {
+                  if (this.properties.TextColumn === -1) {
+                    this.updateDataModel({
+                      propertyName: 'Text',
+                      value: this.selectionData[0]
+                    })
+                  }
                   this.updateDataModel({
-                    propertyName: 'Text',
+                    propertyName: 'Value',
                     value: this.selectionData[0]
                   })
                 }
-                this.updateDataModel({
-                  propertyName: 'Value',
-                  value: this.selectionData[0]
-                })
+                this.clearOptionBGColorAndChecked(e)
+                this.setOptionBGColorAndChecked(e)
               }
-              this.clearOptionBGColorAndChecked(e)
-              this.setOptionBGColorAndChecked(e)
-            }
-          } else {
-            if (this.properties.MultiSelect === 0) {
-              this.clearOptionBGColorAndChecked(e)
-              this.setOptionBGColorAndChecked(e)
-            } else if (this.properties.MultiSelect === 1) {
-              this.setOptionBGColorAndChecked(e)
-            } else if (this.properties.MultiSelect === 2) {
-              if (e.ctrlKey === true) {
-                if (targetElement.tagName === 'INPUT') {
-                  this.setOptionBGColorAndChecked(e)
-                } else {
-                  this.setOptionBGColorAndChecked(e)
-                }
-              } else if (e.shiftKey === true && this.properties.Value !== '') {
-                let startPoint = 0
-                let endPoint = 0
-                for (let i = 0; i < tempPath.length; i++) {
-                  const ele = tempPath[i] as HTMLDivElement
-                  if (ele.className === 'table-body') {
-                  // extend points start and end
-                    for (let j = 0; j < ele.childNodes.length; j++) {
-                      const cd = ele.childNodes[j] as HTMLDivElement
-                      if (cd.innerText === this.properties.Value) {
-                        startPoint = j + 1
+            } else {
+              if (this.properties.MultiSelect === 0) {
+                this.clearOptionBGColorAndChecked(e)
+                this.setOptionBGColorAndChecked(e)
+              } else if (this.properties.MultiSelect === 1) {
+                this.setOptionBGColorAndChecked(e)
+              } else if (this.properties.MultiSelect === 2) {
+                if (e.ctrlKey === true) {
+                  if (targetElement.tagName === 'INPUT') {
+                    this.setOptionBGColorAndChecked(e)
+                  } else {
+                    this.setOptionBGColorAndChecked(e)
+                  }
+                } else if (e.shiftKey === true && this.properties.Value !== '') {
+                  let startPoint = 0
+                  let endPoint = 0
+                  for (let i = 0; i < tempPath.length; i++) {
+                    const ele = tempPath[i] as HTMLDivElement
+                    if (ele.className === 'table-body') {
+                      // extend points start and end
+                      for (let j = 0; j < ele.childNodes.length; j++) {
+                        const cd = ele.childNodes[j] as HTMLDivElement
+                        if (cd.innerText === this.properties.Value) {
+                          startPoint = j + 1
+                        }
+                        if (cd.innerText === targetElement.innerText) {
+                          endPoint = j
+                        }
                       }
-                      if (cd.innerText === targetElement.innerText) {
-                        endPoint = j
+                      // upward selection start and end swap
+                      if (startPoint > endPoint) {
+                        let temp = startPoint
+                        startPoint = endPoint
+                        endPoint = temp
                       }
-                    }
-                    // upward selection start and end swap
-                    if (startPoint > endPoint) {
-                      let temp = startPoint
-                      startPoint = endPoint
-                      endPoint = temp
-                    }
-                    // setting selection
-                    for (let k = startPoint; k <= endPoint; k++) {
-                      const node = ele.childNodes[k] as HTMLDivElement
-                      const tempNode = node.childNodes[0]
-                        .childNodes[0] as HTMLInputElement
-                      node.style.backgroundColor = 'rgb(59, 122, 231)'
-                      if (this.properties.ListStyle === 1 && !tempNode.checked) {
-                      // tempNode.checked = !tempNode.checked
-                        tempNode.checked = true
+                      // setting selection
+                      for (let k = startPoint; k <= endPoint; k++) {
+                        const node = ele.childNodes[k] as HTMLDivElement
+                        const tempNode = node.childNodes[0]
+                          .childNodes[0] as HTMLInputElement
+                        node.style.backgroundColor = 'rgb(59, 122, 231)'
+                        if (this.properties.ListStyle === 1 && !tempNode.checked) {
+                          // tempNode.checked = !tempNode.checked
+                          tempNode.checked = true
+                        }
                       }
+                      break
                     }
-                    break
                   }
                 }
-              }
 
-              if (this.properties.ControlSource !== '') {
-                if (this.properties.TextColumn === -1) {
+                if (this.properties.ControlSource !== '') {
+                  if (this.properties.TextColumn === -1) {
+                    this.updateDataModel({
+                      propertyName: 'Text',
+                      value: this.selectionData[0]
+                    })
+                  }
                   this.updateDataModel({
-                    propertyName: 'Text',
+                    propertyName: 'Value',
                     value: this.selectionData[0]
                   })
                 }
-                this.updateDataModel({
-                  propertyName: 'Value',
-                  value: this.selectionData[0]
-                })
+                this.clearOptionBGColorAndChecked(e)
+                this.setOptionBGColorAndChecked(e)
               }
-              this.clearOptionBGColorAndChecked(e)
-              this.setOptionBGColorAndChecked(e)
             }
-          }
-          if (this.properties.MultiSelect === 0) {
-            for (let i = 0; i < this.extraDatas.RowSourceData!.length; i++) {
-              if (this.listStyleRef[i].style.backgroundColor !== '') {
-                if (this.properties.TextColumn === -1) {
-                  const text = this.extraDatas.RowSourceData![i][0]
-                  this.updateDataModel({ propertyName: 'Text', value: text })
-                } else if (this.properties.TextColumn === 0) {
-                  this.updateDataModel({ propertyName: 'Text', value: i })
-                } else if (this.properties.TextColumn! > 0 && this.properties.TextColumn! <= this.extraDatas.RowSourceData![0].length) {
-                  const text = this.extraDatas.RowSourceData![i][this.properties.TextColumn! - 1]
-                  this.updateDataModel({ propertyName: 'Text', value: text })
+            if (this.properties.MultiSelect === 0) {
+              for (let i = 0; i < this.extraDatas.RowSourceData!.length; i++) {
+                if (this.listStyleRef[i].style.backgroundColor !== '') {
+                  if (this.properties.TextColumn === -1) {
+                    const text = this.extraDatas.RowSourceData![i][0]
+                    this.updateDataModel({ propertyName: 'Text', value: text })
+                  } else if (this.properties.TextColumn === 0) {
+                    this.updateDataModel({ propertyName: 'Text', value: i })
+                  } else if (this.properties.TextColumn! > 0 && this.properties.TextColumn! <= this.extraDatas.RowSourceData![0].length) {
+                    const text = this.extraDatas.RowSourceData![i][this.properties.TextColumn! - 1]
+                    this.updateDataModel({ propertyName: 'Text', value: text })
+                  }
+                  const x = this.extraDatas.RowSourceData![i][this.properties.BoundColumn! - 1]
+                  this.updateDataModel({ propertyName: 'Value', value: x })
                 }
-                const x = this.extraDatas.RowSourceData![i][this.properties.BoundColumn! - 1]
-                this.updateDataModel({ propertyName: 'Value', value: x })
               }
+            } else {
+              this.updateDataModel({ propertyName: 'Text', value: '' })
+              this.updateDataModel({ propertyName: 'Value', value: '' })
             }
-          } else {
-            this.updateDataModel({ propertyName: 'Text', value: '' })
-            this.updateDataModel({ propertyName: 'Value', value: '' })
+            this.getSelectedStyle()
           }
-          this.getSelectedStyle()
         }
       }
     }
@@ -850,6 +855,11 @@ export default class FDListBox extends Mixins(FdControlVue) {
       }
     }
   }
+  get outerListBoxStyleObj () {
+    return {
+      cursor: this.controlCursor
+    }
+  }
   /**
    * @description style object is passed to :style attribute in div tag
    * dynamically changing the styles of the component based on properties
@@ -864,12 +874,9 @@ export default class FDListBox extends Mixins(FdControlVue) {
       display = controlProp.Width === 0 || controlProp.Height === 0 ? 'none' : 'inline-block'
     }
     return {
+      pointerEvents: this.isEditMode ? 'auto' : 'none',
       backgroundColor: controlProp.BackColor,
       borderColor: controlProp.BorderStyle === 1 ? controlProp.BorderColor : '',
-      cursor:
-        controlProp.MousePointer !== 0 || controlProp.MouseIcon !== ''
-          ? this.getMouseCursorData
-          : 'default',
       borderLeft:
         controlProp.BorderStyle === 1
           ? '1px solid ' + controlProp.BorderColor
@@ -992,7 +999,8 @@ export default class FDListBox extends Mixins(FdControlVue) {
           ? this.tempWeight
           : '',
       fontStretch: font.FontStyle !== '' ? this.tempStretch : '',
-      width: '100%'
+      width: '100%',
+      cursor: this.controlCursor
       // display: this.properties.ColumnCount === 0 ? 'none' : ''
     }
   }
@@ -1211,6 +1219,13 @@ export default class FDListBox extends Mixins(FdControlVue) {
       e.stopPropagation()
       if (!this.isActivated) {
         EventBus.$emit('focusUserForm')
+      }
+    }
+  }
+  updateScrollLeft (event: Event) {
+    if (!this.isEditMode) {
+      if (event.target instanceof HTMLDivElement) {
+        event.target.scrollLeft = 0
       }
     }
   }
