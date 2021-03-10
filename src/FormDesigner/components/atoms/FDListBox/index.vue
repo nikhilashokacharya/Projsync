@@ -259,7 +259,11 @@ export default class FDListBox extends Mixins(FdControlVue) {
                         const headWidth = this.listBoxTableRef.children[0].children[0].children[j] as HTMLDivElement
                         if (this.properties.ColumnCount !== -1) {
                           if (j === this.listBoxTableRef.children[0].children[0].children.length - 1) {
-                            headWidth.style.width = finalWidths[j] - 4 + 'px'
+                            if (finalWidths[j] < 10) {
+                              headWidth.style.width = finalWidths[j] + 'px'
+                            } else {
+                              headWidth.style.width = finalWidths[j] - 4 + 'px'
+                            }
                           } else {
                             headWidth.style.width = '100px'
                           }
@@ -272,7 +276,11 @@ export default class FDListBox extends Mixins(FdControlVue) {
                   const width = this.listBoxTableRef.children[1].children[i].children[j] as HTMLDivElement
                   if (this.properties.ColumnCount! === -1) {
                     if (j >= 0 && j < this.extraDatas.RowSourceData!.length) {
-                      width.style.width = tempWidth - 4 + 'px'
+                      if (tempWidth < 10) {
+                        width.style.width = tempWidth + 'px'
+                      } else {
+                        width.style.width = tempWidth - 4 + 'px'
+                      }
                     }
                   } else if (j + 1 > this.properties.ColumnCount!) {
                     width.style.minWidth = '0px'
@@ -280,7 +288,11 @@ export default class FDListBox extends Mixins(FdControlVue) {
                   } else {
                     if (j < this.extraDatas.RowSourceData!.length) {
                       width.style.minWidth = '100px'
-                      width.style.width = tempWidth - 4 + 'px'
+                      if (tempWidth < 10) {
+                        width.style.width = tempWidth + 'px'
+                      } else {
+                        width.style.width = tempWidth - 4 + 'px'
+                      }
                     }
                   }
                 }
@@ -323,6 +335,7 @@ export default class FDListBox extends Mixins(FdControlVue) {
             }
           }
         } else if (this.listBoxTableRef && this.listBoxTableRef.children[1]) {
+          debugger
           finalWidths = this.calculateColumnWidths()
           if (this.listBoxTableRef.children[1].children[0]) {
             for (let i = 0; i < this.listBoxTableRef.children[1].children.length; i++) {
@@ -334,14 +347,28 @@ export default class FDListBox extends Mixins(FdControlVue) {
                   } else {
                     width.style.display = 'inline-block'
                     if (this.properties.ColumnCount === 1) {
-                      if (this.properties.Width! > finalWidths[0]) {
-                        width.style.width = this.properties.Width! - 4 + 'px'
+                      if (finalWidths[j] === 0) {
+                        width.style.display = 'none'
+                      } else if (this.properties.Width! > finalWidths[0]) {
+                        if (this.properties.Width! < 10) {
+                          width.style.width = this.properties.Width! + 'px'
+                        } else {
+                          width.style.width = this.properties.Width! - 4 + 'px'
+                        }
                       } else {
-                        width.style.width = finalWidths[0] - 4 + 'px'
+                        if (finalWidths[0] < 10) {
+                          width.style.width = finalWidths[0] + 'px'
+                        } else {
+                          width.style.width = finalWidths[0] - 4 + 'px'
+                        }
                       }
                     } else {
                       width.style.minWidth = '0px'
-                      width.style.width = finalWidths[j] - 4 + 'px'
+                      if (finalWidths[j] < 10) {
+                        width.style.width = finalWidths[j] + 'px'
+                      } else {
+                        width.style.width = finalWidths[j] - 4 + 'px'
+                      }
                     }
                   }
                   if (this.listBoxTableRef && this.listBoxTableRef.children[0] && this.listBoxTableRef.children[0].children[0] && this.listBoxTableRef.children[0].children[0].children[j]) {
@@ -349,19 +376,37 @@ export default class FDListBox extends Mixins(FdControlVue) {
                     if (this.properties.ColumnCount === -1) {
                       headWidth.style.display = 'inline-block'
                       headWidth.style.minWidth = '0px'
-                      headWidth.style.width = finalWidths[j] - 4 + 'px'
+                      if (finalWidths[j] < 10) {
+                        width.style.width = finalWidths[j] + 'px'
+                      } else {
+                        width.style.width = finalWidths[j] - 4 + 'px'
+                      }
                     } else if (j >= this.properties.ColumnCount!) {
                       headWidth.style.display = 'none'
                     } else {
                       headWidth.style.display = 'inline-block'
                       if (this.properties.ColumnCount === 1) {
-                        if (this.properties.Width! > finalWidths[0]) {
-                          headWidth.style.width = this.properties.Width! - 4 + 'px'
+                        if (finalWidths[j] === 0) {
+                          headWidth.style.display = 'none'
+                        } else if (this.properties.Width! > finalWidths[0]) {
+                          if (this.properties.Width! < 10) {
+                            headWidth.style.width = this.properties.Width! + 'px'
+                          } else {
+                            headWidth.style.width = this.properties.Width! - 4 + 'px'
+                          }
                         } else {
-                          headWidth.style.width = finalWidths[0] - 4 + 'px'
+                          if (finalWidths[0] < 10) {
+                            headWidth.style.width = finalWidths[0] + 'px'
+                          } else {
+                            headWidth.style.width = finalWidths[0] - 4 + 'px'
+                          }
                         }
                       } else {
-                        headWidth.style.width = finalWidths[j] - 4 + 'px'
+                        if (finalWidths[j] < 10) {
+                          headWidth.style.width = finalWidths[j] + 'px'
+                        } else {
+                          headWidth.style.width = finalWidths[j] - 4 + 'px'
+                        }
                       }
                     }
                   }
@@ -375,7 +420,9 @@ export default class FDListBox extends Mixins(FdControlVue) {
                     } else {
                       width.style.display = 'inline-block'
                       if (this.properties.ColumnCount === 1) {
-                        if (this.properties.Width! > finalWidths[0]) {
+                        if (finalWidths[j] === 0) {
+                          width.style.display = 'none'
+                        } else if (this.properties.Width! > finalWidths[0]) {
                           width.style.width = this.properties.Width! - 20 + 'px'
                         } else {
                           width.style.width = finalWidths[0] - 20 + 'px'
@@ -396,7 +443,9 @@ export default class FDListBox extends Mixins(FdControlVue) {
                       } else {
                         headWidth.style.display = 'inline-block'
                         if (this.properties.ColumnCount === 1) {
-                          if (this.properties.Width! > finalWidths[0]) {
+                          if (finalWidths[j] === 0) {
+                            headWidth.style.display = 'none'
+                          } else if (this.properties.Width! > finalWidths[0]) {
                             headWidth.style.width = this.properties.Width! - 20 + 'px'
                           } else {
                             headWidth.style.width = finalWidths[0] - 20 + 'px'
@@ -439,7 +488,11 @@ export default class FDListBox extends Mixins(FdControlVue) {
                   const width = this.listBoxTableRef.children[0].children[i].children[j] as HTMLDivElement
                   if (this.properties.ColumnCount! === -1) {
                     if (j >= 0 && j < this.extraDatas.RowSourceData!.length) {
-                      width.style.width = tempWidth - 4 + 'px'
+                      if (tempWidth < 10) {
+                        width.style.width = tempWidth + 'px'
+                      } else {
+                        width.style.width = tempWidth - 4 + 'px'
+                      }
                     }
                   } else if (j + 1 > this.properties.ColumnCount!) {
                     width.style.minWidth = '0px'
@@ -447,7 +500,11 @@ export default class FDListBox extends Mixins(FdControlVue) {
                   } else {
                     if (j < this.extraDatas.RowSourceData!.length) {
                       width.style.minWidth = '100px'
-                      width.style.width = tempWidth - 4 + 'px'
+                      if (tempWidth < 10) {
+                        width.style.width = tempWidth + 'px'
+                      } else {
+                        width.style.width = tempWidth - 4 + 'px'
+                      }
                     }
                   }
                 }
@@ -474,6 +531,7 @@ export default class FDListBox extends Mixins(FdControlVue) {
             }
           }
         } else if (this.listBoxTableRef && this.listBoxTableRef.children[0]) {
+          debugger
           finalWidths = this.calculateColumnWidths()
           if (this.listBoxTableRef.children[0].children[0]) {
             for (let i = 0; i < this.listBoxTableRef.children[0].children.length; i++) {
@@ -485,14 +543,28 @@ export default class FDListBox extends Mixins(FdControlVue) {
                   } else {
                     width.style.display = 'inline-block'
                     if (this.properties.ColumnCount === 1) {
-                      if (this.properties.Width! > finalWidths[0]) {
-                        width.style.width = this.properties.Width! - 4 + 'px'
+                      if (finalWidths[j] === 0) {
+                        width.style.display = 'none'
+                      } else if (this.properties.Width! > finalWidths[0]) {
+                        if (this.properties.Width! < 10) {
+                          width.style.width = this.properties.Width! + 'px'
+                        } else {
+                          width.style.width = this.properties.Width! - 4 + 'px'
+                        }
                       } else {
-                        width.style.width = finalWidths[0] - 4 + 'px'
+                        if (finalWidths[0] < 10) {
+                          width.style.width = finalWidths[0] + 'px'
+                        } else {
+                          width.style.width = finalWidths[0] - 4 + 'px'
+                        }
                       }
                     } else {
                       width.style.minWidth = '0px'
-                      width.style.width = finalWidths[j] - 4 + 'px'
+                      if (finalWidths[j] < 10) {
+                        width.style.width = finalWidths[j] + 'px'
+                      } else {
+                        width.style.width = finalWidths[j] - 4 + 'px'
+                      }
                     }
                   }
                 }
@@ -505,7 +577,9 @@ export default class FDListBox extends Mixins(FdControlVue) {
                     } else {
                       width.style.display = 'inline-block'
                       if (this.properties.ColumnCount === 1) {
-                        if (this.properties.Width! > finalWidths[0]) {
+                        if (finalWidths[j] === 0) {
+                          width.style.display = 'none'
+                        } else if (this.properties.Width! > finalWidths[0]) {
                           width.style.width = this.properties.Width! - 20 + 'px'
                         } else {
                           width.style.width = finalWidths[0] - 20 + 'px'
@@ -585,6 +659,7 @@ export default class FDListBox extends Mixins(FdControlVue) {
         }
       }
     } else {
+      debugger
       if (columnWidthCount >= totalColumnCount) {
         for (let i = 0; i < totalColumnCount; i++) {
           if (i < this.properties.ColumnCount!) {
@@ -622,6 +697,8 @@ export default class FDListBox extends Mixins(FdControlVue) {
             lastColumWidth = totalWidth - widths[i]!
             finalWidths.push(widths[i])
             totalWidth = lastColumWidth
+          } else if (widths.length === 1) {
+            finalWidths.push(totalColumnWidths)
           } else {
             finalWidths.push(lastColumWidth)
           }
