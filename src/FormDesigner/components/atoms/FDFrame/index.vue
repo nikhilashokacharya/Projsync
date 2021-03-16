@@ -15,7 +15,7 @@
     @keyup.stop="selectMultipleCtrl($event, false)"
   >
     <legend ref="fieldsetRef" :style="legendCssStyleProperty">{{ properties.Caption }}</legend>
-    <div :style="scrollSize" ref="frame" >
+    <div :style="scrollSize()" ref="frame" >
       <div>
       <Container
       :style="frameContainerStyleObj"
@@ -34,7 +34,7 @@
       @deActiveControl="deActControl"
       @dragSelectorControl="dragSelectorControl"
       @addControlObj="addContainerControl"
-      :frameTop="parseInt(scrollSize.top)"
+      :frameTop="parseInt(scrollSize().top)"
       />
       </div>
   </div>

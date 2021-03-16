@@ -1,20 +1,29 @@
 <template>
   <div>
     <div
-      :class="
-        mainSelected && isEditMode && !isRunMode
-          ? 'controlEditStyle'
-          : canDragMainDiv
-          ? 'controlSelectStyle'
-          : 'controlStyle'
-      "
+      class="resizeMainControlStyle"
       :style="resizeControlStyle"
       :ref="'draRef'.concat(controlId)"
-      @mousedown="controlDragResizeMoueDown"
       @contextmenu.stop="displayContextMenu"
-      @click.self="containerBorderClick"
+      @click="containerBorderClick"
       @mouseup="handleMouseUp"
     >
+    <div  :class="[getBorderClass, 'm-top-b move-border']"
+       @mousedown="controlDragResizeMoueDown"
+       :style="getTStyle"
+    />
+    <div :class="[getBorderClass, 'm-right-b move-border']"
+          @mousedown="controlDragResizeMoueDown"
+          :style="getRStyle"
+    />
+    <div :class="[getBorderClass, 'm-bottom-b move-border']"
+          @mousedown="controlDragResizeMoueDown"
+          :style="getBStyle"
+    />
+    <div :class="[getBorderClass, 'm-left-b move-border']"
+    :style="getLStyle"
+    @mousedown="controlDragResizeMoueDown"
+     />
       <ResizeHandler
         v-if="!isRunMode"
         ref="resize"
@@ -33,6 +42,12 @@
           top: propControlData.properties.Top
         }"
       />
+    </div>
+    <div :style="componentStyle"
+      @mousedown="controlDragResizeMoueDown"
+      @contextmenu.stop="displayContextMenu"
+      @mouseup="handleMouseUp"
+    >
       <component
         :is="propControlData.type"
         :controlId="propControlData.properties.ID"
@@ -123,6 +138,7 @@ export default class ResizeControl extends FdSelectVue {
 
   controlDragResizeMoueDown (event: MouseEvent) {
     if (this.isPropChanged) {
+      event.stopPropagation()
       this.mouseDownEvent = event
       this.isControlMouseDown = true
       this.mouseDownContainer = this.controlId
@@ -238,6 +254,34 @@ export default class ResizeControl extends FdSelectVue {
   selectMultipleCtrl (val: boolean) {
     this.selMultipleCtrl = val
   }
+  get componentStyle () {
+    const userData = this.userformData[this.userFormId]
+    const currentProperties = this.propControlData.properties
+    const extraData = this.propControlData.extraDatas!
+    const type = this.propControlData.type
+    const selected = this.getSelectedControlsDatas!
+    let highestZIndex = -1
+    const getContainerList = this.getContainerList(selected[0])
+    if (selected.includes(this.controlId)) {
+      highestZIndex = this.getHighestZIndex(this.controlId)!
+    } else if (getContainerList.includes(this.controlId)) {
+      highestZIndex = this.getHighestZIndex(this.controlId)!
+    }
+    return {
+      position: 'absolute',
+      left: `${currentProperties.Left!}px`,
+      top: `${currentProperties.Top!}px`,
+      /* border width(5) * 2 = 10 */
+      width: `${currentProperties.Width!}px`,
+      height: `${currentProperties.Height!}px`,
+      display:
+        this.isRunMode && currentProperties.Visible === false
+          ? 'none'
+          : 'block',
+      // cursor: !this.isRunMode ? 'move' : 'default',
+      zIndex: (highestZIndex !== -1) ? highestZIndex + 1 : extraData.zIndex! <= 0 ? '' : extraData.zIndex!
+    }
+  }
 
   dragGroupControl (event: MouseEvent, control: string) {
     this.actvControl = control
@@ -290,31 +334,57 @@ export default class ResizeControl extends FdSelectVue {
       return -1
     }
   }
-  get resizeControlStyle () {
-    const userData = this.userformData[this.userFormId]
+  get getLStyle () {
     const currentProperties = this.propControlData.properties
-    const extraData = this.propControlData.extraDatas!
-    const type = this.propControlData.type
-    const selected = this.getSelectedControlsDatas!
-    let highestZIndex = -1
-    const getContainerList = this.getContainerList(selected[0])
-    if (selected.includes(this.controlId)) {
-      highestZIndex = this.getHighestZIndex(this.controlId)!
-    } else if (getContainerList.includes(this.controlId)) {
-      highestZIndex = this.getHighestZIndex(this.controlId)!
+    return {
+      height: `${currentProperties.Height! + 6}px !important`,
+      left: '-9px',
+      top: '-9px',
+      borderLeft: this.getBorderClass === 'controlStyle' ? '' : `calc(6px) solid transparent`,
+      '--select-rotate-degree': '-28deg'
     }
+  }
+  get getTStyle () {
+    const currentProperties = this.propControlData.properties
+    return {
+      top: '-9px',
+      width: `${currentProperties.Width!}px !important`,
+      left: '-3px',
+      borderTop: this.getBorderClass === 'controlStyle' ? '' : `calc(6px) solid transparent`,
+      '--select-rotate-degree': '-110deg'
+    }
+  }
+  get getRStyle () {
+    const currentProperties = this.propControlData.properties
+    return {
+      top: '-9px',
+      left: `${currentProperties.Width! - 3}px`,
+      height: `${currentProperties.Height! + 6}px !important`,
+      borderLeft: this.getBorderClass === 'controlStyle' ? '' : `calc(6px) solid transparent`,
+      '--select-rotate-degree': '-28deg'
+    }
+  }
+  get getBStyle () {
+    const currentProperties = this.propControlData.properties
+    return {
+      left: '-3px',
+      top: `${currentProperties.Height! - 3}px`,
+      width: `${currentProperties.Width!}px !important`,
+      borderTop: this.getBorderClass === 'controlStyle' ? '' : `calc(6px) solid transparent`,
+      '--select-rotate-degree': '-110deg'
+    }
+  }
+  get resizeControlStyle () {
+    const currentProperties = this.propControlData.properties
     return {
       left: `${currentProperties.Left}px`,
       top: `${currentProperties.Top}px`,
-      /* border width(5) * 2 = 10 */
-      width: `${currentProperties.Width! + 10}px`,
-      height: `${currentProperties.Height! + 10}px`,
       display:
         this.isRunMode && currentProperties.Visible === false
           ? 'none'
           : 'block',
-      cursor: !this.isRunMode ? 'move' : 'default',
-      zIndex: (highestZIndex !== -1) ? highestZIndex + 1 : extraData.zIndex! <= 0 ? '' : extraData.zIndex!
+      cursor: !this.isRunMode ? 'move' : 'default'
+      // zIndex: (highestZIndex !== -1) ? highestZIndex + 1 : extraData.zIndex! <= 0 ? '' : extraData.zIndex!
     }
   }
   get mainSelected () {
@@ -700,27 +770,41 @@ export default class ResizeControl extends FdSelectVue {
     const selected = this.selectedControls[this.userFormId].selected
     const getContainer = this.getContainerList(this.controlId)
     getContainer.pop()
-    const selContainer = userData[containerId].type === 'Page' ? this.getContainerList(containerId)[0] : containerId
-    if (this.controlId === selContainer && this.selMultipleCtrl !== true) {
-      let isSameContainer: boolean = false
-      const groupId = userData[this.controlId].properties.GroupID!
-      if (this.isGroupControlelected! === '') {
-        const previousContainer = this.selectedControls[this.userFormId].container[0]
-        const currentContainer = this.getContainerList(this.controlId)[0]
-        isSameContainer = currentContainer === previousContainer
-        if (isSameContainer) {
-          if (selected.length === 1) {
-            this.isMoving = true
-            this.isEditMode = true
-            this.selectControl({
-              userFormId: this.userFormId,
-              select: {
-                container: this.getContainerList(containerId),
-                selected: [containerId]
+    if (containerId) {
+      const selContainer = userData[containerId].type === 'Page' ? this.getContainerList(containerId)[0] : containerId
+      if (this.controlId === selContainer && this.selMultipleCtrl !== true) {
+        let isSameContainer: boolean = false
+        const groupId = userData[this.controlId].properties.GroupID!
+        if (this.isGroupControlelected! === '') {
+          const previousContainer = this.selectedControls[this.userFormId].container[0]
+          const currentContainer = this.getContainerList(this.controlId)[0]
+          isSameContainer = currentContainer === previousContainer
+          if (isSameContainer) {
+            if (selected.length === 1) {
+              this.isMoving = true
+              this.isEditMode = true
+              this.selectControl({
+                userFormId: this.userFormId,
+                select: {
+                  container: this.getContainerList(containerId),
+                  selected: [containerId]
+                }
+              })
+            } else {
+              if (!selected.includes(this.controlId)) {
+                this.isMoving = true
+                this.isEditMode = true
+                this.selectControl({
+                  userFormId: this.userFormId,
+                  select: {
+                    container: this.getContainerList(containerId),
+                    selected: [containerId]
+                  }
+                })
               }
-            })
+            }
           } else {
-            if (!selected.includes(this.controlId)) {
+            if (selected.length === 1 || (selected.length > 1 && !selected.some(item => getContainer.includes(item)))) {
               this.isMoving = true
               this.isEditMode = true
               this.selectControl({
@@ -732,22 +816,12 @@ export default class ResizeControl extends FdSelectVue {
               })
             }
           }
-        } else if (!selected.some(item => getContainer.includes(item))) {
-          this.isMoving = true
-          this.isEditMode = true
-          this.selectControl({
-            userFormId: this.userFormId,
-            select: {
-              container: this.getContainerList(containerId),
-              selected: [containerId]
-            }
-          })
         }
+        if (this.isEditMode && (userData[this.controlId].type === 'Frame' || userData[this.controlId].type === 'MultiPage')) {
+          event.stopPropagation()
+        }
+        callBack(this.isEditMode)
       }
-      if (this.isEditMode && (userData[this.controlId].type === 'Frame' || userData[this.controlId].type === 'MultiPage')) {
-        event.stopPropagation()
-      }
-      callBack(this.isEditMode)
     }
   }
   getEditModeValue (callBack: Function) {
@@ -780,6 +854,9 @@ export default class ResizeControl extends FdSelectVue {
     return { groupId: groupId, containerId: this.containerId }
   }
   containerBorderClick () {
+    if (this.isEditMode) {
+      EventBus.$emit('closeMenu')
+    }
     if (this.isEditMode && this.isMoveWhenMouseDown !== true) {
       if (this.propControlData.type === 'MultiPage' || this.propControlData.type === 'Frame') {
         this.selectControl({
@@ -790,18 +867,36 @@ export default class ResizeControl extends FdSelectVue {
       }
     }
   }
+  get getBorderClass () {
+    if (this.mainSelected && this.isEditMode && !this.isRunMode) {
+      return 'controlEditStyle'
+    } else if (this.canDragMainDiv) {
+      return 'controlSelectStyle'
+    } else {
+      return 'controlStyle'
+    }
+  }
 }
 </script>
 
 <style scoped>
+.move-border {
+  position: absolute;
+  z-index: 99999999999;
+}
+.m-top-b, .m-bottom-b{
+  width: 100%;
+}
+.m-left-b, .m-right-b{
+  height: 100%;
+}
 .controlSelectStyle {
   box-sizing: border-box;
   position: absolute;
-  --border-width: 5;
+  --border-width: 3;
   --stripe-distance: 2px;
-  border: calc(var(--border-width) * 1px) solid transparent;
   border-image: repeating-linear-gradient(
-      -110deg,
+      var(--select-rotate-degree),
       black,
       transparent 1px,
       transparent var(--stripe-distance),
@@ -812,13 +907,13 @@ export default class ResizeControl extends FdSelectVue {
 .controlEditStyle {
   box-sizing: border-box;
   position: absolute;
-  --border-width: 5;
+  --border-width: 3;
   --stripe-distance: 2px;
-  border: calc(var(--border-width) * 1px) solid transparent;
+  /* border: calc(var(--border-width) * 1px) solid transparent; */
   border-image: repeating-linear-gradient(
       -45deg,
       black,
-      transparent 2px,
+      transparent 1.5px,
       transparent var(--stripe-distance),
       black calc(var(--stripe-distance) + 0.2px)
     )
@@ -830,6 +925,13 @@ export default class ResizeControl extends FdSelectVue {
   padding-top: 5px;
   padding-left: 5px;
   cursor: default !important;
+  z-index: 0;
+}
+.resizeMainControlStyle {
+  box-sizing: border-box;
+  position: absolute;
+  margin-top: 3px;
+  margin-left: 3px;
 }
 :focus {
   outline: none;

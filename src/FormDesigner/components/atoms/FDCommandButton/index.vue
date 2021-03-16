@@ -325,7 +325,9 @@ export default class FDCommandButton extends Mixins(FdControlVue) {
    * @description mounted initializes the values which are required for the component
    */
   mounted () {
-    this.$el.focus()
+    this.$el.focus({
+      preventScroll: true
+    })
     this.updateAutoSize()
     if (this.properties.Picture) {
       this.positionLogo(this.properties.PicturePosition)
@@ -333,7 +335,9 @@ export default class FDCommandButton extends Mixins(FdControlVue) {
     }
   }
   releaseEditMode (event: KeyboardEvent) {
-    this.$el.focus()
+    this.$el.focus({
+      preventScroll: true
+    })
     this.setContentEditable(event, false)
   }
 }

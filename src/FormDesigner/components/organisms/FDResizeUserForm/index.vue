@@ -20,6 +20,12 @@
         :userFormId="userFormId"
         controlType="userform"
         @updateUserFormResize="updateUserFormResize"
+        :size="{
+          width: propControlData.properties.Width,
+          height: propControlData.properties.Height,
+          left: propControlData.properties.Left,
+          top: propControlData.properties.Top
+        }"
       />
       <Userform
         :userFormId="userFormId"

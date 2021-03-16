@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-for="handlerName in handlers" :key="handlerName">
+  <div :style="getResizeHandlerStyle" v-for="handlerName in handlers" :key="handlerName">
       <div
         v-if="controlType === 'control'"
         :class="[getMainSelected ? `handle handle-${handlerName}`: null]"
@@ -228,8 +228,17 @@ export default class Resizehandler extends FDCommonMethod {
           EventBus.$emit('startMoveControl', event, handler, this.getContainerList(this.isSelctedControl))
           document.onmousemove = (event: MouseEvent) => { EventBus.$emit('elementDrag', event) }
         } else {
-          this.positions.offsetX = event.offsetX
-          this.positions.offsetY = event.offsetY
+          if (event.target instanceof HTMLDivElement && event.target!.className.includes('m-right-b')) {
+            this.positions.offsetX = event.offsetX + this.size.width
+            this.positions.offsetY = event.offsetY
+          } else if (event.target instanceof HTMLDivElement && event.target!.className.includes('m-bottom-b')) {
+            this.positions.offsetX = event.offsetX
+            this.positions.offsetY = event.offsetY + this.size.height
+          } else {
+            this.positions.offsetX = event.offsetX
+            this.positions.offsetY = event.offsetY
+          }
+
           this.isMainSelect = true
           EventBus.$emit('startMoveControl', event, handler, this.getContainerList(this.isSelctedControl))
           document.onmousemove = (event: MouseEvent) => { EventBus.$emit('moveControl', event) }
@@ -278,7 +287,7 @@ export default class Resizehandler extends FDCommonMethod {
       return this.size ? {
         left: `${-this.positions.movementX}px`,
         top: `${-this.positions.movementY}px`,
-        height: this.isGroupControl ? `${this.size.height}px !important` : '100%'
+        height: `${this.size.height}px !important`
       } : null
     } else {
       return this.size ? {
@@ -293,7 +302,7 @@ export default class Resizehandler extends FDCommonMethod {
       return this.size ? {
         left: `${-this.positions.movementX}px`,
         top: `${-this.positions.movementY}px`,
-        width: this.isGroupControl ? `${this.size.width}px !important` : '100%'
+        width: `${this.size.width}px !important`
       } : null
     } else {
       return this.size ? {
@@ -308,7 +317,7 @@ export default class Resizehandler extends FDCommonMethod {
       return this.size ? {
         left: `${this.size.width - this.positions.movementX}px`,
         top: `${-this.positions.movementY}px`,
-        height: this.isGroupControl ? `${this.size.height}px !important` : '100%'
+        height: `${this.size.height}px !important`
       } : null
     } else {
       return this.size ? {
@@ -323,7 +332,7 @@ export default class Resizehandler extends FDCommonMethod {
       return this.size ? {
         left: `${-this.positions.movementX}px`,
         top: `${this.size.height - this.positions.movementY}px`,
-        width: this.isGroupControl ? `${this.size.width}px !important` : '100%'
+        width: `${this.size.width}px !important`
       } : null
     } else {
       return this.size ? {
@@ -592,6 +601,25 @@ export default class Resizehandler extends FDCommonMethod {
   get getIsMoveTarget () {
     return this.getMainSelected
   }
+  get getResizeHandlerStyle () {
+    if (this.controlType === 'userform') {
+      return {
+        position: 'absolute',
+        width: this.size ? this.size.width + 10 + 'px' : '0px',
+        height: this.size ? this.size.height + 10 + 'px' : '0px',
+        left: '0px',
+        top: '0px'
+      }
+    } else {
+      return {
+        position: 'absolute',
+        width: this.size ? this.size.width + 2 + 'px' : '0px',
+        height: this.size ? this.size.height + 2 + 'px' : '0px',
+        left: '-4px',
+        top: '-4px'
+      }
+    }
+  }
 }
 </script>
 
@@ -600,6 +628,7 @@ export default class Resizehandler extends FDCommonMethod {
   z-index: 9999;
   position: absolute;
   border: 0.5px rgb(59, 58, 58) dashed;
+  margin: -4px
 }
 .m-top-b, .m-bottom-b{
   width: 100%;
@@ -617,9 +646,9 @@ export default class Resizehandler extends FDCommonMethod {
   position: absolute;
   width: 6px;
   height: 6px;
-
   background: white;
   border: 1px solid #333;
+  z-index: 9999999999999999999999
 }
 .handleActivate {
   box-sizing: border-box;

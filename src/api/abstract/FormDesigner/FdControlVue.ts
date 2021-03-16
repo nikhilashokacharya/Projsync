@@ -31,6 +31,7 @@ export default class FdControlVue extends Vue {
   tempStretch: string = 'normal';
   isVisible: boolean = false;
   tempListBoxComboBoxEvent: Event;
+  isLargeChange: boolean = false;
   labelStyle = {}
   reverseStyle = {
     display: '',
@@ -324,114 +325,125 @@ export default class FdControlVue extends Vue {
 
   protected increaseTheValueAfterDelay () {
     if (this.isSpinButtonScrollBarMouseDown) {
-      this.spinButtonScrollBarClickCount = this.spinButtonScrollBarClickCount + 1
-      let tempVal, tempMax
-      if (this.properties.Max! >= 0 && this.properties.Min! >= 0) {
-        if (this.properties.Max! < this.properties.Min!) {
-          tempMax = this.properties.Max!
-          if (this.properties.Value! < this.properties.Max! && this.properties.Value! > this.properties.Min!) {
-            this.updateDataModel({ propertyName: 'Value', value: this.properties.Min })
-          }
-          tempVal = this.properties.Value! as number
-          if (
-            tempVal >= tempMax &&
-              tempVal - tempMax > this.properties.SmallChange!
-          ) {
-            tempVal = tempVal - this.properties.SmallChange!
-          } else if (tempVal >= tempMax) {
-            tempVal = tempMax
-          } else {
-            tempVal = tempMax
-          }
-        } else {
-          tempMax = this.properties.Max!
-          if (this.properties.Value! > this.properties.Max! && this.properties.Value! < this.properties.Min!) {
-            this.updateDataModel({ propertyName: 'Value', value: this.properties.Min })
-          }
-          tempVal = this.properties.Value! as number
-          if (
-            tempVal <= tempMax &&
-        tempMax - tempVal > this.properties.SmallChange!
-          ) {
-            tempVal = tempVal + this.properties.SmallChange!
-          } else if (tempVal <= tempMax) {
-            tempVal = tempMax
-          } else {
-            tempVal = tempMax
-          }
-        }
-        this.updateDataModel({ propertyName: 'Value', value: tempVal })
-      } else if (this.properties.Max! < 0 && this.properties.Min! < 0) {
-        if (this.properties.Max! > this.properties.Min!) {
-          tempMax = this.properties.Max!
-          if (this.properties.Value! > this.properties.Max! && this.properties.Value! < this.properties.Min!) {
-            this.updateDataModel({ propertyName: 'Value', value: this.properties.Max })
-          }
-          tempVal = this.properties.Value! as number
-          if (
-            tempVal <= tempMax &&
-          Math.abs(tempVal) - Math.abs(tempMax) > this.properties.SmallChange!
-          ) {
-            tempVal = Math.abs(tempVal) - this.properties.SmallChange!
-          } else if (tempVal <= tempMax) {
-            tempVal = Math.abs(tempMax)
-          } else {
-            tempVal = Math.abs(tempMax)
-          }
-        } else {
-          tempMax = Math.abs(this.properties.Max!)
-          if (this.properties.Value! < this.properties.Max! && this.properties.Value! > this.properties.Min!) {
-            this.updateDataModel({ propertyName: 'Value', value: this.properties.Min })
-          }
-          tempVal = Math.abs(this.properties.Value! as number)
-          if (
-            tempVal <= tempMax &&
-        tempMax - tempVal > this.properties.SmallChange!
-          ) {
-            tempVal = tempVal + this.properties.SmallChange!
-          } else if (tempVal <= tempMax) {
-            tempVal = tempMax
-          } else {
-            tempVal = tempMax
-          }
-        }
-        this.updateDataModel({ propertyName: 'Value', value: '-' + tempVal })
-      } else if (this.properties.Max! < this.properties.Min!) {
+      this.increaseTheValueOfControl()
+    }
+  }
+
+  increaseTheValueOfControl () {
+    this.spinButtonScrollBarClickCount = this.spinButtonScrollBarClickCount + 1
+    let change = 0
+    if (this.isLargeChange && this.data.type === 'ScrollBar') {
+      change = this.properties.LargeChange!
+    } else {
+      change = this.properties.SmallChange!
+    }
+    let tempVal, tempMax
+    if (this.properties.Max! >= 0 && this.properties.Min! >= 0) {
+      if (this.properties.Max! < this.properties.Min!) {
         tempMax = this.properties.Max!
-        if (this.properties.Value! > this.properties.Min! && this.properties.Value! < this.properties.Max!) {
-          this.updateDataModel({ propertyName: 'Value', value: this.properties.Max })
+        if (this.properties.Value! < this.properties.Max! && this.properties.Value! > this.properties.Min!) {
+          this.updateDataModel({ propertyName: 'Value', value: this.properties.Min })
         }
-        tempVal = this.properties.Value as number
+        tempVal = this.properties.Value! as number
         if (
           tempVal >= tempMax &&
-        tempVal - tempMax >= this.properties.SmallChange!
+            tempVal - tempMax > change
         ) {
-          tempVal = tempVal - this.properties.SmallChange!
-        } else if (tempVal <= tempMax) {
+          tempVal = tempVal - change
+        } else if (tempVal >= tempMax) {
           tempVal = tempMax
         } else {
           tempVal = tempMax
         }
-        this.updateDataModel({ propertyName: 'Value', value: tempVal })
       } else {
         tempMax = this.properties.Max!
         if (this.properties.Value! > this.properties.Max! && this.properties.Value! < this.properties.Min!) {
           this.updateDataModel({ propertyName: 'Value', value: this.properties.Min })
         }
-        tempVal = this.properties.Value as number
+        tempVal = this.properties.Value! as number
         if (
           tempVal <= tempMax &&
-        tempMax - tempVal > this.properties.SmallChange!
+      tempMax - tempVal > change
         ) {
-          tempVal = tempVal + this.properties.SmallChange!
+          tempVal = tempVal + change
         } else if (tempVal <= tempMax) {
           tempVal = tempMax
         } else {
           tempVal = tempMax
         }
-        this.updateDataModel({ propertyName: 'Value', value: tempVal })
       }
+      this.updateDataModel({ propertyName: 'Value', value: tempVal })
+    } else if (this.properties.Max! < 0 && this.properties.Min! < 0) {
+      if (this.properties.Max! > this.properties.Min!) {
+        tempMax = this.properties.Max!
+        if (this.properties.Value! > this.properties.Max! && this.properties.Value! < this.properties.Min!) {
+          this.updateDataModel({ propertyName: 'Value', value: this.properties.Max })
+        }
+        tempVal = this.properties.Value! as number
+        if (
+          tempVal <= tempMax &&
+        Math.abs(tempVal) - Math.abs(tempMax) > change
+        ) {
+          tempVal = Math.abs(tempVal) - change
+        } else if (tempVal <= tempMax) {
+          tempVal = Math.abs(tempMax)
+        } else {
+          tempVal = Math.abs(tempMax)
+        }
+      } else {
+        tempMax = Math.abs(this.properties.Max!)
+        if (this.properties.Value! < this.properties.Max! && this.properties.Value! > this.properties.Min!) {
+          this.updateDataModel({ propertyName: 'Value', value: this.properties.Min })
+        }
+        tempVal = Math.abs(this.properties.Value! as number)
+        if (
+          tempVal <= tempMax &&
+      tempMax - tempVal > change
+        ) {
+          tempVal = tempVal + change
+        } else if (tempVal <= tempMax) {
+          tempVal = tempMax
+        } else {
+          tempVal = tempMax
+        }
+      }
+      this.updateDataModel({ propertyName: 'Value', value: '-' + tempVal })
+    } else if (this.properties.Max! < this.properties.Min!) {
+      tempMax = this.properties.Max!
+      if (this.properties.Value! > this.properties.Min! && this.properties.Value! < this.properties.Max!) {
+        this.updateDataModel({ propertyName: 'Value', value: this.properties.Max })
+      }
+      tempVal = this.properties.Value as number
+      if (
+        tempVal >= tempMax &&
+      tempVal - tempMax >= change
+      ) {
+        tempVal = tempVal - change
+      } else if (tempVal <= tempMax) {
+        tempVal = tempMax
+      } else {
+        tempVal = tempMax
+      }
+      this.updateDataModel({ propertyName: 'Value', value: tempVal })
+    } else {
+      tempMax = this.properties.Max!
+      if (this.properties.Value! > this.properties.Max! && this.properties.Value! < this.properties.Min!) {
+        this.updateDataModel({ propertyName: 'Value', value: this.properties.Min })
+      }
+      tempVal = this.properties.Value as number
+      if (
+        tempVal <= tempMax &&
+      tempMax - tempVal > change
+      ) {
+        tempVal = tempVal + change
+      } else if (tempVal <= tempMax) {
+        tempVal = tempMax
+      } else {
+        tempVal = tempMax
+      }
+      this.updateDataModel({ propertyName: 'Value', value: tempVal })
     }
+    this.isLargeChange = false
   }
   /**
    * @description increaseTheValue calls Vuex Actions to update object and Value Property
@@ -455,114 +467,125 @@ export default class FdControlVue extends Vue {
   }
   protected decreaseTheValueAfterDelay () {
     if (this.isSpinButtonScrollBarMouseDown) {
-      this.spinButtonScrollBarClickCount = this.spinButtonScrollBarClickCount + 1
-      let tempVal, tempMin
-      if (this.properties.Max! >= 0 && this.properties.Min! >= 0) {
-        if (this.properties.Max! < this.properties.Min!) {
-          tempMin = this.properties.Min!
-          if (this.properties.Value! < this.properties.Max! && this.properties.Value! > this.properties.Min!) {
-            this.updateDataModel({ propertyName: 'Value', value: this.properties.Min })
-          }
-          tempVal = this.properties.Value! as number
-          if (
-            tempVal <= tempMin &&
-          tempMin - tempVal > this.properties.SmallChange!
-          ) {
-            tempVal = tempVal + this.properties.SmallChange!
-          } else if (tempVal <= tempMin) {
-            tempVal = tempMin
-          } else {
-            tempVal = tempMin
-          }
-        } else {
-          tempMin = this.properties.Min!
-          if (this.properties.Value! > this.properties.Max! && this.properties.Value! < this.properties.Min!) {
-            this.updateDataModel({ propertyName: 'Value', value: this.properties.Min })
-          }
-          tempVal = this.properties.Value! as number
-          if (
-            tempVal >= tempMin &&
-            tempVal - tempMin > this.properties.SmallChange!
-          ) {
-            tempVal = tempVal - this.properties.SmallChange!
-          } else if (tempVal >= tempMin) {
-            tempVal = tempMin
-          } else {
-            tempVal = tempMin
-          }
-        }
-        this.updateDataModel({ propertyName: 'Value', value: tempVal })
-      } else if (this.properties.Max! < 0 && this.properties.Min! < 0) {
-        if (this.properties.Max! > this.properties.Min!) {
-          tempMin = this.properties.Min!
-          if (this.properties.Value! > this.properties.Max! && this.properties.Value! < this.properties.Min!) {
-            this.updateDataModel({ propertyName: 'Value', value: this.properties.Min })
-          }
-          tempVal = this.properties.Value! as number
-          if (
-            tempVal >= tempMin &&
-          Math.abs(tempMin) - Math.abs(tempVal) > this.properties.SmallChange!
-          ) {
-            tempVal = Math.abs(tempVal) + this.properties.SmallChange!
-          } else if (tempVal <= tempMin) {
-            tempVal = Math.abs(tempMin)
-          } else {
-            tempVal = Math.abs(tempMin)
-          }
-        } else {
-          tempMin = Math.abs(this.properties.Min!)
-          if (this.properties.Value! < this.properties.Max! && this.properties.Value! > this.properties.Min!) {
-            this.updateDataModel({ propertyName: 'Value', value: this.properties.Min })
-          }
-          tempVal = Math.abs(this.properties.Value! as number)
-          if (
-            tempVal >= tempMin &&
-            tempVal - tempMin > this.properties.SmallChange!
-          ) {
-            tempVal = tempVal - this.properties.SmallChange!
-          } else if (tempVal >= tempMin) {
-            tempVal = tempMin
-          } else {
-            tempVal = tempMin
-          }
-        }
-        this.updateDataModel({ propertyName: 'Value', value: '-' + tempVal })
-      } else if (this.properties.Max! < this.properties.Min!) {
+      this.decreaseTheValueOfControl()
+    }
+  }
+
+  decreaseTheValueOfControl () {
+    let change = 0
+    if (this.isLargeChange && this.data.type === 'ScrollBar') {
+      change = this.properties.LargeChange!
+    } else {
+      change = this.properties.SmallChange!
+    }
+    this.spinButtonScrollBarClickCount = this.spinButtonScrollBarClickCount + 1
+    let tempVal, tempMin
+    if (this.properties.Max! >= 0 && this.properties.Min! >= 0) {
+      if (this.properties.Max! < this.properties.Min!) {
         tempMin = this.properties.Min!
-        if (this.properties.Value! > this.properties.Min! && this.properties.Value! < this.properties.Max!) {
-          this.updateDataModel({ propertyName: 'Value', value: this.properties.Max })
+        if (this.properties.Value! < this.properties.Max! && this.properties.Value! > this.properties.Min!) {
+          this.updateDataModel({ propertyName: 'Value', value: this.properties.Min })
         }
-        tempVal = this.properties.Value as number
+        tempVal = this.properties.Value! as number
         if (
           tempVal <= tempMin &&
-            tempMin - tempVal > this.properties.SmallChange!
+        tempMin - tempVal > change
         ) {
-          tempVal = tempVal + this.properties.SmallChange!
-        } else if (tempVal >= tempMin) {
+          tempVal = tempVal + change
+        } else if (tempVal <= tempMin) {
           tempVal = tempMin
         } else {
           tempVal = tempMin
         }
-        this.updateDataModel({ propertyName: 'Value', value: tempVal })
       } else {
         tempMin = this.properties.Min!
         if (this.properties.Value! > this.properties.Max! && this.properties.Value! < this.properties.Min!) {
           this.updateDataModel({ propertyName: 'Value', value: this.properties.Min })
         }
-        tempVal = this.properties.Value as number
+        tempVal = this.properties.Value! as number
         if (
           tempVal >= tempMin &&
-            tempVal - tempMin > this.properties.SmallChange!
+          tempVal - tempMin > change
         ) {
-          tempVal = tempVal - this.properties.SmallChange!
+          tempVal = tempVal - change
         } else if (tempVal >= tempMin) {
           tempVal = tempMin
         } else {
           tempVal = tempMin
         }
-        this.updateDataModel({ propertyName: 'Value', value: tempVal })
       }
+      this.updateDataModel({ propertyName: 'Value', value: tempVal })
+    } else if (this.properties.Max! < 0 && this.properties.Min! < 0) {
+      if (this.properties.Max! > this.properties.Min!) {
+        tempMin = this.properties.Min!
+        if (this.properties.Value! > this.properties.Max! && this.properties.Value! < this.properties.Min!) {
+          this.updateDataModel({ propertyName: 'Value', value: this.properties.Min })
+        }
+        tempVal = this.properties.Value! as number
+        if (
+          tempVal >= tempMin &&
+        Math.abs(tempMin) - Math.abs(tempVal) > change
+        ) {
+          tempVal = Math.abs(tempVal) + change
+        } else if (tempVal <= tempMin) {
+          tempVal = Math.abs(tempMin)
+        } else {
+          tempVal = Math.abs(tempMin)
+        }
+      } else {
+        tempMin = Math.abs(this.properties.Min!)
+        if (this.properties.Value! < this.properties.Max! && this.properties.Value! > this.properties.Min!) {
+          this.updateDataModel({ propertyName: 'Value', value: this.properties.Min })
+        }
+        tempVal = Math.abs(this.properties.Value! as number)
+        if (
+          tempVal >= tempMin &&
+          tempVal - tempMin > change
+        ) {
+          tempVal = tempVal - change
+        } else if (tempVal >= tempMin) {
+          tempVal = tempMin
+        } else {
+          tempVal = tempMin
+        }
+      }
+      this.updateDataModel({ propertyName: 'Value', value: '-' + tempVal })
+    } else if (this.properties.Max! < this.properties.Min!) {
+      tempMin = this.properties.Min!
+      if (this.properties.Value! > this.properties.Min! && this.properties.Value! < this.properties.Max!) {
+        this.updateDataModel({ propertyName: 'Value', value: this.properties.Max })
+      }
+      tempVal = this.properties.Value as number
+      if (
+        tempVal <= tempMin &&
+          tempMin - tempVal > change
+      ) {
+        tempVal = tempVal + change
+      } else if (tempVal >= tempMin) {
+        tempVal = tempMin
+      } else {
+        tempVal = tempMin
+      }
+      this.updateDataModel({ propertyName: 'Value', value: tempVal })
+    } else {
+      tempMin = this.properties.Min!
+      if (this.properties.Value! > this.properties.Max! && this.properties.Value! < this.properties.Min!) {
+        this.updateDataModel({ propertyName: 'Value', value: this.properties.Min })
+      }
+      tempVal = this.properties.Value as number
+      if (
+        tempVal >= tempMin &&
+          tempVal - tempMin > change
+      ) {
+        tempVal = tempVal - change
+      } else if (tempVal >= tempMin) {
+        tempVal = tempMin
+      } else {
+        tempVal = tempMin
+      }
+      this.updateDataModel({ propertyName: 'Value', value: tempVal })
     }
+    this.isLargeChange = false
   }
   /**
    * @description decreaseTheValue calls Vuex Actions to update object and Value Property
@@ -1045,182 +1068,183 @@ handleMultiSelect (e: MouseEvent) {
  *
  */
 handleExtendArrowKeySelect (e: KeyboardEvent) {
-  const x = e.key.toUpperCase().charCodeAt(0)
-  const tempPath = e.composedPath()
-  const eventTarget = e.target as HTMLTableRowElement
-  const nextSiblingEvent = eventTarget.nextSibling as HTMLDivElement
-  const prevSiblingEvent = eventTarget.previousSibling as HTMLDivElement
-  if (
+  if (e.ctrlKey !== true) {
+    const x = e.key.toUpperCase().charCodeAt(0)
+    const tempPath = e.composedPath()
+    const eventTarget = e.target as HTMLTableRowElement
+    const nextSiblingEvent = eventTarget.nextSibling as HTMLDivElement
+    const prevSiblingEvent = eventTarget.previousSibling as HTMLDivElement
+    if (
    this.properties.MatchEntry! === 0 &&
    x >= 48 && x <= 90
-  ) {
-    this.matchEntry = []
-    const prevMatchData =
+    ) {
+      this.matchEntry = []
+      const prevMatchData =
    this.extraDatas.MatchData === '' ? e.key : this.extraDatas.MatchData
-    this.updateDataModelExtraData({ propertyName: 'MatchData', value: prevMatchData !== e.key ? e.key : prevMatchData })
+      this.updateDataModelExtraData({ propertyName: 'MatchData', value: prevMatchData !== e.key ? e.key : prevMatchData })
 
-    for (let index = 0; index < tempPath.length; index++) {
-      const element = tempPath[index] as HTMLDivElement
-      if (element.className === 'table-body') {
-        for (let index = 0; index < element.childNodes.length; index++) {
-          const ei = element.childNodes[index] as HTMLDivElement
-          let splitData = ei.innerText.replace(/\t/g, ' ').split(' ')
-          let si = 0
-          if (this.properties.ListStyle === 0) {
-            si = -1
+      for (let index = 0; index < tempPath.length; index++) {
+        const element = tempPath[index] as HTMLDivElement
+        if (element.className === 'table-body') {
+          for (let index = 0; index < element.childNodes.length; index++) {
+            const ei = element.childNodes[index] as HTMLDivElement
+            let splitData = ei.innerText.replace(/\t/g, ' ').split(' ')
+            let si = 0
+            if (this.properties.ListStyle === 0) {
+              si = -1
+            }
+            if (splitData[si + 1][0].includes(this.extraDatas.MatchData!)) {
+              this.matchEntry.push(index)
+            }
           }
-          if (splitData[si + 1][0].includes(this.extraDatas.MatchData!)) {
-            this.matchEntry.push(index)
-          }
-        }
 
-        if (
+          if (
          this.extraDatas.MatchData![0] !== undefined &&
          this.extraDatas.MatchData![0] === e.key &&
          this.extraDatas.MatchData!.length > 0
-        ) {
-          const tempChildNode = element.childNodes[this.matchEntry[this.matchIndex]] as HTMLDivElement
-          this.matchIndex++
-          if (
-            this.matchIndex === this.matchEntry.length &&
+          ) {
+            const tempChildNode = element.childNodes[this.matchEntry[this.matchIndex]] as HTMLDivElement
+            this.matchIndex++
+            if (
+              this.matchIndex === this.matchEntry.length &&
            prevMatchData === this.extraDatas.MatchData
-          ) {
-            this.matchIndex = 0
-            this.clearOptionBGColorAndChecked(e)
-            this.setBGandCheckedForMatch(
-              tempChildNode
-            )
-            break
-          } else if (prevMatchData !== this.extraDatas.MatchData) {
-            this.matchIndex = 0
-            this.clearOptionBGColorAndChecked(e)
-            this.setBGandCheckedForMatch(
-              tempChildNode
-            )
-            break
-          } else {
-            if (this.matchEntry.length === 0) {
-              this.matchEntry.push(0)
+            ) {
               this.matchIndex = 0
+              this.clearOptionBGColorAndChecked(e)
+              this.setBGandCheckedForMatch(
+                tempChildNode
+              )
+              break
+            } else if (prevMatchData !== this.extraDatas.MatchData) {
+              this.matchIndex = 0
+              this.clearOptionBGColorAndChecked(e)
+              this.setBGandCheckedForMatch(
+                tempChildNode
+              )
+              break
+            } else {
+              if (this.matchEntry.length === 0) {
+                this.matchEntry.push(0)
+                this.matchIndex = 0
+              }
+              this.clearOptionBGColorAndChecked(e)
+              this.setBGandCheckedForMatch(
+                tempChildNode
+              )
+              break
             }
-            this.clearOptionBGColorAndChecked(e)
-            this.setBGandCheckedForMatch(
-              tempChildNode
-            )
-            break
           }
-        }
-        break
-      }
-    }
-  } else if (
-    this.properties.MatchEntry === 1 &&
-    x >= 48 && x <= 90
-  ) {
-    let temp = this.extraDatas.MatchData + e.key
-    this.updateDataModelExtraData({ propertyName: 'MatchData', value: temp })
-
-    for (let point = 0; point < tempPath.length; point++) {
-      const tbody = tempPath[point] as HTMLDivElement
-      if (tbody.className === 'table-body') {
-        this.matchEntry = []
-        for (let p = 0; p < tbody.childNodes.length; p++) {
-          const ei = tbody.childNodes[p] as HTMLDivElement
-          let matchEntryComplete = ei.innerText
-            .replace(/\t/g, ' ')
-            .split(' ')
-          let sii = 0
-          if (this.properties.ListStyle === 0) {
-            sii = -1
-          }
-          if (
-            matchEntryComplete[sii + 1][0].includes(this.extraDatas.MatchData!) &&
-           this.extraDatas.MatchData!.length < 2
-          ) {
-            this.matchEntry.push(p)
-          } else if (
-            matchEntryComplete[sii + 1].includes(this.extraDatas.MatchData!) &&
-           this.extraDatas.MatchData!.length > 1
-          ) {
-            this.matchEntry.push(p)
-          }
-        }
-
-        if (this.extraDatas.MatchData!.length <= 1) {
-          let singleMatch = tbody.childNodes[this.matchEntry[0]] as HTMLDivElement
-          this.clearOptionBGColorAndChecked(e)
-          this.setBGandCheckedForMatch(singleMatch)
           break
-        } else if (
+        }
+      }
+    } else if (
+      this.properties.MatchEntry === 1 &&
+    x >= 48 && x <= 90
+    ) {
+      let temp = this.extraDatas.MatchData + e.key
+      this.updateDataModelExtraData({ propertyName: 'MatchData', value: temp })
+
+      for (let point = 0; point < tempPath.length; point++) {
+        const tbody = tempPath[point] as HTMLDivElement
+        if (tbody.className === 'table-body') {
+          this.matchEntry = []
+          for (let p = 0; p < tbody.childNodes.length; p++) {
+            const ei = tbody.childNodes[p] as HTMLDivElement
+            let matchEntryComplete = ei.innerText
+              .replace(/\t/g, ' ')
+              .split(' ')
+            let sii = 0
+            if (this.properties.ListStyle === 0) {
+              sii = -1
+            }
+            if (
+              matchEntryComplete[sii + 1][0].includes(this.extraDatas.MatchData!) &&
+           this.extraDatas.MatchData!.length < 2
+            ) {
+              this.matchEntry.push(p)
+            } else if (
+              matchEntryComplete[sii + 1].includes(this.extraDatas.MatchData!) &&
+           this.extraDatas.MatchData!.length > 1
+            ) {
+              this.matchEntry.push(p)
+            }
+          }
+
+          if (this.extraDatas.MatchData!.length <= 1) {
+            let singleMatch = tbody.childNodes[this.matchEntry[0]] as HTMLDivElement
+            this.clearOptionBGColorAndChecked(e)
+            this.setBGandCheckedForMatch(singleMatch)
+            break
+          } else if (
          this.extraDatas.MatchData!.length > 1 &&
          this.matchEntry.length !== 0
-        ) {
-          let completeAutoMatch = tbody.childNodes[this.matchEntry[0]] as HTMLDivElement
-          this.clearOptionBGColorAndChecked(e)
-          this.setBGandCheckedForMatch(completeAutoMatch)
+          ) {
+            let completeAutoMatch = tbody.childNodes[this.matchEntry[0]] as HTMLDivElement
+            this.clearOptionBGColorAndChecked(e)
+            this.setBGandCheckedForMatch(completeAutoMatch)
+          }
+          break
         }
-        break
       }
     }
-  }
-  if (
-    e.key === 'ArrowDown' &&
+    if (
+      e.key === 'ArrowDown' &&
    e.shiftKey === true &&
    (nextSiblingEvent !== null || prevSiblingEvent.nextSibling !== null)
-  ) {
-    let currentElement: HTMLDivElement
-    if (nextSiblingEvent === null) {
-      currentElement = prevSiblingEvent.nextSibling! as HTMLDivElement
-    } else {
-      currentElement = nextSiblingEvent
-    }
-    if (this.properties.MultiSelect === 2) {
-      if (eventTarget.style.backgroundColor !== 'rgb(59, 122, 231)') {
-        this.setOptionBGColorAndChecked(e)
-      } else if (
-        eventTarget.style.backgroundColor === 'rgb(59, 122, 231)' &&
+    ) {
+      let currentElement: HTMLDivElement
+      if (nextSiblingEvent === null) {
+        currentElement = prevSiblingEvent.nextSibling! as HTMLDivElement
+      } else {
+        currentElement = nextSiblingEvent
+      }
+      if (this.properties.MultiSelect === 2) {
+        if (eventTarget.style.backgroundColor !== 'rgb(59, 122, 231)') {
+          this.setOptionBGColorAndChecked(e)
+        } else if (
+          eventTarget.style.backgroundColor === 'rgb(59, 122, 231)' &&
         currentElement!.style.backgroundColor !== ''
-      ) {
-        this.setOptionBGColorAndChecked(e)
-      } else if (eventTarget.nextSibling!.nextSibling !== null) {
-        this.setBGColorForNextSibling(e)
-      } else if (
+        ) {
+          this.setOptionBGColorAndChecked(e)
+        } else if (eventTarget.nextSibling!.nextSibling !== null) {
+          this.setBGColorForNextSibling(e)
+        } else if (
       eventTarget.nextSibling!.nextSibling === null &&
       currentElement!.style.backgroundColor !== 'rgb(59, 122, 231)'
-      ) {
-        this.setBGColorForNextSibling(e)
-      }
+        ) {
+          this.setBGColorForNextSibling(e)
+        }
         currentElement!.focus()
-    }
-  } else if (
-    e.key === 'ArrowUp' &&
+      }
+    } else if (
+      e.key === 'ArrowUp' &&
    e.shiftKey === true &&
    (prevSiblingEvent !== null || nextSiblingEvent.previousSibling !== null)
-  ) {
-    let currentElement: HTMLDivElement
-    if (prevSiblingEvent === null) {
-      currentElement = nextSiblingEvent.previousSibling! as HTMLDivElement
-    } else {
-      currentElement = prevSiblingEvent
-    }
-    if (this.properties.MultiSelect === 2) {
-      if (
-        eventTarget.style.backgroundColor === 'rgb(59, 122, 231)' &&
+    ) {
+      let currentElement: HTMLDivElement
+      if (prevSiblingEvent === null) {
+        currentElement = nextSiblingEvent.previousSibling! as HTMLDivElement
+      } else {
+        currentElement = prevSiblingEvent
+      }
+      if (this.properties.MultiSelect === 2) {
+        if (
+          eventTarget.style.backgroundColor === 'rgb(59, 122, 231)' &&
         currentElement.style.backgroundColor !== ''
-      ) {
-        this.setOptionBGColorAndChecked(e)
-      } else if (eventTarget.previousSibling!.previousSibling !== null) {
-        this.setBGColorForPreviousSibling(e)
-      } else if (
+        ) {
+          this.setOptionBGColorAndChecked(e)
+        } else if (eventTarget.previousSibling!.previousSibling !== null) {
+          this.setBGColorForPreviousSibling(e)
+        } else if (
         eventTarget.previousSibling!.previousSibling === null &&
         currentElement.style.backgroundColor !== 'rgb(59, 122, 231)'
-      ) {
-        this.setBGColorForPreviousSibling(e)
+        ) {
+          this.setBGColorForPreviousSibling(e)
+        }
+        currentElement.focus()
       }
-      currentElement.focus()
     }
   }
-  // }
 }
 
 /**

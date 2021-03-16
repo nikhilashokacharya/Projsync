@@ -2,15 +2,26 @@
   <div v-if="groupedControls[userFormId].groupArray.length!==0">
    <div
       v-for="(groupName, index) in groupedControls[userFormId].groupArray"
-      :class="getGroupEditStyle(groupName)"
       :key="groupName.concat(index)"
       :style="getGroupStyle(groupName)"
       :id="groupName"
-      @mousedown="handleMouseDown($event,'drag')"
+      @mousedown="handleMouseDown($event,'drag', groupName)"
       @contextmenu.self.stop="openMenu($event,'control')"
     >
+    <div  :class="[getGroupEditStyle(groupName), 'm-top-b move-border']"
+       :style="getTStyle(groupName)"
+    />
+    <div :class="[getGroupEditStyle(groupName), 'm-right-b move-border']"
+          :style="getRStyle(groupName)"
+    />
+    <div :class="[getGroupEditStyle(groupName), 'm-bottom-b move-border']"
+          :style="getBStyle(groupName)"
+    />
+    <div :class="[getGroupEditStyle(groupName), 'm-left-b move-border']"
+    :style="getLStyle(groupName)"
+     />
     <div
-    :style="getGroupStyle(groupName)"
+    :style="getResizeHandler(groupName)"
     class="innerGroupStyle"
     :id="groupName"
     @mousedown="innerGroupDivMouseDown"
@@ -114,7 +125,7 @@ export default class GroupControl extends FDCommonMethod {
     EventBus.$off('getGroupSize', this.getGroupSize)
     EventBus.$off('groupElementDrag', this.elementDrag)
     EventBus.$off('updateGroupStyle')
-    // EventBus.$off('setGroupSize', this.setGroupSize)
+    EventBus.$off('setGroupSize', this.setGroupSize)
   }
   convertToGridSize (val: number) {
     const gridSize = 9
@@ -185,12 +196,14 @@ export default class GroupControl extends FDCommonMethod {
     }
   }
   setGroupSize (callBack: Function) {
-    for (const group of this.divStyleArray) {
-      if (group.display === 'block') {
-        this.groupStyle(group.groupName!)
+    if (this.divStyleArray.length > 0) {
+      for (const group of this.divStyleArray) {
+        if (group.display === 'block') {
+          this.groupStyle(group.groupName!)
+        }
       }
+      callBack()
     }
-    callBack()
   }
   endGroupMoveControl () {
     // if (this.getIsMoveTarget) {
@@ -365,8 +378,36 @@ export default class GroupControl extends FDCommonMethod {
     }
   }
 
-  handleMouseDown (event: CustomMouseEvent, handler: string) {
+  get isGroupControlelected () {
+    const userData = this.userformData[this.userFormId]
+    let groupId = userData[this.getSelectedControlsDatas![0]].properties.GroupID
+    if (groupId === '') {
+      const containerList = [...this.getContainerList(this.getSelectedControlsDatas![0])]
+      containerList.reverse()
+      for (let i = 1; i < containerList.length; i++) {
+        const type = userData[containerList[i]].type
+        if (type === 'Page') {
+          groupId = userData[this.getContainerList(containerList[i])[0]].properties.GroupID!
+        } else {
+          groupId = userData[containerList[i]].properties.GroupID!
+        }
+        if (groupId !== '') {
+          break
+        }
+      }
+    }
+    return groupId
+  }
+
+  handleMouseDown (event: CustomMouseEvent, handler: string, groupName: string | undefined) {
+    EventBus.$emit('handleName', 'notDrag')
     if (this.toolBoxSelect === 'Select' && !this.isMouseDownProp) {
+      if (groupName && this.isGroupControlelected === groupName) {
+        this.selectControl({
+          userFormId: this.userFormId,
+          select: { container: this.getContainerList(groupName!), selected: [groupName!] }
+        })
+      }
       event.stopPropagation()
       this.tempEvent = event
       EventBus.$emit('groupDrag', 'NotDrag')
@@ -650,39 +691,41 @@ export default class GroupControl extends FDCommonMethod {
         let dragResizeReffer: IdragResizeRefStyle = {}
         const control: controlProperties = this.userformData[this.userFormId][k]
           .properties
-        for (const key in this.controlRef.resizeControl) {
-          if (
-            this.controlRef.resizeControl[key].$refs['draRef'.concat(control.ID)] !== undefined
-          ) {
-            dragResizeReffer = this.controlRef.resizeControl[key].$refs['draRef'.concat(control.ID)]
+        if (control.GroupID === '') {
+          for (const key in this.controlRef.resizeControl) {
+            if (
+              this.controlRef.resizeControl[key].$refs['draRef'.concat(control.ID)] !== undefined
+            ) {
+              dragResizeReffer = this.controlRef.resizeControl[key].$refs['draRef'.concat(control.ID)]
+            }
           }
-        }
-        const top = dragResizeReffer.offsetTop! - y
-        const left = dragResizeReffer.offsetLeft! - x
-        const incWidth = control.Width! + x > 0 ? control.Width! + x : 0
-        const incHeight = control.Height! + y > 0 ? control.Height! + y : 0
-        const decWidth = control.Width! - x > 0 ? control.Width! - x : 0
-        const decHeight = control.Height! - y > 0 ? control.Height! - y : 0
+          const top = dragResizeReffer.offsetTop! - y
+          const left = dragResizeReffer.offsetLeft! - x
+          const incWidth = control.Width! + x > 0 ? control.Width! + x : 0
+          const incHeight = control.Height! + y > 0 ? control.Height! + y : 0
+          const decWidth = control.Width! - x > 0 ? control.Width! - x : 0
+          const decHeight = control.Height! - y > 0 ? control.Height! - y : 0
 
-        if (this.resizeDiv === 'drag') {
-          this.updateControlAction('Top', top, k)
-          this.updateControlAction('Left', left, k)
-        } else {
-          if (this.resizeDiv.includes('t')) {
-            if (incHeight > 0) {
-              this.updateControlAction('Top', top, k)
+          if (this.resizeDiv === 'drag') {
+            this.updateControlAction('Top', top, k)
+            this.updateControlAction('Left', left, k)
+          } else {
+            if (this.resizeDiv.includes('t')) {
+              if (incHeight > 0) {
+                this.updateControlAction('Top', top, k)
+              }
+              this.updateControlAction('Height', incHeight, k)
+            } else if (this.resizeDiv.includes('b')) {
+              this.updateControlAction('Height', decHeight, k)
             }
-            this.updateControlAction('Height', incHeight, k)
-          } else if (this.resizeDiv.includes('b')) {
-            this.updateControlAction('Height', decHeight, k)
-          }
-          if (this.resizeDiv.includes('l')) {
-            if (incWidth > 0) {
-              this.updateControlAction('Left', left, k)
+            if (this.resizeDiv.includes('l')) {
+              if (incWidth > 0) {
+                this.updateControlAction('Left', left, k)
+              }
+              this.updateControlAction('Width', incWidth, k)
+            } else if (this.resizeDiv.includes('r')) {
+              this.updateControlAction('Width', decWidth, k)
             }
-            this.updateControlAction('Width', incWidth, k)
-          } else if (this.resizeDiv.includes('r')) {
-            this.updateControlAction('Width', decWidth, k)
           }
         }
       }
@@ -761,8 +804,23 @@ export default class GroupControl extends FDCommonMethod {
     }
     return isSelected ? 'mainEditDiv' : 'mainDiv'
   }
+  getResizeHandler (groupName: string) {
+    const groupProperty = this.divStyleArray[this.divStyleArray.findIndex((p) => p.groupName === groupName)]
+    return groupProperty ? {
+      width: parseInt(groupProperty.width!) - 5 + 'px',
+      height: parseInt(groupProperty.height!) - 5 + 'px'
+    } : null
+  }
   getGroupStyle (groupName: string) {
-    return this.divStyleArray[this.divStyleArray.findIndex((p) => p.groupName === groupName)]
+    const groupProperty = this.divStyleArray[this.divStyleArray.findIndex((p) => p.groupName === groupName)]
+    if (groupProperty) {
+      return {
+        left: groupProperty.left,
+        top: groupProperty.top,
+        display: groupProperty.display,
+        position: 'absolute'
+      }
+    }
   }
 
   @Watch('selectedControls', { deep: true })
@@ -848,6 +906,53 @@ export default class GroupControl extends FDCommonMethod {
   innerGroupDivMouseDown () {
     this.isMouseDownProp = true
   }
+  get propControlData () {
+    return this.userformData[this.userFormId][this.control]
+  }
+  getLStyle (groupName: string) {
+    const groupProperties = this.divStyleArray[this.divStyleArray.findIndex((p) => p.groupName === groupName)]
+    return groupProperties ? {
+      height: `${parseInt(groupProperties.height!) + 18}px !important`,
+      left: '-12px',
+      top: '-12px',
+      display: groupProperties.display,
+      borderLeft: `calc(5px) solid transparent`,
+      '--select-rotate-degree': '-403deg'
+    } : null
+  }
+  getTStyle (groupName: string) {
+    const groupProperties = this.divStyleArray[this.divStyleArray.findIndex((p) => p.groupName === groupName)]
+    return groupProperties ? {
+      top: '-12px',
+      width: `${parseInt(groupProperties.width!) + 18}px !important`,
+      left: '-12px',
+      display: groupProperties.display,
+      borderTop: `calc(5px) solid transparent`,
+      '--select-rotate-degree': '-412deg'
+    } : null
+  }
+  getRStyle (groupName: string) {
+    const groupProperties = this.divStyleArray[this.divStyleArray.findIndex((p) => p.groupName === groupName)]
+    return groupProperties ? {
+      top: '-12px',
+      left: `${parseInt(groupProperties.width!) + 6}px`,
+      height: `${parseInt(groupProperties.height!) + 18}px !important`,
+      display: groupProperties.display,
+      borderLeft: `calc(5px) solid transparent`,
+      '--select-rotate-degree': '-403deg'
+    } : null
+  }
+  getBStyle (groupName: string) {
+    const groupProperties = this.divStyleArray[this.divStyleArray.findIndex((p) => p.groupName === groupName)]
+    return groupProperties ? {
+      left: '-12px',
+      top: `${parseInt(groupProperties.height!) + 6}px`,
+      width: `${parseInt(groupProperties.width!) + 18}px !important`,
+      display: groupProperties.display,
+      borderTop: `calc(5px) solid transparent`,
+      '--select-rotate-degree': '-412deg'
+    } : null
+  }
 }
 </script>
 
@@ -929,28 +1034,24 @@ export default class GroupControl extends FDCommonMethod {
 .mainDiv {
   cursor: move;
   position: absolute;
-  --border-width: 5;
+  --border-width: 1;
   --stripe-distance: 2px;
-  border: calc(var(--border-width) * 1px) solid transparent;
   border-image: repeating-linear-gradient(
-      -110deg,
+      var(--select-rotate-degree),
       black,
       transparent 1px,
       transparent var(--stripe-distance),
       black calc(var(--stripe-distance) + 0.2px)
     )
     var(--border-width);
-  padding: 5px;
-  margin-top: -5px;
-  margin-left: -5px;
-  display: none;
+  display: none
 }
 .mainEditDiv {
   position: absolute;
   cursor: move;
-  --border-width: 5;
-  --stripe-distance: 2px;
-  border: calc(var(--border-width) * 1px) solid transparent;
+  --border-width: 4;
+  --stripe-distance: 3px;
+  /* border: calc(var(--border-width) * 1px) solid transparent; */
   border-image: repeating-linear-gradient(
       -45deg,
       black,
@@ -959,10 +1060,10 @@ export default class GroupControl extends FDCommonMethod {
       black calc(var(--stripe-distance) + 0.2px)
     )
     var(--border-width);
-  padding: 5px;
-  margin-top: -5px;
-  margin-left: -5px;
-  display: none;
+  display: none
+  /* padding: 5px;
+  margin-top: -10px;
+  margin-left: -10px; */
 }
 .innerGroupStyle {
     margin-top: -5px;
@@ -977,49 +1078,61 @@ export default class GroupControl extends FDCommonMethod {
   height: 6px;
   background: white;
   border: 1px solid #333;
+  z-index: 99999999999;
 }
 .handle-tl {
-  top: -5px;
-  left: -5px;
+  top: -12px;
+  left: -12px;
   cursor: nw-resize;
 }
 .handle-tm {
-  top: -5px;
+  top: -12px;
   left: 50%;
-  margin-left: -5px;
+  margin-left: -12px;
   cursor: n-resize;
 }
 .handle-tr {
-  top: -5px;
-  right: -5px;
+  top: -12px;
+  right: -12px;
   cursor: ne-resize;
 }
 .handle-ml {
   top: 50%;
-  margin-top: -5px;
-  left: -5px;
+  margin-top: -12px;
+  left: -12px;
   cursor: w-resize;
 }
 .handle-mr {
   top: 50%;
-  margin-top: -5px;
-  right: -5px;
+  margin-top: -12px;
+  right: -12px;
   cursor: e-resize;
 }
 .handle-bl {
-  bottom: -5px;
-  left: -5px;
+  bottom: -12px;
+  left: -12px;
   cursor: sw-resize;
 }
 .handle-bm {
-  bottom: -5px;
+  bottom: -12px;
   left: 50%;
-  margin-left: -5px;
+  margin-left: -12px;
   cursor: s-resize;
 }
 .handle-br {
-  bottom: -5px;
-  right: -5px;
+  bottom: -12px;
+  right: -12px;
   cursor: se-resize;
+}
+.move-border {
+  position: absolute;
+  z-index: 99999999999;
+  /* border: 1px solid red */
+}
+.m-top-b, .m-bottom-b{
+  width: 100%;
+}
+.m-left-b, .m-right-b{
+  height: 100%;
 }
 </style>

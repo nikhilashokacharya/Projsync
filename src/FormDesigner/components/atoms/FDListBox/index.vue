@@ -1,17 +1,14 @@
 <template>
-<div class="outerListBoxDiv" :style="outerListBoxStyleObj" @mouseover="updateMouseCursor">
+<div class="outerListBoxDiv" :style="outerListBoxStyleObj" @mouseover="updateMouseCursor" @keydown="forMatchEntry" v-on="eventStoppers()" :tabindex="properties.TabIndex" @keydown.esc="setContentEditable($event, false)">
   <div
     class="listStyle"
     ref="listStyleOuterRef"
     :style="listStyleObj"
     :title="properties.ControlTipText"
     @click="listBoxClick"
-    @mousedown="controlEditMode"
     :tabindex="properties.TabIndex"
-    @keydown="forMatchEntry"
-    v-on="eventStoppers()"
+    @mousedown="controlEditMode"
     @scroll="updateScrollLeft"
-    @keydown.esc="setContentEditable($event, false)"
   >
     <div class="table-style" :style="tableStyleObj" ref="listBoxTableRef" v-if="properties.RowSource !== ''">
       <div v-if="properties.ColumnHeads === true" class="theadClass">
@@ -335,7 +332,6 @@ export default class FDListBox extends Mixins(FdControlVue) {
             }
           }
         } else if (this.listBoxTableRef && this.listBoxTableRef.children[1]) {
-          debugger
           finalWidths = this.calculateColumnWidths()
           if (this.listBoxTableRef.children[1].children[0]) {
             for (let i = 0; i < this.listBoxTableRef.children[1].children.length; i++) {
@@ -531,7 +527,6 @@ export default class FDListBox extends Mixins(FdControlVue) {
             }
           }
         } else if (this.listBoxTableRef && this.listBoxTableRef.children[0]) {
-          debugger
           finalWidths = this.calculateColumnWidths()
           if (this.listBoxTableRef.children[0].children[0]) {
             for (let i = 0; i < this.listBoxTableRef.children[0].children.length; i++) {
@@ -659,7 +654,6 @@ export default class FDListBox extends Mixins(FdControlVue) {
         }
       }
     } else {
-      debugger
       if (columnWidthCount >= totalColumnCount) {
         for (let i = 0; i < totalColumnCount; i++) {
           if (i < this.properties.ColumnCount!) {
@@ -1177,7 +1171,9 @@ export default class FDListBox extends Mixins(FdControlVue) {
    * @description mounted initializes the values which are required for the component
    */
   mounted () {
-    this.$el.focus()
+    this.$el.focus({
+      preventScroll: true
+    })
     var event = new MouseEvent('mousedown.stop')
     this.updateColumns()
     if (this.properties.RowSource !== '') {
@@ -1236,12 +1232,18 @@ export default class FDListBox extends Mixins(FdControlVue) {
       this.setContentEditable(event, true)
     }
     if (this.isEditMode) {
-      this.listStyleRef[0].click()
+      if (event.ctrlKey !== true) {
+        if (this.listStyleRef && this.listStyleRef[0]) {
+          this.listStyleRef[0].click()
+        }
+      } else if (event.ctrlKey === true) {
+        event.stopPropagation()
+      }
     }
     if (event.key === 'Escape' && event.keyCode === 27) {
       this.releaseEditMode(event)
     }
-    if (event.key === 'Delete') {
+    if (event.key === 'Delete' && !this.isEditMode) {
       this.deleteItem(event)
     }
   }
@@ -1277,7 +1279,9 @@ export default class FDListBox extends Mixins(FdControlVue) {
     }
   }
   releaseEditMode (event: KeyboardEvent) {
-    this.$el.focus()
+    this.$el.focus({
+      preventScroll: true
+    })
     this.setContentEditable(event, false)
   }
   eventStoppers () {

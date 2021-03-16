@@ -9,7 +9,7 @@ export class ControlPropertyData {
       UserForm: {
         properties: {
           BackColor: 'rgba(235, 235, 235)',
-          BorderColor: 'rgb(2 0 0)',
+          BorderColor: 'rgb(2, 0, 0)',
           BorderStyle: 0,
           Caption: 'UserForm1',
           Cycle: 0,
@@ -24,7 +24,7 @@ export class ControlPropertyData {
             FontStrikethrough: false,
             FontStyle: 'Arial Narrow'
           },
-          ForeColor: 'rgb(2 0 0)',
+          ForeColor: 'rgb(2, 0, 0)',
           Height: 350,
           HelpContextID: 0,
           KeepScrollBarsVisible: 3,
@@ -79,7 +79,7 @@ export class ControlPropertyData {
             FontStrikethrough: false,
             FontStyle: 'Arial Narrow'
           },
-          ForeColor: 'rgb(2 0 0)',
+          ForeColor: 'rgb(2, 0, 0)',
           Height: 18,
           HelpContextID: 0,
           Left: 0,
@@ -135,7 +135,7 @@ export class ControlPropertyData {
             FontStrikethrough: false,
             FontStyle: 'Arial Narrow'
           },
-          ForeColor: 'rgb(2 0 0)',
+          ForeColor: 'rgb(2, 0, 0)',
           Height: 22,
           HelpContextID: 0,
           Left: 20,
@@ -182,7 +182,7 @@ export class ControlPropertyData {
             FontStrikethrough: false,
             FontStyle: 'Arial Narrow'
           },
-          ForeColor: 'rgb(2 0 0)',
+          ForeColor: 'rgb(2, 0, 0)',
           GroupName: '',
           Height: 18,
           HelpContextID: 0,
@@ -242,7 +242,7 @@ export class ControlPropertyData {
             FontStrikethrough: false,
             FontStyle: 'Arial Narrow'
           },
-          ForeColor: 'rgb(0 0 3)',
+          ForeColor: 'rgb(0, 0, 3)',
           Height: 18,
           HelpContextID: 0,
           HideSelection: true,
@@ -299,7 +299,7 @@ export class ControlPropertyData {
       Frame: {
         properties: {
           BackColor: 'rgba(235, 235, 235)',
-          BorderColor: 'rgb(2 0 0)',
+          BorderColor: 'rgb(2, 0, 0)',
           BorderStyle: 0,
           Caption: 'Frame1',
           ControlTipText: '',
@@ -314,7 +314,7 @@ export class ControlPropertyData {
             FontStrikethrough: false,
             FontStyle: 'Arial Narrow'
           },
-          ForeColor: 'rgb(2 0 0)',
+          ForeColor: 'rgb(2, 0, 0)',
           Height: 144,
           HelpContextID: 0,
           KeepScrollBarsVisible: 3,
@@ -402,7 +402,7 @@ export class ControlPropertyData {
             FontStrikethrough: false,
             FontStyle: 'Arial Narrow'
           },
-          ForeColor: 'rgb(0 0 3)',
+          ForeColor: 'rgb(0, 0, 3)',
           Height: 150,
           HelpContextID: 0,
           IMEMode: 0,
@@ -464,7 +464,7 @@ export class ControlPropertyData {
             FontStrikethrough: false,
             FontStyle: 'Arial Narrow'
           },
-          ForeColor: 'rgb(2 0 0)',
+          ForeColor: 'rgb(2, 0, 0)',
           Height: 200,
           HelpContextID: 0,
           Left: 40,
@@ -509,7 +509,7 @@ export class ControlPropertyData {
             FontStrikethrough: false,
             FontStyle: 'Arial Narrow'
           },
-          ForeColor: 'rgb(2 0 0)',
+          ForeColor: 'rgb(2, 0, 0)',
           GroupName: '',
           Height: 25,
           HelpContextID: 0,
@@ -548,7 +548,7 @@ export class ControlPropertyData {
           ControlTipText: 'ScrollBar',
           Delay: 50,
           Enabled: true,
-          ForeColor: 'rgb(2 0 0)',
+          ForeColor: 'rgb(2, 0, 0)',
           Height: 180,
           HelpContextID: 0,
           LargeChange: 1,
@@ -585,7 +585,7 @@ export class ControlPropertyData {
           ControlTipText: 'SpinButton',
           Delay: 50,
           Enabled: true,
-          ForeColor: 'rgb(2 0 0)',
+          ForeColor: 'rgb(2, 0, 0)',
           Height: 180,
           HelpContextID: 0,
           Left: 0,
@@ -627,7 +627,7 @@ export class ControlPropertyData {
             FontStrikethrough: false,
             FontStyle: 'Arial Narrow'
           },
-          ForeColor: 'rgb(2 0 0)',
+          ForeColor: 'rgb(2, 0, 0)',
           Height: 300,
           HelpContextID: 0,
           Left: 50,
@@ -690,7 +690,7 @@ export class ControlPropertyData {
             FontStrikethrough: false,
             FontStyle: 'Arial Narrow'
           },
-          ForeColor: 'rgb(2 0 0)',
+          ForeColor: 'rgb(2, 0, 0)',
           Height: 60,
           HelpContextID: 0,
           Left: 20,
@@ -778,7 +778,7 @@ export class ControlPropertyData {
             FontStrikethrough: false,
             FontStyle: 'Arial Narrow'
           },
-          ForeColor: 'rgb(0 0 3)',
+          ForeColor: 'rgb(0, 0, 3)',
           Height: 18,
           HelpContextID: 0,
           HideSelection: true,

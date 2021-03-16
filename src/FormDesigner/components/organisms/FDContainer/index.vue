@@ -1,6 +1,6 @@
 <template>
 <div>
-  <div @mouseup="onMouseUp" :style="parentDiv" ref="parentDivRef">
+  <div @mouseup="onMouseUp" :style="parentDiv" ref="parentDivRef" @scroll="updateScroll">
     <drag-selector
       ref="dragSelector"
       :style="dragSelectorStyle"
@@ -11,8 +11,8 @@
       @addControlObj="event => addControlObj(event)"
       @updateMousedownVar="updateMousedownVar"
     >
-    <div :style="childDiv">
-    <div :style="pictureChildDiv">
+    <div :style="childDiv" ref="childDivRef" @scroll="updateScroll">
+    <div :style="pictureChildDiv" @scroll="updateScroll" ref="pictureDivRef">
       <GroupControl
         :containerId="containerId"
         :userFormId="userFormId"
@@ -25,7 +25,6 @@
       <div
         v-for="control in propControlData.controls"
         :key="control"
-        class="resize"
       >
         <ResizeControl
           ref="resizeControl"
@@ -124,6 +123,8 @@ export default class Container extends FDCommonMethod {
   @Ref('parentDivRef') parentDivRef: HTMLDivElement
   @Ref('verticalScrollRef') verticalScrollRef: HTMLDivElement
   @Ref('horizontalScrollRef') horizontalScrollRef: HTMLDivElement
+  @Ref('pictureDivRef') pictureDivRef: HTMLDivElement
+  @Ref('childDivRef') childDivRef: HTMLDivElement
 
   @Prop() createBackgroundString: string
   @Prop() getSizeMode: string
@@ -147,7 +148,6 @@ export default class Container extends FDCommonMethod {
   updateVerticalScrollTop (e: Event) {
     if (e.target instanceof HTMLDivElement) {
       this.parentDivRef.scrollTop = e.target.scrollTop
-      console.log('e.target.scrollTop', e.target.scrollTop, this.parentDivRef.scrollTop)
       this.updateControl({
         userFormId: this.userFormId,
         controlId: this.controlId,
@@ -442,8 +442,9 @@ export default class Container extends FDCommonMethod {
                   this.updatedSelect(this.getContainerList(this.selectedSelect[0]), this.selectedControls[this.userFormId].selected)
                 }
               }
-              EventBus.$emit('setGroupSize')
-              event.stopPropagation()
+              EventBus.$emit('setGroupSize', () => {
+                event.stopPropagation()
+              })
               document.onmouseup(event)
             }
           }
@@ -502,7 +503,7 @@ export default class Container extends FDCommonMethod {
       } else if (controlProp.ScrollBars === 2) {
         return this.frameTop ? (-this.frameTop) + 22 : 7
       }
-      return this.frameTop ? -this.frameTop : 0
+      return this.frameTop ? (-this.frameTop) + 4 : 0
     } else if (type === 'Page') {
       if (controlProp.ScrollBars === 3) {
         return 15
@@ -796,27 +797,19 @@ export default class Container extends FDCommonMethod {
     this.parentDivRef.scrollTop = this.propControlData.properties.ScrollTop!
     this.verticalScrollRef.scrollTop = this.propControlData.properties.ScrollTop!
   }
+  updateScroll (e: MouseEvent) {
+    this.pictureDivRef.scrollTop = 0
+    this.parentDivRef.scrollTop = this.propControlData.properties.ScrollTop!
+    this.childDivRef.scrollTop = 0
+    this.pictureDivRef.scrollLeft = 0
+    this.parentDivRef.scrollLeft = this.propControlData.properties.ScrollLeft!
+    this.childDivRef.scrollLeft = 0
+  }
 }
 </script>
 
 <style scoped>
 :focus {
   outline: none;
-}
-.dragSelector {
-  visibility: hidden;
-}
-.dragSelector > .resize {
-  visibility: visible;
-  position: sticky;
-  top: 0px;
-}
-.dragSelector > .group {
-  visibility: visible;
-}
-.resize {
-  position: sticky;
-  top: 0px;
-  left: 0px;
 }
 </style>

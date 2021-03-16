@@ -32,6 +32,7 @@
           data-gramm="false"
           ref="textareaRef"
           :style="cssStyleProperty"
+          @focus="closeTextMenu"
           @mouseover="updateMouseCursor"
           wrap="off"
           @dblclick="dblclick($event)"
@@ -557,7 +558,8 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     this.selectionData[0] = a.innerText
     for (let i = 0; i < this.extraDatas.RowSourceData!.length; i++) {
       const b = this.trRef[i].children[0] as HTMLDivElement
-      if (a.innerText === b.innerText) {
+      const aInnerText = a.innerText.split('\n')
+      if (aInnerText[0] === b.innerText) {
         if (this.properties.TextColumn === -1) {
           const text = this.extraDatas.RowSourceData![i][0]
           this.updateDataModel({ propertyName: 'Text', value: text })
@@ -2070,6 +2072,10 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     }
   }
 
+  closeTextMenu () {
+    EventBus.$emit('closeMenu')
+  }
+
   protected get labelStyleObj (): Partial<CSSStyleDeclaration> {
     const controlProp = this.properties
     const font: font = controlProp.Font
@@ -2211,7 +2217,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     }
   }
   enabledCheck (e: MouseEvent) {
-    if (this.isRunMode || this.isActivated || this.isEditMode) {
+    if (this.isRunMode || this.isEditMode) {
       if (this.open) {
         this.open = false
         this.textareaRef.focus()
@@ -2236,6 +2242,9 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   comBoxClick (event: MouseEvent) {
     if (this.toolBoxSelectControl === 'Select') {
       event.stopPropagation()
+    }
+    if (this.isEditMode) {
+      this.closeTextMenu()
     }
   }
 }

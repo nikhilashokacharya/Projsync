@@ -371,7 +371,9 @@ export default class FDSpinButton extends Mixins(FdControlVue) {
   }
 
   mounted () {
-    this.$el.focus()
+    this.$el.focus({
+      preventScroll: true
+    })
     if (this.properties.Orientation === 0) {
       this.orientationValues.orientation = 0
       this.orientationValues.width = 0

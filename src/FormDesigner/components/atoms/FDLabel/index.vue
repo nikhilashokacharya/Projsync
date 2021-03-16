@@ -293,14 +293,18 @@ export default class FDLabel extends Mixins(FdControlVue) {
     }
   }
   mounted () {
-    this.$el.focus()
+    this.$el.focus({
+      preventScroll: true
+    })
     if (this.properties.Picture) {
       this.positionLogo(this.properties.PicturePosition)
       this.pictureSize()
     }
   }
   releaseEditMode (event: KeyboardEvent) {
-    this.$el.focus()
+    this.$el.focus({
+      preventScroll: true
+    })
     this.setContentEditable(event, false)
   }
   labelClick (event: MouseEvent) {

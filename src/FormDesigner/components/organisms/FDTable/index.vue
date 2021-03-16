@@ -865,10 +865,14 @@ export default class FDTable extends Vue {
       } else if (propertyName === 'ScrollTop') {
         if (checkPropertyValue(propertyName, value)) {
           this.validateScrollTopProp({ propertyName: propertyName, value: value }, e, false)
+        } else {
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
         }
       } else if (propertyName === 'ScrollLeft') {
         if (checkPropertyValue(propertyName, value)) {
           this.validateScrollLeftProp({ propertyName: propertyName, value: value }, e, false)
+        } else {
+          this.updateInputBoxValueToPreviousValue(e, propertyName)
         }
       } else if (propertyName === 'ScrollBars') {
         if (value === 1) {
