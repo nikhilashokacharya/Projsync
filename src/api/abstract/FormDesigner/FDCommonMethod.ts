@@ -13,7 +13,7 @@ export default class FDCommonMethod extends Vue {
   @Action('fd/updateControl') updateControl!: (payload: IupdateControl) => void;
   @Action('fd/updateControlExtraData') updateControlExtraData!: (payload: IupdateControlExtraData) => void;
   isPropChanged: boolean = false
-  mouseDownEvent: MouseEvent
+  mouseDownEvent!: MouseEvent
   isDargMouseDown: boolean = false
   mouseDownContainer: string = ''
   isControlMouseDown: boolean = false

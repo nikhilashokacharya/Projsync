@@ -38,6 +38,7 @@
         <div
           :tabindex="index"
           class="tr"
+          :style="trStyleObj"
           ref="listStyleRef"
           v-for="(item, index) of extraDatas.RowSourceData"
           :key="index"
@@ -126,14 +127,26 @@ import { EventBus } from '@/FormDesigner/event-bus'
   name: 'FDListBox'
 })
 export default class FDListBox extends Mixins(FdControlVue) {
-  @Ref('listStyleRef') listStyleRef: HTMLDivElement[];
+  @Ref('listStyleRef') listStyleRef!: HTMLDivElement[];
   @Ref('listBoxTableRef') listBoxTableRef!: HTMLDivElement;
   @Ref('listStyleOuterRef') listStyleOuterRef!: HTMLDivElement;
-  @Prop() isActivated: boolean;
-  @Prop() toolBoxSelectControl: string
-  checkedvalue: boolean;
-  $el: HTMLDivElement;
+  @Prop() isActivated: boolean = false;
+  @Prop() toolBoxSelectControl: string = ''
+  checkedvalue: boolean = false;
+  $el!: HTMLDivElement;
 
+  get trStyleObj () {
+    let width:string = '0px'
+    let height: string = '0px'
+    if (this.listStyleOuterRef && (this.listStyleOuterRef.scrollHeight > this.listStyleOuterRef.clientHeight)) {
+      width = 'calc(100% - 20px)'
+    } else {
+      width = 'calc(100% - 3px)'
+    }
+    return {
+      width: width
+    }
+  }
   get emptyColHeads () {
     return {
       height: '15px'
@@ -530,6 +543,10 @@ export default class FDListBox extends Mixins(FdControlVue) {
           finalWidths = this.calculateColumnWidths()
           if (this.listBoxTableRef.children[0].children[0]) {
             for (let i = 0; i < this.listBoxTableRef.children[0].children.length; i++) {
+              for (let j = 0; j < this.listBoxTableRef.children[0].children[i].children.length; j++) {
+                const width = this.listBoxTableRef.children[0].children[i].children[j] as HTMLDivElement
+                width.style.minWidth = '0px'
+              }
               if (this.properties.ListStyle === 0) {
                 for (let j = 0; j < this.listBoxTableRef.children[0].children[i].children.length; j++) {
                   const width = this.listBoxTableRef.children[0].children[i].children[j] as HTMLDivElement
@@ -559,6 +576,19 @@ export default class FDListBox extends Mixins(FdControlVue) {
                         width.style.width = finalWidths[j] + 'px'
                       } else {
                         width.style.width = finalWidths[j] - 4 + 'px'
+                      }
+                    }
+                  }
+                }
+                for (let j = 0; j < this.listBoxTableRef.children[0].children[i].children.length; j++) {
+                  let colWidths = this.properties.ColumnWidths!
+                  let columnWidthCount = colWidths.split(';').length
+                  let totalColumnCount = this.properties.ColumnCount! < this.extraDatas.RowSourceData![0].length ? this.properties.ColumnCount! : this.extraDatas.RowSourceData![0].length
+                  if (columnWidthCount > 0) {
+                    if (columnWidthCount < totalColumnCount) {
+                      for (let k = columnWidthCount; k < totalColumnCount!; k++) {
+                        const width = this.listBoxTableRef.children[0].children[i].children[k] as HTMLDivElement
+                        width.style.minWidth = '100px'
                       }
                     }
                   }
@@ -1405,7 +1435,7 @@ export default class FDListBox extends Mixins(FdControlVue) {
 }
 .tdClassIn {
   width: fit-content !important;
-  min-width: 0px !important;
+  min-width: 14px !important;
 }
 .inputClass {
   margin: 0;

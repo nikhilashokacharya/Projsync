@@ -1,5 +1,5 @@
 <template>
-  <div id="app" @blur="closeTextMenu" tabindex="0" @focus="updatefocus" @contextmenu.stop="preventcontextMenu" @keydown.esc="closeMenu">
+  <div id="app" @mousedown="closeTextMenu" @blur="closeTextMenu" tabindex="0" @focus="updatefocus" @contextmenu.stop="preventcontextMenu" @keydown.esc="closeMenu">
     <div
       id="right-click-menu"
       :style="contextMenuStyle"
@@ -155,11 +155,11 @@ interface IDialog
 export default class FDPage extends Vue {
   @State((state) => state.fd.userformData) userformData!: userformData;
   @State((state) => state.fd.copiedControl) copiedControl!: userformData;
-  @Ref('contextmenu') contextmenu: HTMLDivElement
-  @Ref('mainConextMenu') mainConextMenu: ContextMenu
-  @Ref('renameDialogRef') renameDialogRef: RenameMultiPageDialog
-  @Ref('userformTabOrderRef') userformTabOrderRef: UserformTabOrder
-  @Ref('tabstripTabOrderRef') tabstripTabOrderRef: TabStripTabOrder
+  @Ref('contextmenu') contextmenu!: HTMLDivElement
+  @Ref('mainConextMenu') mainConextMenu!: ContextMenu
+  @Ref('renameDialogRef') renameDialogRef!: RenameMultiPageDialog
+  @Ref('userformTabOrderRef') userformTabOrderRef!: UserformTabOrder
+  @Ref('tabstripTabOrderRef') tabstripTabOrderRef!: TabStripTabOrder
   containerId: string = ''
   controlId: string = ''
   copiedText = ''
@@ -196,7 +196,7 @@ export default class FDPage extends Vue {
   contextMenuHeight: number = 84
   groupStyleArray: Array<IGroupStyle> = []
   updatedValue: number = 0
-  tabData: controlData
+  tabData!: controlData
   tabstripContextMenu: boolean = false
 
   closeTextMenu () {
@@ -557,9 +557,10 @@ export default class FDPage extends Vue {
     event.preventDefault()
   }
   @Watch('selectedControls', { deep: true })
-  updateContextMenu (newControl: selectedControls, oldControl: selectedControls) {
+  updateContextMenu () {
     const selected = this.selectedControls[this.userFormId].selected
-    if (this.selectedControls) {
+    const userData = this.userformData[this.userFormId]
+    if (selected[0].startsWith('group') || (userData[selected[0]].type !== 'Userform')) {
       if (selected.length === 1 && selected[0] !== this.controlTextMenu) {
         this.textMenu = false
       }

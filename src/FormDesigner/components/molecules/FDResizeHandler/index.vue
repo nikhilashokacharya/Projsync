@@ -14,10 +14,18 @@
         @mousedown.stop="handleMouseDown($event, handlerName, controlType, userFormId)"
       ></div>
     </div>
-    <div v-show="isMove" class="m-top-b move-border" :style="getTStyle" />
-    <div v-show="isMove" class="m-right-b move-border" :style="getRStyle"/>
-    <div v-show="isMove" class="m-bottom-b move-border" :style="getBStyle"/>
-    <div v-show="isMove" class="m-left-b move-border" :style="getLStyle"/>
+    <div :style="{position: 'relative', ...getTStyle}">
+    <div v-show="isMove" class="m-top-b move-border" :style="getTStyleChild"/>
+    </div>
+    <div :style="{position: 'relative', ...getRStyle}">
+    <div v-show="isMove" class="m-right-b move-border" :style="getRStyleChild"/>
+    </div>
+    <div :style="{position: 'relative', ...getBStyle}">
+    <div v-show="isMove" class="m-bottom-b move-border" :style="getBStyleChild"/>
+    </div>
+    <div :style="{position: 'relative', ...getLStyle}">
+    <div v-show="isMove" class="m-left-b move-border" :style="getLStyleChild"/>
+    </div>
   </div>
 </template>
 
@@ -31,14 +39,14 @@ import FDCommonMethod from '@/api/abstract/FormDesigner/FDCommonMethod'
   components: {}
 })
 export default class Resizehandler extends FDCommonMethod {
-  $el: HTMLDivElement
+  $el!: HTMLDivElement
   @State((state) => state.fd.selectedControls) selectedControls!: fdState['selectedControls'];
   @State((state) => state.fd.userformData) userformData!: userformData;
 
   @Prop({ required: true, type: String }) public controlId!: string;
-  @Prop({ required: true, type: String }) public userFormId: string;
-  @Prop({ required: true, type: String }) public controlType: string;
-  @Prop() public size: {width: number, height: number, left: number, top: number}
+  @Prop({ required: true, type: String }) public userFormId!: string;
+  @Prop({ required: true, type: String }) public controlType!: string;
+  @Prop() public size!: {width: number, height: number, left: number, top: number}
   isGroupControl: boolean = false
 
   positions: IMousePosition = {
@@ -286,14 +294,12 @@ export default class Resizehandler extends FDCommonMethod {
     if (this.resizeDiv === 'drag') {
       return this.size ? {
         left: `${-this.positions.movementX}px`,
-        top: `${-this.positions.movementY}px`,
-        height: `${this.size.height}px !important`
+        top: `${-this.positions.movementY}px`
       } : null
     } else {
       return this.size ? {
         left: `${-this.handlerPosition.left}px !important`,
-        top: `${-this.handlerPosition.top}px !important`,
-        height: `${this.handlerPosition.height}px !important`
+        top: `${-this.handlerPosition.top}px !important`
       } : null
     }
   }
@@ -301,14 +307,12 @@ export default class Resizehandler extends FDCommonMethod {
     if (this.resizeDiv === 'drag') {
       return this.size ? {
         left: `${-this.positions.movementX}px`,
-        top: `${-this.positions.movementY}px`,
-        width: `${this.size.width}px !important`
+        top: `${-this.positions.movementY}px`
       } : null
     } else {
       return this.size ? {
         left: `${-this.handlerPosition.left}px`,
-        top: `${-this.handlerPosition.top}px`,
-        width: `${this.handlerPosition.width}px !important`
+        top: `${-this.handlerPosition.top}px`
       } : null
     }
   }
@@ -316,13 +320,11 @@ export default class Resizehandler extends FDCommonMethod {
     if (this.resizeDiv === 'drag') {
       return this.size ? {
         left: `${this.size.width - this.positions.movementX}px`,
-        top: `${-this.positions.movementY}px`,
-        height: `${this.size.height}px !important`
+        top: `${-this.positions.movementY}px`
       } : null
     } else {
       return this.size ? {
         left: `${this.handlerPosition.width - this.handlerPosition.left}px`,
-        height: `${this.handlerPosition.height}px !important`,
         top: `${-this.handlerPosition.top}px !important`
       } : null
     }
@@ -331,14 +333,56 @@ export default class Resizehandler extends FDCommonMethod {
     if (this.resizeDiv === 'drag') {
       return this.size ? {
         left: `${-this.positions.movementX}px`,
-        top: `${this.size.height - this.positions.movementY}px`,
-        width: `${this.size.width}px !important`
+        top: `${this.size.height - this.positions.movementY}px`
       } : null
     } else {
       return this.size ? {
         top: `${this.handlerPosition.height - this.handlerPosition.top}px`,
-        width: `${this.handlerPosition.width}px !important`,
         left: `${-this.handlerPosition.left}px`
+      } : null
+    }
+  }
+  get getLStyleChild () {
+    if (this.resizeDiv === 'drag') {
+      return this.size ? {
+        height: `${this.size.height}px !important`
+      } : null
+    } else {
+      return this.size ? {
+        height: `${this.handlerPosition.height}px !important`
+      } : null
+    }
+  }
+  get getTStyleChild () {
+    if (this.resizeDiv === 'drag') {
+      return this.size ? {
+        width: `${this.size.width}px !important`
+      } : null
+    } else {
+      return this.size ? {
+        width: `${this.handlerPosition.width}px !important`
+      } : null
+    }
+  }
+  get getRStyleChild () {
+    if (this.resizeDiv === 'drag') {
+      return this.size ? {
+        height: `${this.size.height}px !important`
+      } : null
+    } else {
+      return this.size ? {
+        height: `${this.handlerPosition.height}px !important`
+      } : null
+    }
+  }
+  get getBStyleChild () {
+    if (this.resizeDiv === 'drag') {
+      return this.size ? {
+        width: `${this.size.width}px !important`
+      } : null
+    } else {
+      return this.size ? {
+        width: `${this.handlerPosition.width}px !important`
       } : null
     }
   }
@@ -626,7 +670,7 @@ export default class Resizehandler extends FDCommonMethod {
 <style  scoped>
 .move-border {
   z-index: 9999;
-  position: absolute;
+  position: fixed;
   border: 0.5px rgb(59, 58, 58) dashed;
   margin: -4px
 }

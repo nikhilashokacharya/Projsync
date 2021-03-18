@@ -60,7 +60,7 @@ import { EventBus } from '@/FormDesigner/event-bus'
 export default class ResizeUserForm extends FdSelectVue {
   @Prop({ required: true, type: String }) public containerId!: string;
   @Ref('userFormRef') readonly userFormRef!: Userform;
-  $el: HTMLDivElement
+  $el!: HTMLDivElement
 
   containerEditMode: boolean = false
   isRepeat: boolean = false

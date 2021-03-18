@@ -71,13 +71,13 @@ import { controlProperties } from '@/FormDesigner/controls-properties'
   }
 })
 export default class FDScrollBar extends Mixins(FdControlVue) {
-  $el: HTMLDivElement
+  $el!: HTMLDivElement
   isInvert: boolean = false
   intervalVariable: number = 0
   thumbHeight: string = ''
   minHeight: string = ''
   currentThumbLeft: number = 0
-  @Ref('sliderRef') sliderRef: HTMLInputElement
+  @Ref('sliderRef') sliderRef!: HTMLInputElement
   updateValueProperty (e: Event) {
     if (e.target instanceof HTMLInputElement) {
       const targetValue = parseInt(e.target!.value)

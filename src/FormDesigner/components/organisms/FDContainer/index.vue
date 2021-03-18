@@ -85,15 +85,15 @@ import DragSelector from '@/FormDesigner/components/organisms/FDDragSelector/Dra
 export default class Container extends FDCommonMethod {
   $el!: HTMLDivElement;
   currentSelectedGroup: string = '';
-  @Prop() getScrollBarX: string
-  @Prop() getScrollBarY: string
+  @Prop() getScrollBarX!: string
+  @Prop() getScrollBarY!: string
   isControlPasted: boolean = false
 
   @Prop({ required: true, type: String }) public controlId!: string;
   @Prop({ required: true, type: String }) userFormId!: string;
   @Prop({ required: true, type: String }) containerId!: string;
-  @Prop() mouseCursorData: string;
-  @Prop() getSampleDotPattern: { backgroundImage: string; backgroundSize: string; backgroundPosition: string }
+  @Prop() mouseCursorData!: string;
+  @Prop() getSampleDotPattern!: { backgroundImage: string; backgroundSize: string; backgroundPosition: string }
   @State((state: rootState) => state.fd.toolBoxSelect) toolBoxSelect!: fdState['toolBoxSelect'];
   @State((state) => state.fd.selectedControls)
   selectedControls!: fdState['selectedControls'];
@@ -112,32 +112,32 @@ export default class Container extends FDCommonMethod {
   ) => void;
   @Action('fd/selectControl') selectControl!: (payload: IselectControl) => void;
 
-  @Prop() isEditMode: boolean;
-  @Prop() width: number
-  @Prop() height: number
+  @Prop() isEditMode!: boolean
+  @Prop() width!: number
+  @Prop() height!: number
 
   @Ref('groupRef') readonly groupRef!: GroupControl;
   @Ref('refContextMenu') readonly refContextMenu!: ContextMenu;
-  @Ref('dragSelector') readonly dragSelector: dragselector;
-  @Ref('contextmenu') readonly contextmenu: HTMLDivElement;
-  @Ref('parentDivRef') parentDivRef: HTMLDivElement
-  @Ref('verticalScrollRef') verticalScrollRef: HTMLDivElement
-  @Ref('horizontalScrollRef') horizontalScrollRef: HTMLDivElement
-  @Ref('pictureDivRef') pictureDivRef: HTMLDivElement
-  @Ref('childDivRef') childDivRef: HTMLDivElement
+  @Ref('dragSelector') readonly dragSelector!: dragselector;
+  @Ref('contextmenu') readonly contextmenu!: HTMLDivElement;
+  @Ref('parentDivRef') parentDivRef!: HTMLDivElement
+  @Ref('verticalScrollRef') verticalScrollRef!: HTMLDivElement
+  @Ref('horizontalScrollRef') horizontalScrollRef!: HTMLDivElement
+  @Ref('pictureDivRef') pictureDivRef!: HTMLDivElement
+  @Ref('childDivRef') childDivRef!: HTMLDivElement
 
-  @Prop() createBackgroundString: string
-  @Prop() getSizeMode: string
-  @Prop() getRepeatData: string
-  @Prop() getPosition: string
-  @Prop() dragSelctorWidthHeight: Partial<CSSStyleDeclaration>
-  @Prop() frameTop: number
+  @Prop() createBackgroundString!: string
+  @Prop() getSizeMode!: string
+  @Prop() getRepeatData!: string
+  @Prop() getPosition!: string
+  @Prop() dragSelctorWidthHeight!: Partial<CSSStyleDeclaration>
+  @Prop() frameTop!: number
 
   controlContextMenu: Array<IcontextMenu> = controlContextMenu;
   userformContextMenu: Array<IcontextMenu> = userformContextMenu;
   handler: string = '';
   grouphandler: string = '';
-  mainSelectData: controlData
+  mainSelectData!: controlData
   containerPosition: IMousePosition = { clientX: 0, clientY: 0, movementX: 0, movementY: 0 }
   selectedGroup: string[] = []
   groupStyleArray: Array<IGroupStyle> = [];
@@ -479,10 +479,10 @@ export default class Container extends FDCommonMethod {
     }
   }
   muldragControl (val: IDragResizeGroup) {
-    this.groupRef.handleMouseDown(val.event, val.handler)
+    this.groupRef.handleMouseDown(val.event, val.handler, '')
   }
   dragControl (event: MouseEvent) {
-    this.groupRef.handleMouseDown(event, 'drag')
+    this.groupRef.handleMouseDown(event, 'drag', '')
   }
   /**
    * @description style object to dynamically changing the styles of  the darg-selctor component based on propControlData

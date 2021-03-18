@@ -1,4 +1,5 @@
 <template>
+<div>
   <div
     class="custom-select"
     :tabindex="tabindex"
@@ -163,7 +164,14 @@
         </div>
       </div>
     </div>
-      <div class="items" :class="{ selectHide: !open }" :style="itemsStyleObj" @mouseover="updateMouseCursor" ref="itemsRef">
+    </div>
+        <label
+          ref="autoSizeTextarea"
+          class="labelStyle"
+          :class="labelStyleObj"
+        ></label>
+  </div>
+  <div class="items" :class="{ selectHide: !open }" :style="itemsStyleObj" @mouseover="updateMouseCursor" ref="itemsRef">
         <div
           class="listStyle"
           :title="properties.ControlTipText"
@@ -274,14 +282,8 @@
             </div>
           </div>
         </div>
-      </div>
-    </div>
-        <label
-          ref="autoSizeTextarea"
-          class="labelStyle"
-          :class="labelStyleObj"
-        ></label>
   </div>
+</div>
 </template>
 
 <script lang="ts">
@@ -299,7 +301,7 @@ import { EventBus } from '@/FormDesigner/event-bus'
 })
 export default class FDComboBox extends Mixins(FdControlVue) {
   $el!: HTMLDivElement;
-  @Ref('textareaRef') textareaRef: HTMLTextAreaElement;
+  @Ref('textareaRef') textareaRef!: HTMLTextAreaElement;
   @Ref('autoSizeTextarea') readonly autoSizeTextarea!: HTMLLabelElement;
   @Ref('hideSelectionDiv') readonly hideSelectionDiv!: HTMLDivElement;
   @Ref('comboRef') comboRef!: HTMLDivElement;
@@ -317,7 +319,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   tempInputValue: string = '';
   tempWidth: string = '0px';
   isScrolling: boolean = false;
-  tempHeight: number;
+  tempHeight: number = 0;
   inBlur: boolean = false;
   headWidth: string = '100%';
   controlZIndex: number = -1;
@@ -557,7 +559,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     const a = e.currentTarget! as HTMLDivElement
     this.selectionData[0] = a.innerText
     for (let i = 0; i < this.extraDatas.RowSourceData!.length; i++) {
-      const b = this.trRef[i].children[0] as HTMLDivElement
+      const b = this.properties.ListStyle === 0 ? this.trRef[i].children[0] as HTMLDivElement : this.trRef[i].children[1] as HTMLDivElement
       const aInnerText = a.innerText.split('\n')
       if (aInnerText[0] === b.innerText) {
         if (this.properties.TextColumn === -1) {
@@ -578,13 +580,11 @@ export default class FDComboBox extends Mixins(FdControlVue) {
   @Watch('open')
   openValidate () {
     if (this.open) {
-      this.updateDataModelExtraData({ propertyName: 'zIndex', value: -1 })
       this.listHeightValue()
       if (this.properties.RowSource === '') {
         this.updateEmptyColumnHeight()
       }
     } else {
-      this.updateDataModelExtraData({ propertyName: 'zIndex', value: this.controlZIndex })
     }
     if (this.open && this.properties.RowSource !== '') {
       Vue.nextTick(() => {
@@ -1446,20 +1446,22 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     const controlProp = this.properties
     return {
       width: controlProp.Width! > 21 ? 'fit-content' : '0px',
-      gridTemplateColumns: controlProp.Width! > 21 ? '5px auto' : '0px 0px'
+      gridTemplateColumns: controlProp.Width! > 21 ? '5px ' + `${controlProp.Width! - 29}px` : '0px 0px'
 
     }
   }
   dblclick (e: Event) {
-    let newSelectionStart = 0
-    const eTarget = e.target as HTMLTextAreaElement
-    for (let i = eTarget.selectionStart; i > 0; i--) {
-      if (eTarget.value[i - 1] === ' ' || eTarget.value[i - 1] === undefined) {
-        newSelectionStart = i
-        break
+    if (this.isEditMode) {
+      let newSelectionStart = 0
+      const eTarget = e.target as HTMLTextAreaElement
+      for (let i = eTarget.selectionStart; i > 0; i--) {
+        if (eTarget.value[i - 1] === ' ' || eTarget.value[i - 1] === undefined) {
+          newSelectionStart = i
+          break
+        }
       }
+      this.textareaRef.setSelectionRange(newSelectionStart, eTarget.selectionEnd)
     }
-    this.textareaRef.setSelectionRange(newSelectionStart, eTarget.selectionEnd)
   }
 
   toFocus () {
@@ -1620,27 +1622,33 @@ export default class FDComboBox extends Mixins(FdControlVue) {
       this.selectionStart = eventTarget.selectionStart
       this.selectionEnd = eventTarget.selectionEnd
     }
-    if (
-      !this.properties.HideSelection &&
-      textareaRef &&
-      event.target instanceof HTMLTextAreaElement
-    ) {
-      const eventTarget = event.target
+    // if (
+    //   !this.properties.HideSelection &&
+    //   textareaRef &&
+    //   event.target instanceof HTMLTextAreaElement
+    // ) {
+    //   const eventTarget = event.target
 
-      hideSelectionDiv.style.display = 'block'
-      hideSelectionDiv.style.height = this.properties.Height! + 'px'
-      hideSelectionDiv.style.width = this.properties.Width! + 'px'
-      textareaRef.style.display = 'none'
-      let textarea = eventTarget.value
-      let firstPart =
-        textarea.slice(0, eventTarget.selectionEnd) +
-        '</span>' +
-        textarea.slice(eventTarget.selectionEnd + Math.abs(0))
-      let text =
-        firstPart.slice(0, eventTarget.selectionStart) +
-        "<span style='background-color:lightblue'>" +
-        firstPart.slice(eventTarget.selectionStart + Math.abs(0))
-      hideSelectionDiv.innerHTML = text
+    //   hideSelectionDiv.style.display = 'block'
+    //   hideSelectionDiv.style.height = this.properties.Height! + 'px'
+    //   hideSelectionDiv.style.width = this.properties.Width! + 'px'
+    //   textareaRef.style.display = 'none'
+    //   let textarea = eventTarget.value
+    //   let firstPart =
+    //     textarea.slice(0, eventTarget.selectionEnd) +
+    //     '</span>' +
+    //     textarea.slice(eventTarget.selectionEnd + Math.abs(0))
+    //   let text =
+    //     firstPart.slice(0, eventTarget.selectionStart) +
+    //     "<span style='background-color:lightblue'>" +
+    //     firstPart.slice(eventTarget.selectionStart + Math.abs(0))
+    //   hideSelectionDiv.innerHTML = text
+    // }
+    const selection = window.getSelection()!
+    if (selection.rangeCount >= 1) {
+      for (var i = 0; i < selection.rangeCount; i++) {
+        selection.removeRange(selection.getRangeAt(i))
+      }
     }
     if (this.properties.MatchRequired && textareaRef) {
       const arrayCheck = this.extraDatas.RowSourceData!.findIndex(
@@ -1668,17 +1676,17 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     if (this.isOpenForStyleProp && this.properties.Style === 1) {
       this.open = !this.open
     }
-    if (!this.properties.HideSelection) {
-      hideSelectionDiv.style.display = 'none'
-    } else {
-      return undefined
-    }
-    if (this.properties.EnterFieldBehavior === 0) {
-      this.textareaRef.focus()
-      this.textareaRef.select()
-    } else if (this.properties.EnterFieldBehavior === 1) {
-    } else {
-      return undefined
+    // if (!this.properties.HideSelection) {
+    //   hideSelectionDiv.style.display = 'none'
+    // } else {
+    //   return undefined
+    // }
+    if (this.isRunMode) {
+      if (this.properties.EnterFieldBehavior === 0) {
+        this.textareaRef.focus()
+        this.textareaRef.select()
+      } else if (this.properties.EnterFieldBehavior === 1) {
+      }
     }
   }
   /**
@@ -1690,23 +1698,23 @@ export default class FDComboBox extends Mixins(FdControlVue) {
    * @event click
    */
   divHide (event: MouseEvent, textareaRef: HTMLTextAreaElement) {
-    if (
-      event.target instanceof HTMLSpanElement ||
-      event.target instanceof HTMLDivElement
-    ) {
-      event.target.style.display = 'none'
-      textareaRef.style.display = 'block'
-      if (
-        event.target.tagName === 'SPAN' &&
-        event.target.parentNode!.nodeName === 'DIV'
-      ) {
-        (event.target.parentNode as HTMLElement).style.display = 'none'
-      }
-      textareaRef.focus()
-      textareaRef.selectionStart = textareaRef.selectionEnd
-    } else {
-      throw new Error('event.target is not an instance of Span or Div Element')
-    }
+    // if (
+    //   event.target instanceof HTMLSpanElement ||
+    //   event.target instanceof HTMLDivElement
+    // ) {
+    //   event.target.style.display = 'none'
+    //   textareaRef.style.display = 'block'
+    //   if (
+    //     event.target.tagName === 'SPAN' &&
+    //     event.target.parentNode!.nodeName === 'DIV'
+    //   ) {
+    //     (event.target.parentNode as HTMLElement).style.display = 'none'
+    //   }
+    //   textareaRef.focus()
+    //   textareaRef.selectionStart = textareaRef.selectionEnd
+    // } else {
+    //   throw new Error('event.target is not an instance of Span or Div Element')
+    // }
   }
   /**
    * @description dragBehavior - if true when dragging
@@ -1943,7 +1951,8 @@ export default class FDComboBox extends Mixins(FdControlVue) {
       display = controlProp.Width === 0 || controlProp.Height === 0 ? 'none' : 'block'
     }
     return {
-      display: display
+      display: display,
+      zIndex: this.isEditMode ? (this.getHighestZIndex !== -1) ? this.getHighestZIndex + 1 + '' : this.extraDatas.zIndex! <= 0 ? '' : this.extraDatas.zIndex! + '' : ''
     }
   }
   protected get tdStyleObj (): Partial<CSSStyleDeclaration> {
@@ -2015,13 +2024,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     this.updateColumns()
   }
 
-  @Watch('data.extraDatas.zIndex')
-  setLocalZIndex () {
-    this.controlZIndex = this.data.extraDatas!.zIndex!
-  }
-
   mounted () {
-    this.controlZIndex = this.data.extraDatas!.zIndex!
     this.$el.focus({
       preventScroll: true
     })
@@ -2182,7 +2185,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
       cursor: this.controlCursor,
       position: 'absolute',
       top: `${controlProp.Height! + 1}px`,
-      zIndex: '999'
+      zIndex: '9999999999999'
     }
   }
 

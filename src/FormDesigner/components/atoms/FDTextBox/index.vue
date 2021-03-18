@@ -120,22 +120,24 @@ import { EventBus } from '@/FormDesigner/event-bus'
 export default class FDTextBox extends Mixins(FdControlVue) {
   @Ref('hideSelectionDiv') readonly hideSelectionDiv!: HTMLDivElement;
   @Ref('autoSizeTextarea') readonly autoSizeTextarea!: HTMLLabelElement;
-  @Ref('textareaRef') textareaRef: HTMLTextAreaElement;
+  @Ref('textareaRef') textareaRef!: HTMLTextAreaElement;
 
-  $el: HTMLDivElement
+  $el!: HTMLDivElement
   originalText: string = ''
   trimmedText: string = ''
   fitToSizeWhenMultiLine: boolean = false
   dblclick (e: Event) {
-    let newSelectionStart = 0
-    const eTarget = e.target as HTMLTextAreaElement
-    for (let i = eTarget.selectionStart; i > 0; i--) {
-      if (eTarget.value[i - 1] === ' ' || eTarget.value[i - 1] === undefined) {
-        newSelectionStart = i
-        break
+    if (this.isEditMode) {
+      let newSelectionStart = 0
+      const eTarget = e.target as HTMLTextAreaElement
+      for (let i = eTarget.selectionStart; i > 0; i--) {
+        if (eTarget.value[i - 1] === ' ' || eTarget.value[i - 1] === undefined) {
+          newSelectionStart = i
+          break
+        }
       }
+      this.textareaRef.setSelectionRange(newSelectionStart, eTarget.selectionEnd)
     }
-    this.textareaRef.setSelectionRange(newSelectionStart, eTarget.selectionEnd)
   }
   get getDisableValue () {
     if (this.isRunMode) {
@@ -352,7 +354,11 @@ export default class FDTextBox extends Mixins(FdControlVue) {
       const val = el.value
       const selStart = el.selectionStart
       el.value = val.slice(0, selStart) + text + val.slice(el.selectionEnd)
-      el.selectionEnd = el.selectionStart = selStart + text.length
+      const startEndPos = selStart + text.length
+      el.selectionStart = el.selectionEnd = startEndPos
+      this.textareaRef.blur()
+      this.textareaRef.focus()
+      el.selectionStart = el.selectionEnd = startEndPos
     }
   }
   /**
@@ -365,8 +371,8 @@ export default class FDTextBox extends Mixins(FdControlVue) {
   enterKeyBehavior (event: KeyboardEvent): boolean {
     if (this.properties.MultiLine) {
       if (event.ctrlKey) {
-        // // this.handleCtrlEnter(this.textareaRef, '\n')
-        // // const eTarget = event.target as HTMLTextAreaElement
+        this.handleCtrlEnter(this.textareaRef, '\n')
+        // const eTarget = event.target as HTMLTextAreaElement
         // this.updateDataModel({ propertyName: 'Value', value: eTarget.value })
         return true
       } else if (this.properties.EnterKeyBehavior && this.properties.MultiLine) {
@@ -670,6 +676,12 @@ export default class FDTextBox extends Mixins(FdControlVue) {
   ) {
     this.getSelectionStart = this.textareaRef.selectionStart
     this.getSelectionEnd = this.textareaRef.selectionEnd
+    const selection = window.getSelection()!
+    if (selection.rangeCount >= 1) {
+      for (var i = 0; i < selection.rangeCount; i++) {
+        selection.removeRange(selection.getRangeAt(i))
+      }
+    }
     // if (!this.properties.HideSelection) {
     //   if (event.target instanceof HTMLTextAreaElement) {
     //     const eventTarget = event.target

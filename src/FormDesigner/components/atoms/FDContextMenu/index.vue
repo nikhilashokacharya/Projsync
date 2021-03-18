@@ -102,18 +102,18 @@ import FDCommonMethod from '@/api/abstract/FormDesigner/FDCommonMethod'
   }
 })
 export default class ContextMenu extends FDCommonMethod {
-  @Prop() values: Array<IControlContextMenu>;
-  @Prop() userFormId: string;
-  @Prop() containerId: string;
-  @Prop() keyEventName: string;
-  @Prop() controlId: string;
-  @Prop() selectedTab: number;
-  @Prop() data: controlData;
-  @Prop() groupStyleArray: Array<IGroupStyle>
-  @Prop() contextMenutype: string
-  @Prop() editTextRef: HTMLSpanElement | HTMLTextAreaElement
-  @Prop() copiedText: string
-  @Prop() textMenu: boolean
+  @Prop() values!: Array<IControlContextMenu>;
+  @Prop() userFormId!: string;
+  @Prop() containerId!: string;
+  @Prop() keyEventName!: string;
+  @Prop() controlId!: string;
+  @Prop() selectedTab!: number;
+  @Prop() data: controlData | undefined;
+  @Prop() groupStyleArray!: Array<IGroupStyle>
+  @Prop() contextMenutype!: string
+  @Prop() editTextRef!: HTMLSpanElement | HTMLTextAreaElement
+  @Prop() copiedText!: string
+  @Prop() textMenu!: boolean
 
   @State((state) => state.fd.selectedControls)
   selectedControls!: fdState['selectedControls'];

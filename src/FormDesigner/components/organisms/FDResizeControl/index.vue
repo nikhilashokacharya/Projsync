@@ -60,6 +60,7 @@
         :isRunMode="isRunMode"
         :isEditMode="isEditMode"
         :containerId="containerId"
+        :getHighestZIndex="getControlZIndex"
         @setEditMode="setEditMode"
         @selectedItem="selectedItem"
         @deleteItem="deleteItem"
@@ -254,6 +255,15 @@ export default class ResizeControl extends FdSelectVue {
   selectMultipleCtrl (val: boolean) {
     this.selMultipleCtrl = val
   }
+  get getControlZIndex () {
+    const selected = this.getSelectedControlsDatas!
+    const getContainerList = this.getContainerList(selected[0])
+    if (selected.includes(this.controlId)) {
+      return this.getHighestZIndex(this.controlId)!
+    } else if (getContainerList.includes(this.controlId)) {
+      return this.getHighestZIndex(this.controlId)!
+    }
+  }
   get componentStyle () {
     const userData = this.userformData[this.userFormId]
     const currentProperties = this.propControlData.properties
@@ -267,19 +277,34 @@ export default class ResizeControl extends FdSelectVue {
     } else if (getContainerList.includes(this.controlId)) {
       highestZIndex = this.getHighestZIndex(this.controlId)!
     }
-    return {
-      position: 'absolute',
-      left: `${currentProperties.Left!}px`,
-      top: `${currentProperties.Top!}px`,
-      /* border width(5) * 2 = 10 */
-      width: `${currentProperties.Width!}px`,
-      height: `${currentProperties.Height!}px`,
-      display:
+    if (type === 'ComboBox' && this.isEditMode) {
+      return {
+        position: 'absolute',
+        left: `${currentProperties.Left!}px`,
+        top: `${currentProperties.Top!}px`,
+        /* border width(5) * 2 = 10 */
+        width: `${currentProperties.Width!}px`,
+        height: `${currentProperties.Height!}px`,
+        display:
+        this.isRunMode && currentProperties.Visible === false
+          ? 'none'
+          : 'block'
+      }
+    } else {
+      return {
+        position: 'absolute',
+        left: `${currentProperties.Left!}px`,
+        top: `${currentProperties.Top!}px`,
+        /* border width(5) * 2 = 10 */
+        width: `${currentProperties.Width!}px`,
+        height: `${currentProperties.Height!}px`,
+        display:
         this.isRunMode && currentProperties.Visible === false
           ? 'none'
           : 'block',
-      // cursor: !this.isRunMode ? 'move' : 'default',
-      zIndex: (highestZIndex !== -1) ? highestZIndex + 1 : extraData.zIndex! <= 0 ? '' : extraData.zIndex!
+        // cursor: !this.isRunMode ? 'move' : 'default',
+        zIndex: (highestZIndex !== -1) ? highestZIndex + 1 : extraData.zIndex! <= 0 ? '' : extraData.zIndex!
+      }
     }
   }
 
