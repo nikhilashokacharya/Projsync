@@ -266,7 +266,18 @@ export default class FDLabel extends Mixins(FdControlVue) {
           this.positionLogo(this.properties.PicturePosition)
         }
         this.$nextTick(() => {
-          const { width, height } = this.getWidthHeight()
+          let { width, height } = this.getWidthHeight()
+          if (this.properties.Picture && this.imageRef) {
+            if (this.properties.PicturePosition! >= 0 && this.properties.PicturePosition! <= 5) {
+              if (width === this.imageRef!.naturalWidth) {
+                width = width + 10
+              } if (height === this.imageRef!.naturalHeight) {
+                height = height - 5
+              }
+            } else {
+              width = this.imageRef!.naturalWidth
+            }
+          }
           if (this.properties.Caption === '') {
             this.updateDataModel({
               propertyName: 'Height',
@@ -327,7 +338,6 @@ export default class FDLabel extends Mixins(FdControlVue) {
 <style scoped>
 .label {
   float: left;
-  padding-left: 2px;
   overflow: hidden;
   outline: none;
   box-sizing: border-box;
