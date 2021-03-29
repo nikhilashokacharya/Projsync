@@ -13,6 +13,8 @@
     @keydown.enter.exact="setContentEditable($event, true)"
     @contextmenu="showContextMenu($event, controlId, controlId, 'container', isEditMode)"
     @keyup.stop="selectMultipleCtrl($event, false)"
+    @mouseup="handleMouseUp"
+    @mousedown="handleMouseDown"
   >
     <legend ref="fieldsetRef" :style="legendCssStyleProperty">{{ properties.Caption }}</legend>
     <div :style="scrollSize()" ref="frame" >
@@ -235,7 +237,7 @@ export default class FDFrame extends Mixins(FdContainerVue) {
       wordBreak: 'normal',
       overflow: 'hidden',
       maxWidth: `${controlProp.Width! - 20}px`,
-      zIndex: '1'
+      zIndex: this.controls.length === 0 ? '1' : (this.controls.length + 1).toString()
     }
   }
   scrollSize () {
@@ -333,6 +335,19 @@ export default class FDFrame extends Mixins(FdContainerVue) {
     } else {
       this.addControlObj(event, this.controlId)
     }
+  }
+  handleMouseDown (event: MouseEvent) {
+    const container = this.selectedControls[this.userFormId].container
+    const selected = this.containerRef.getSelectedControlsDatas!
+    if (!(container.includes(this.controlId) || selected.includes(this.controlId))) {
+      EventBus.$emit('getDragSelectorEdit', event, this.controlId)
+    }
+    if (this.isEditMode || this.toolBoxSelect !== 'Select') {
+      event.stopPropagation()
+    }
+  }
+  handleMouseUp (event: MouseEvent) {
+    this.containerRef.onMouseUp(event)
   }
 }
 </script>

@@ -47,6 +47,7 @@
           :value="properties.Text"
           @dragstart="dragBehavior"
           @keydown.enter.prevent
+          @keydown.tab.exact="moveToNextControl"
         />
         <div
           ref="hideSelectionDiv"
@@ -176,7 +177,7 @@
           class="listStyle"
           :title="properties.ControlTipText"
           :style="listStyleObj"
-          @mousedown="scrollingOnListItems"
+          @mousedown.stop="scrollingOnListItems"
         >
           <div
             :style="tableStyleObj"
@@ -244,7 +245,7 @@
                 @mouseenter="handleDrag"
                 @keydown="handleExtendArrowKeySelect"
                 @blur="clearMatchEntry"
-                @mousedown="
+                @mousedown.stop="
                   isRunMode || isEditMode
                     ? checkBothEnabledAndLocked
                       ? handleMultiSelect($event)
@@ -1504,7 +1505,13 @@ export default class FDComboBox extends Mixins(FdControlVue) {
       this.headWidth = '100%'
     }
   }
-
+  moveToNextControl (e: KeyboardEvent) {
+    if (this.isEditMode) {
+      e.preventDefault()
+      e.stopPropagation()
+      EventBus.$emit('focusNextControlOnAutoTab')
+    }
+  }
   handleTextInput (e: Event) {
     const controlPropData = this.properties
     if (controlPropData.AutoTab && controlPropData.MaxLength! > 0) {
@@ -1582,6 +1589,10 @@ export default class FDComboBox extends Mixins(FdControlVue) {
 
   scrollingOnListItems (e: Event) {
     this.isScrolling = true
+    if (this.properties.RowSource === '') {
+      this.isScrolling = false
+      this.open = false
+    }
   }
   /**
    * @description  show selection when TextBox loses focus
@@ -1622,28 +1633,6 @@ export default class FDComboBox extends Mixins(FdControlVue) {
       this.selectionStart = eventTarget.selectionStart
       this.selectionEnd = eventTarget.selectionEnd
     }
-    // if (
-    //   !this.properties.HideSelection &&
-    //   textareaRef &&
-    //   event.target instanceof HTMLTextAreaElement
-    // ) {
-    //   const eventTarget = event.target
-
-    //   hideSelectionDiv.style.display = 'block'
-    //   hideSelectionDiv.style.height = this.properties.Height! + 'px'
-    //   hideSelectionDiv.style.width = this.properties.Width! + 'px'
-    //   textareaRef.style.display = 'none'
-    //   let textarea = eventTarget.value
-    //   let firstPart =
-    //     textarea.slice(0, eventTarget.selectionEnd) +
-    //     '</span>' +
-    //     textarea.slice(eventTarget.selectionEnd + Math.abs(0))
-    //   let text =
-    //     firstPart.slice(0, eventTarget.selectionStart) +
-    //     "<span style='background-color:lightblue'>" +
-    //     firstPart.slice(eventTarget.selectionStart + Math.abs(0))
-    //   hideSelectionDiv.innerHTML = text
-    // }
     const selection = window.getSelection()!
     if (selection.rangeCount >= 1) {
       for (var i = 0; i < selection.rangeCount; i++) {
@@ -1673,7 +1662,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     textareaRef: HTMLTextAreaElement,
     hideSelectionDiv: HTMLDivElement
   ) {
-    if (this.isOpenForStyleProp && this.properties.Style === 1) {
+    if (this.isEditMode && this.properties.Style === 1 && event.which !== 3) {
       this.open = !this.open
     }
     // if (!this.properties.HideSelection) {
@@ -1698,23 +1687,6 @@ export default class FDComboBox extends Mixins(FdControlVue) {
    * @event click
    */
   divHide (event: MouseEvent, textareaRef: HTMLTextAreaElement) {
-    // if (
-    //   event.target instanceof HTMLSpanElement ||
-    //   event.target instanceof HTMLDivElement
-    // ) {
-    //   event.target.style.display = 'none'
-    //   textareaRef.style.display = 'block'
-    //   if (
-    //     event.target.tagName === 'SPAN' &&
-    //     event.target.parentNode!.nodeName === 'DIV'
-    //   ) {
-    //     (event.target.parentNode as HTMLElement).style.display = 'none'
-    //   }
-    //   textareaRef.focus()
-    //   textareaRef.selectionStart = textareaRef.selectionEnd
-    // } else {
-    //   throw new Error('event.target is not an instance of Span or Div Element')
-    // }
   }
   /**
    * @description dragBehavior - if true when dragging
@@ -1756,22 +1728,42 @@ export default class FDComboBox extends Mixins(FdControlVue) {
           }
         }
         let addValue = spaceCount * (parseInt(textareaRef.style.fontSize) / 4.5)
-        if (this.properties.SelectionMargin) {
-          this.updateDataModel({
-            propertyName: 'Width',
-            value:
+        if (this.properties.ShowDropButtonWhen === 2) {
+          if (this.properties.SelectionMargin) {
+            this.updateDataModel({
+              propertyName: 'Width',
+              value:
             tempLabel.offsetWidth > 20
               ? tempLabel.offsetWidth + 25 + addValue + 8
               : tempLabel.offsetWidth + 29 + addValue + 8
-          })
-        } else {
-          this.updateDataModel({
-            propertyName: 'Width',
-            value:
+            })
+          } else {
+            this.updateDataModel({
+              propertyName: 'Width',
+              value:
             tempLabel.offsetWidth > 20
               ? tempLabel.offsetWidth + 25 + addValue
               : tempLabel.offsetWidth + 29 + addValue
-          })
+            })
+          }
+        } else {
+          if (this.properties.SelectionMargin) {
+            this.updateDataModel({
+              propertyName: 'Width',
+              value:
+            tempLabel.offsetWidth > 20
+              ? tempLabel.offsetWidth + 5 + addValue + 8
+              : tempLabel.offsetWidth + 9 + addValue + 8
+            })
+          } else {
+            this.updateDataModel({
+              propertyName: 'Width',
+              value:
+            tempLabel.offsetWidth > 20
+              ? tempLabel.offsetWidth + 5 + addValue
+              : tempLabel.offsetWidth + 9 + addValue
+            })
+          }
         }
         this.updateDataModel({
           propertyName: 'Height',
@@ -1952,7 +1944,7 @@ export default class FDComboBox extends Mixins(FdControlVue) {
     }
     return {
       display: display,
-      zIndex: this.isEditMode ? (this.getHighestZIndex !== -1) ? this.getHighestZIndex + 1 + '' : this.extraDatas.zIndex! <= 0 ? '' : this.extraDatas.zIndex! + '' : ''
+      zIndex: this.isEditMode ? this.extraDatas.zIndex! + '' : ''
     }
   }
   protected get tdStyleObj (): Partial<CSSStyleDeclaration> {

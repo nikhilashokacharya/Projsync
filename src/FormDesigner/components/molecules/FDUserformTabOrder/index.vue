@@ -3,6 +3,7 @@
   tabindex="0"
   @keydown.enter="updateControlData"
   @keydown.esc="closeDialog()"
+  @focus="focusSelectedControl"
   >
     <div class="outer-taborder-div popup" :style="tabOrderDialogInitialStyle">
       <div class="taborder-header-div" @mousedown.stop="dragTabOrderDialog">
@@ -21,11 +22,15 @@
         <div class="wrapper1">
           <span class="inner-header">{{controlType === 'MultiPage' ? 'Page Order' : 'Tab Order'}}</span>
           <div class="frame">
-            <div v-for="(value, index) in tabOrderList" :key="value.controlId">
+            <div v-for="(value, index) in tabOrderList" :key="value.controlId" ref="tabOrderFrameRef"
+            @keydown="selectedItem(index, $event), selectOnShiftAndCtrl(index, $event)"
+            :class="{ 'active-item': currentIndex.includes(index) }"
+            >
               <button
                 class="inside-frame"
-                :class="{ 'active-item': currentIndex === index }"
-                @click="selectedTab(index)"
+                @mousedown="selectedTab(index), selectOnShiftAndCtrl(index,$event)"
+                @mouseenter="onDrag(index, $event)"
+                :class="{ 'active-item': currentIndex.includes(index) }"
               >
                 {{ value.name }}
               </button>
@@ -75,13 +80,17 @@ export default class FDUserformTabOrder extends FdDialogDragVue {
   @Action('fd/setChildControls') setChildControls!: (
     payload: IsetChildControls
   ) => void;
+  @Ref('tabOrderFrameRef') tabOrderFrameRef!: HTMLDivElement[];
   isTabOrderOpen: boolean = false;
   userFormId: string = '';
-  currentIndex: number = -1;
+  currentIndex: number[] = [];
   tabOrderList: localTabOrderItem[] = [];
   controlType: string = ''
   containerId: string = ''
   selectedPageID: string = ''
+  isDrag: boolean = true
+  indexes: number[] = []
+  previous: number[] = []
   get buttonDisabled () {
     return !(this.tabOrderList.length > 1)
   }
@@ -119,6 +128,8 @@ export default class FDUserformTabOrder extends FdDialogDragVue {
     this.closeDialog()
   }
   closeDialog () {
+    this.currentIndex = []
+    this.previous = []
     this.selectedPageID = ''
     this.isTabOrderOpen = false
     this.getFocusElement(false)
@@ -126,6 +137,11 @@ export default class FDUserformTabOrder extends FdDialogDragVue {
   @Emit('getFocusElement')
   getFocusElement (val: boolean) {
     return { val: val, dialogType: 'userformTaborder' }
+  }
+  focusSelectedControl () {
+    if (this.tabOrderList.length > 0 && this.tabOrderFrameRef[0].children[0] && this.tabOrderFrameRef[0].children[0] instanceof HTMLButtonElement) {
+      this.tabOrderFrameRef[0].children[0].focus()
+    }
   }
   created () {
     EventBus.$on(
@@ -160,7 +176,8 @@ export default class FDUserformTabOrder extends FdDialogDragVue {
               }
             }
           }
-          this.currentIndex = 0
+          this.currentIndex = [0]
+          this.previous = []
         }
         this.isTabOrderOpen = true
         this.userFormId = userFormId

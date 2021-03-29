@@ -20,7 +20,7 @@
   >
     <div id="logo" ref="logoRef" :style="reverseStyle">
     <img v-if="properties.Picture" id="img" :src="properties.Picture" draggable="false" :style="[imageProperty,imagePos]" ref="imageRef">
-    <div v-if="!syncIsEditMode || isRunMode" :style="labelStyle" ref="textSpanRef">
+    <div v-if="!syncIsEditMode || isRunMode" :style="[labelStyle, {color: !properties.Enabled ? 'gray' : ''}]" ref="textSpanRef">
       <span :style="spanStyleObj">{{ computedCaption.afterbeginCaption }}</span>
           <span class="spanClass" :style="spanClassStyleObj">{{
             computedCaption.acceleratorCaption
@@ -30,7 +30,7 @@
     <FDEditableText
       v-else
       :editable="isRunMode === false && syncIsEditMode"
-      :style="labelStyle"
+      :style="[labelStyle, {color: !properties.Enabled ? 'gray' : ''}]"
       ref="editableTextRef"
       :caption="properties.Caption"
       @updateCaption="updateCaption"
@@ -171,7 +171,7 @@ export default class FDToggleButton extends Mixins(FdControlVue) {
         : '1px 1px gray',
       backgroundColor: controlProp.BackStyle ? controlProp.Value !== 'False' ? controlProp.BackColor : controlProp.BackColor : 'transparent',
       opacity: controlProp.BackStyle ? controlProp.Value !== 'False' ? 0.5 : 1 : 1,
-      outline: controlProp.Enabled
+      outline: this.isEditMode ? controlProp.Enabled ? '1px dotted black' : '1px solid black' : controlProp.Enabled
         ? this.isFocus
           ? '1px dotted black'
           : 'none'

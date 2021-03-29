@@ -66,13 +66,13 @@
             class="left-button"
             :style="scrollButtonStyle"
             @mouseover="updateMouseCursor"
-            @click="leftmove"
+            @click="isEditMode&&leftmove()"
           ></button>
           <button
             class="right-button"
             :style="scrollButtonStyle"
             @mouseover="updateMouseCursor"
-            @click="rightmove"
+            @click="isEditMode&&rightmove()"
           ></button>
         </div>
       </div>
@@ -99,7 +99,7 @@ import { EventBus } from '@/FormDesigner/event-bus'
 })
 export default class FDTabStrip extends FdControlVue {
   @State((state) => state.fd.userformData) userformData!: userformData;
-  @Prop() isEditMode: boolean = false;
+  @Prop() isEditMode!: boolean
   @Prop({ required: true, type: String }) public userFormId!: string;
   @Ref('tabstripContextMenu') tabstripContextMenu!: HTMLDivElement;
   @Ref('scrolling') scrolling!: HTMLDivElement;
@@ -429,7 +429,7 @@ export default class FDTabStrip extends FdControlVue {
           : this.transformScrollButtonStyle,
       display: controlProp.Style === 2 ? 'none' : !this.properties.MultiRow
         ? this.isScrollVisible
-          ? 'block'
+          ? 'flex'
           : 'none'
         : 'none',
       right:

@@ -100,8 +100,8 @@
         </div>
         <div></div>
         <div :style="getScrollButtonStyleObj" ref="buttonStyleRef">
-          <button class="left-button" :style="scrollButtonStyle" @mousedown.stop @click="leftmove" @mouseover="updateMouseCursor"></button>
-          <button class="right-button" :style="scrollButtonStyle" @mousedown.stop @click="rightmove" @mouseover="updateMouseCursor"></button>
+          <button class="left-button" :style="scrollButtonStyle" @mousedown="mouseDownstop($event)" @click="isEditMode&&leftmove()" @mouseover="updateMouseCursor"></button>
+          <button class="right-button" :style="scrollButtonStyle" @mousedown="mouseDownstop($event)" @click="isEditMode&&rightmove()" @mouseover="updateMouseCursor"></button>
         </div>
       </div>
     </div>
@@ -160,6 +160,12 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
   lastChangedInRightMove: boolean = false;
   tabsIndex: number = 0;
 
+  mouseDownstop (e: MouseEvent) {
+    debugger
+    if (this.isEditMode) {
+      e.stopPropagation()
+    }
+  }
   updateTabsWidth () {
     if (this.properties.MultiRow) {
       if (this.properties.TabOrientation === 0 || this.properties.TabOrientation === 1) {
@@ -595,7 +601,7 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
           : this.transformScrollButtonStyle,
       display: controlProp.Style === 2 ? 'none' : !this.properties.MultiRow
         ? this.isScrollVisible
-          ? 'block'
+          ? 'flex'
           : 'none'
         : 'none',
       right:
@@ -2134,9 +2140,11 @@ export default class FDMultiPage extends Mixins(FdContainerVue) {
       if (editMode) {
         event.stopPropagation()
         this.setEditMode(editMode)
-        this.updatedValue = this.pageValueIndex.indexValue
-        this.selectedPageID = this.pageValueIndex.pageValue
-        this.updateDataModel({ propertyName: 'Value', value: this.pageValueIndex.indexValue })
+        if (this.pageValueIndex && this.userformData[this.userFormId][this.controlId].controls.includes(this.pageValueIndex.pageValue)) {
+          this.updatedValue = this.pageValueIndex.indexValue
+          this.selectedPageID = this.pageValueIndex.pageValue
+          this.updateDataModel({ propertyName: 'Value', value: this.pageValueIndex.indexValue })
+        }
         this.selectControl({
           userFormId: this.userFormId,
           select: {

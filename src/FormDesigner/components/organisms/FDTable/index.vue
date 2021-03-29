@@ -174,6 +174,21 @@ export default class FDTable extends Vue {
       })
     }
   }
+  validateComboBoxPropVal (propertyValue : string, propertyName: string, controlId: string) {
+    const controlData = this.userformData[this.userFormId][controlId]
+    if (controlData.properties.RowSource) {
+      const rowSourceData = controlData.extraDatas!.RowSourceData!
+      for (var i = 0; i < rowSourceData.length; i++) {
+        for (var j = 0; j < rowSourceData[i].length; j++) {
+          if (rowSourceData[i][j] === propertyValue) {
+            return true
+          }
+        }
+      }
+      return false
+    }
+    return false
+  }
   updateProperty (arg: IPropControl) {
     const selected = this.getSelectedControlsDatas!
     const userData = this.userformData[this.userFormId]
@@ -204,6 +219,14 @@ export default class FDTable extends Vue {
         this.validateSpecialEffectForOptionButtonCheckBox(selected[i], arg.propertyName, arg.value)
       } else if (arg.propertyName === 'Text' && currentControlData.type === 'ListBox' && selected.length > 1) {
         const isValid = this.validateTextValueProperty(arg.value, arg.propertyName, selected[i])
+        if (isValid) {
+          this.updatePropValue(selected[i], arg.propertyName, arg.value)
+        } else {
+          this.setInvalidErrorMessage(arg.propertyName, 2, null)
+          this.updateInputBoxValueToPreviousValue(this.eventObjectToAssignPreviousValue, arg.propertyName)
+        }
+      } else if (arg.propertyName === 'Text' && currentControlData.type === 'ComboBox' && currentControlData.properties.Style === 1) {
+        const isValid = this.validateComboBoxPropVal(arg.value, arg.propertyName, selected[i])
         if (isValid) {
           this.updatePropValue(selected[i], arg.propertyName, arg.value)
         } else {
@@ -576,9 +599,7 @@ export default class FDTable extends Vue {
             }
           } else {
             if (controlType === 'ComboBox' && this.userformData[this.userFormId][this.getSelectedControlsDatas[0]].properties.Style === 1) {
-              this.updateInputBoxValueToPreviousValue(e, propertyName)
-              this.setInvalidErrorMessage(propertyName, 2, null)
-            } else {
+              this.eventObjectToAssignPreviousValue = e
               this.emitUpdateProperty(propertyName, propertyValue)
             }
           }

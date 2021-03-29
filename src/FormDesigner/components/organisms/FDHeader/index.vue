@@ -709,10 +709,13 @@ export default class Header extends FDCommonMethod {
     const highProrControl: string[] = []
     const lowProrControl: string[] = []
     const container = this.getContainerList(this.getSelectedControlsDatas![0])[0]
-    const containerControls = this.userformData[this.userFormId][container].controls
+    const containerControls = [...this.userformData[this.userFormId][container].controls]
+    containerControls.sort((a, b) => {
+      return userData[b].extraDatas!.zIndex! - userData[a].extraDatas!.zIndex!
+    })
     for (const index in containerControls) {
       const cntrlData = this.userformData[this.userFormId][containerControls[index]]
-      if (cntrlData.type === 'MultiPage' || cntrlData.type === 'Frame' || cntrlData.type === 'ListBox') {
+      if (cntrlData.extraDatas!.zIndex! > userData[containerControls[0]].extraDatas!.zIndex!) {
         highProrControl.push(containerControls[index])
       } else {
         lowProrControl.push(containerControls[index])
@@ -836,10 +839,13 @@ export default class Header extends FDCommonMethod {
     const highProrControl: string[] = []
     const lowProrControl: string[] = []
     const container = this.getContainerList(this.getSelectedControlsDatas![0])[0]
-    const containerControls = this.userformData[this.userFormId][container].controls
+    const containerControls = [...this.userformData[this.userFormId][container].controls]
+    containerControls.sort((a, b) => {
+      return userData[b].extraDatas!.zIndex! - userData[a].extraDatas!.zIndex!
+    })
     for (const index in containerControls) {
       const cntrlData = this.userformData[this.userFormId][containerControls[index]]
-      if (cntrlData.type === 'MultiPage' || cntrlData.type === 'Frame' || cntrlData.type === 'ListBox') {
+      if (cntrlData.extraDatas!.zIndex! > userData[containerControls[0]].extraDatas!.zIndex!) {
         highProrControl.push(containerControls[index])
       } else {
         lowProrControl.push(containerControls[index])
@@ -1739,18 +1745,19 @@ export default class Header extends FDCommonMethod {
     }
     return disabled
   }
+
   bringForward () {
     const userData = this.userformData[this.userFormId]
     const highProrControl = []
-    const lowProrControl = []
     const container = this.getContainerList(this.getSelectedControlsDatas![0])[0]
-    const containerControls = this.userformData[this.userFormId][container].controls
+    const containerControls = [...this.userformData[this.userFormId][container].controls]
+    containerControls.sort((a, b) => {
+      return userData[b].extraDatas!.zIndex! - userData[a].extraDatas!.zIndex!
+    })
     for (const index in containerControls) {
       const cntrlData = this.userformData[this.userFormId][containerControls[index]]
-      if (cntrlData.type === 'MultiPage' || cntrlData.type === 'Frame' || cntrlData.type === 'ListBox') {
+      if (cntrlData.extraDatas!.zIndex! > userData[containerControls[0]].extraDatas!.zIndex!) {
         highProrControl.push(containerControls[index])
-      } else {
-        lowProrControl.push(containerControls[index])
       }
     }
     let nextSelctedSeries: string[] = []
@@ -1766,7 +1773,6 @@ export default class Header extends FDCommonMethod {
         return 'zIndex' in userData[val].extraDatas! && (userData[val].extraDatas!.zIndex === tempZIndex + 1)
       })
       const nextSelectedControl = controlIndex !== -1 ? Object.keys(userData)[controlIndex] : ''
-      const nextControlType = userData[nextSelectedControl].type
       if (nextSelectedControl !== '' && !highProrControl.includes(nextSelectedControl)) {
         if (getSelControl!.includes(nextSelectedControl)) {
           if (!nextSelctedSeries.includes(selControl)) {
@@ -1803,14 +1809,14 @@ export default class Header extends FDCommonMethod {
           }
         }
       } else {
-        if (getSelControl!.includes(nextSelectedControl) && (type === 'Frame' || type === 'MultiPage' || type === 'ListBox')) {
+        if (getSelControl!.includes(nextSelectedControl) && (type && type !== 'Userform')) {
           if (!nextHighControlSeries.includes(selControl)) {
             nextHighControlSeries.push(selControl)
           }
           if (!nextHighControlSeries.includes(nextSelectedControl)) {
             nextHighControlSeries.push(nextSelectedControl)
           }
-        } else if (type === 'Frame' || type === 'MultiPage' || type === 'ListBox') {
+        } else if (type && type !== 'Userform') {
           if (Object.keys(nextHighControlSeries).length !== 0) {
             const tempExchageIndex = userData[nextHighControlSeries[0]].extraDatas!.zIndex!
             const swapTabIndex = userData[nextSelectedControl].extraDatas!.zIndex!
@@ -1845,10 +1851,13 @@ export default class Header extends FDCommonMethod {
     const highProrControl = []
     const lowProrControl = []
     const container = this.getContainerList(this.getSelectedControlsDatas![0])[0]
-    const containerControls = this.userformData[this.userFormId][container].controls
+    const containerControls = [...this.userformData[this.userFormId][container].controls]
+    containerControls.sort((a, b) => {
+      return userData[b].extraDatas!.zIndex! - userData[a].extraDatas!.zIndex!
+    })
     for (const index in containerControls) {
       const cntrlData = this.userformData[this.userFormId][containerControls[index]]
-      if (cntrlData.type === 'MultiPage' || cntrlData.type === 'Frame' || cntrlData.type === 'ListBox') {
+      if (cntrlData.extraDatas!.zIndex! > userData[containerControls[0]].extraDatas!.zIndex!) {
         highProrControl.push(containerControls[index])
       } else {
         lowProrControl.push(containerControls[index])
@@ -1863,11 +1872,10 @@ export default class Header extends FDCommonMethod {
     for (const selControl of getSelControl) {
       const type = userData[selControl].type
       const tempZIndex = userData[selControl].extraDatas!.zIndex!
-      const controlIndex = Object.keys(userData).findIndex((val: string, index: number) => {
+      const controlIndex = containerControls.findIndex((val: string, index: number) => {
         return 'zIndex' in userData[val].extraDatas! && (userData[val].extraDatas!.zIndex === tempZIndex - 1)
       })
-      const nextSelectedControl = controlIndex !== -1 ? Object.keys(userData)[controlIndex] : ''
-      const nextControlType = userData[nextSelectedControl].type
+      const nextSelectedControl = controlIndex !== -1 ? containerControls[controlIndex] : ''
       if (nextSelectedControl !== '' && !highProrControl.includes(selControl)) {
         if (getSelControl!.includes(nextSelectedControl)) {
           if (!nextSelctedSeries.includes(selControl)) {
@@ -1903,7 +1911,7 @@ export default class Header extends FDCommonMethod {
             }
           }
         }
-      } else if (!lowProrControl.includes(nextSelectedControl) && (type === 'Frame' || type === 'MultiPage' || type === 'ListBox')) {
+      } else if (!lowProrControl.includes(nextSelectedControl) && (type && type !== 'Userform')) {
         if (getSelControl!.includes(nextSelectedControl)) {
           if (!nextHighControlSeries.includes(selControl)) {
             nextHighControlSeries.push(selControl)

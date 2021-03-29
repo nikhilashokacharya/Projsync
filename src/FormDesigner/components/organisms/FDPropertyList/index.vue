@@ -68,6 +68,7 @@ export default class PropertiesList extends FDCommonMethod {
   propList = new PropertyListDefine();
   selected: string | number | font | null | undefined = null
   resultArray: boolean[] = []
+  styleResultArray: boolean[] = []
 
   isTableVisible = false;
   hideShowTable () {
@@ -119,11 +120,15 @@ export default class PropertiesList extends FDCommonMethod {
         const checkValArr = [['CheckBox', 'OptionButton', 'ToggleButton'],
           ['TextBox', 'ListBox', 'ComboBox'],
           ['TabStrip', 'MultiPage', 'SpinButton', 'ScrollBar']]
+        const checkStyle = [['ComboBox'],
+          ['TabStrip', 'MultiPage']
+        ]
 
-        const uniqueKey = ['Name', 'TabIndex', 'Index', 'MouseIcon', 'Picture', 'Cancel', 'Default', 'Style']
+        const uniqueKey = ['Name', 'TabIndex', 'Index', 'MouseIcon', 'Picture', 'Cancel', 'Default']
         const combinedObj: ICommonProp = {}
         const commonPropValue: ICommonPropVal = {}
         this.resultArray = []
+        this.styleResultArray = []
 
         // get array of Object which property Object of selected Controls
         for (const controlIndex in this.getSelectedControlsDatas!) {
@@ -141,6 +146,12 @@ export default class PropertiesList extends FDCommonMethod {
           uniqueKey.push('Value')
         }
 
+        for (let i = 0; i < checkStyle.length; i++) {
+          this.styleResultArray[i] = checkStyle[i].some(item => uniqueSelType.includes(item))
+        }
+        if (this.styleResultArray.filter((x: boolean) => { return x === true }).length > 1) {
+          uniqueKey.push('Style')
+        }
         // get the array which include common key of selected controls
         let commonProp = ctrlKeys.reduce((a, b) => a.filter((c: string) => b.includes(c)))
 

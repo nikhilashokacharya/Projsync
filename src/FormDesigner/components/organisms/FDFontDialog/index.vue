@@ -222,7 +222,7 @@ export interface INewFont {
 })
 export default class FDFontDialog extends FdDialogDragVue {
   @Prop() fontPropValue!: fontString;
-  @Prop() isOpen: boolean = false;
+  @Prop() isOpen!: boolean
   @Prop({ required: true }) public readonly getSelectedControlsDatas: any
   @Ref('fontDialogRef') fontDialogRef!: HTMLDivElement;
   @Ref('strikeOutRef') strikeOutRef!: HTMLInputElement;

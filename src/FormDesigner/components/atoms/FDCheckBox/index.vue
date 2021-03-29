@@ -44,7 +44,7 @@
           ref="editableTextRef"
           :editable="isRunMode === false && syncIsEditMode"
           :caption="properties.Caption"
-          :style="[labelStyle, {color: !properties.Enabled ? 'gray' : ''}]"
+          :style="[labelStyle, {color: !properties.Enabled ? 'gray' : '', outline: '1px dotted black', outlineOffset: '-1px'}]"
           @updateCaption="updateCaption"
           @releaseEditMode="releaseEditMode"
         >

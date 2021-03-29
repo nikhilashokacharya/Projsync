@@ -93,6 +93,7 @@ export default class GroupControl extends FDCommonMethod {
   isMainSelect = false;
   isMove: boolean = false
   tempEvent = {}
+  groupMouseDown: CustomMouseEvent | null = null
 
   created () {
     EventBus.$on('getGroupMoveValue', this.getGroupMoveValue)
@@ -174,11 +175,35 @@ export default class GroupControl extends FDCommonMethod {
   getClientValue (value: string, containerX: number, containerY: number, event: MouseEvent, container: string, previousEvent: MouseEvent) {
     this.value = value
     this.container = container
+    const userData = this.userformData[this.userFormId]
     if (container === this.containerId) {
+      const controlProp = this.mouseDownOnControl ? userData[this.mouseDownOnControl].properties : { ID: '' }
+      const groupProperties = controlProp.GroupID ? this.divStyleArray[this.divStyleArray.findIndex((p) => p.groupName === controlProp.GroupID)]
+        : this.groupName
+          ? this.divStyleArray[this.divStyleArray.findIndex((p) => p.groupName === this.groupName)]
+          : {}
+      const differenceX = this.mouseDownOnControl
+        ? Object.keys(groupProperties).length > 0
+          ? parseInt(groupProperties.left!) - controlProp.Left!
+          : 0
+        : 0
+      const differenceY = this.mouseDownOnControl
+        ? Object.keys(groupProperties).length > 0
+          ? parseInt(groupProperties.top!) - controlProp.Top!
+          : 0
+        : 0
       this.positions.clientX = previousEvent.clientX
       this.positions.clientY = previousEvent.clientY
-      this.positions.offsetX = previousEvent.offsetX
-      this.positions.offsetY = previousEvent.offsetY
+      if (groupProperties.groupName && this.groupMouseDown!.target instanceof HTMLDivElement && this.groupMouseDown!.target!.className.includes('m-right-b')) {
+        this.positions.offsetX = this.positions.offsetX! + parseInt(groupProperties.width!)
+        this.positions.offsetY = this.positions.offsetY!
+      } else if (groupProperties.groupName && this.groupMouseDown!.target instanceof HTMLDivElement && this.groupMouseDown!.target!.className.includes('m-bottom-b')) {
+        this.positions.offsetX = this.positions.offsetX
+        this.positions.offsetY = this.positions.offsetY! + parseInt(groupProperties.height!)
+      } else {
+        this.positions.offsetX = (this.positions.offsetX! - differenceX)
+        this.positions.offsetY = (this.positions.offsetY! - differenceY)
+      }
       this.elementMouseDrag(event, containerX, containerY, previousEvent)
     }
   }
@@ -206,6 +231,7 @@ export default class GroupControl extends FDCommonMethod {
     }
   }
   endGroupMoveControl () {
+    this.mouseDownOnControl = ''
     // if (this.getIsMoveTarget) {
     this.positions.movementX = 0
     this.positions.movementY = 0
@@ -219,6 +245,7 @@ export default class GroupControl extends FDCommonMethod {
 
   percwidthArray: number[] = [];
   percheightArray: number[] = [];
+  mouseDownOnControl: string = ''
 
   initialArray: Array<IGroupStyle> = [];
 
@@ -228,11 +255,22 @@ export default class GroupControl extends FDCommonMethod {
     })
     return isGroupPrsent === -1
   }
-  startGroupMoveControl (event: MouseEvent) {
+  startGroupMoveControl (event: MouseEvent, control: string, groupName: string) {
+    this.positions.clientX = 0
+    this.positions.clientY = 0
+    this.positions.offsetX = 0
+    this.positions.offsetY = 0
+    this.groupName = groupName
+    if (control) {
+      this.mouseDownOnControl = control
+    }
+    this.groupMouseDown = event
     // EventBus.$emit('groupDrag', 'groupdrag')
     if (this.getIsMoveTarget) {
       this.positions.clientX = event.clientX
       this.positions.clientY = event.clientY
+      this.positions.offsetX = event.offsetX
+      this.positions.offsetY = event.offsetY
     }
   }
 
@@ -241,8 +279,8 @@ export default class GroupControl extends FDCommonMethod {
       //   this.moveBorder(event)
       if (event.movementX !== 0 && event.movementY !== 0) {
         EventBus.$emit('isMousedownMove', true)
-        EventBus.$emit('moveControl', event, 'groupControlDrag')
         EventBus.$emit('groupDrag', 'groupdrag')
+        EventBus.$emit('moveControl', event, 'groupControlDrag')
         this.isMove = true
         // this.updateIsMove(true)
       }
@@ -378,31 +416,11 @@ export default class GroupControl extends FDCommonMethod {
     }
   }
 
-  get isGroupControlelected () {
-    const userData = this.userformData[this.userFormId]
-    let groupId = userData[this.getSelectedControlsDatas![0]].properties.GroupID
-    if (groupId === '') {
-      const containerList = [...this.getContainerList(this.getSelectedControlsDatas![0])]
-      containerList.reverse()
-      for (let i = 1; i < containerList.length; i++) {
-        const type = userData[containerList[i]].type
-        if (type === 'Page') {
-          groupId = userData[this.getContainerList(containerList[i])[0]].properties.GroupID!
-        } else {
-          groupId = userData[containerList[i]].properties.GroupID!
-        }
-        if (groupId !== '') {
-          break
-        }
-      }
-    }
-    return groupId
-  }
-
-  handleMouseDown (event: CustomMouseEvent, handler: string, groupName: string | undefined) {
-    EventBus.$emit('handleName', 'notDrag')
+  handleMouseDown (event: CustomMouseEvent, handler: string, groupName: string | undefined, control: string | '') {
     if (this.toolBoxSelect === 'Select' && !this.isMouseDownProp) {
-      if (groupName && this.isGroupControlelected === groupName) {
+      EventBus.$emit('handleName', 'notDrag')
+      if (groupName && handler === 'drag' &&
+      !(this.getSelectedControlsDatas!.length > 1 && this.getContainerList(groupName)[0] === this.getContainerList(this.getSelectedControlsDatas![0])[0])) {
         this.selectControl({
           userFormId: this.userFormId,
           select: { container: this.getContainerList(groupName!), selected: [groupName!] }
@@ -417,16 +435,14 @@ export default class GroupControl extends FDCommonMethod {
       this.positions.clientY = event.clientY
       this.currentMouseDownEvent = event
       if (handler !== 'drag') {
-        EventBus.$emit('startGroupMoveControl', event)
+        EventBus.$emit('startGroupMoveControl', event, '', groupName)
         EventBus.$emit('startResizeGroupControl', event, handler)
         document.onmousemove = (event: MouseEvent) => {
           EventBus.$emit('resizeGroupControl', event, this.positions)
         }
       } else {
-        this.positions.offsetX = event.offsetX
-        this.positions.offsetY = event.offsetY
         this.isMainSelect = true
-        EventBus.$emit('startGroupMoveControl', event)
+        EventBus.$emit('startGroupMoveControl', event, control, groupName)
         EventBus.$emit('startResizeGroupControl', event, handler)
         document.onmousemove = (event: MouseEvent) => {
           EventBus.$emit('moveGroupControl', event)
@@ -453,12 +469,25 @@ export default class GroupControl extends FDCommonMethod {
       this.resizeDiv = 'drag'
       let targetLeft = -1
       let targetTop = -1
-      const main = this.selectedControls[this.userFormId].selected[0]
-      const isGroup = main.startsWith('group') ? this.divStyleArray.findIndex(val => val.groupName === main) : -1
-      if (isGroup === -1) {
+      const main = this.mouseDownOnControl
+      const mainGroup = main ? this.userformData[this.userFormId][main].properties.GroupID! : ''
+      const isGroup = mainGroup !== ''
+        ? this.divStyleArray.findIndex(val => val.groupName === mainGroup)
+        : this.groupName
+          ? this.divStyleArray.findIndex(val => val.groupName === this.groupName)
+          : -1
+      if (isGroup === -1 && main) {
         const targetData = this.userformData[this.userFormId][main].properties
-        targetLeft = targetData.Left!
-        targetTop = targetData.Top!
+        if (this.groupMouseDown!.target instanceof HTMLDivElement && this.groupMouseDown!.target!.className.includes('m-right-b')) {
+          targetLeft = targetData.Left! + targetData.Width!
+          targetTop = targetData.Top!
+        } else if (this.groupMouseDown!.target instanceof HTMLDivElement && this.groupMouseDown!.target!.className.includes('m-bottom-b')) {
+          targetLeft = targetData.Left!
+          targetTop = targetData.Top! + targetData.Height!
+        } else {
+          targetLeft = targetData.Left!
+          targetTop = targetData.Top!
+        }
       } else {
         const targetData = this.divStyleArray[isGroup]
         targetLeft = parseInt(targetData.left!)
@@ -765,10 +794,12 @@ export default class GroupControl extends FDCommonMethod {
         }
       }
     }
-    for (const controlGroup in this.divStyleArray) {
-      const groupName = this.divStyleArray[controlGroup].groupName!
-      if (groupName.startsWith('group')) {
-        this.groupStyle(groupName)
+    if (handler !== 'drag') {
+      for (const controlGroup in this.divStyleArray) {
+        const groupName = this.divStyleArray[controlGroup].groupName!
+        if (groupName.startsWith('group')) {
+          this.groupStyle(groupName)
+        }
       }
     }
     document.onmouseup = null

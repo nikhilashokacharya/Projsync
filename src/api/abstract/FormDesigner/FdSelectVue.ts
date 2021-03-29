@@ -153,14 +153,6 @@ export default class FdSelectVue extends FDCommonMethod {
       value: updateData.value
     })
   }
-  bringFront () {
-    const container = this.selectedControls[this.userFormId].container[0]
-    if (container) {
-      this.swapZIndex(
-        this.userformData[this.userFormId][container].controls.length
-      )
-    }
-  }
   getMouseCursor (controlId: string, callback: Function) {
     const cursorProp = this.mousePointerToDisplay(controlId)
     callback(cursorProp)

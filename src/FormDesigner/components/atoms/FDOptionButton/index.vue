@@ -43,7 +43,7 @@
         <FDEditableText
           v-else
           :editable="isRunMode === false && syncIsEditMode"
-          :style="[labelStyle, {color: !properties.Enabled ? 'gray' : ''}]"
+          :style="[labelStyle, {color: !properties.Enabled ? 'gray' : '', outline: '1px dotted black', outlineOffset: '-1px'}]"
           :caption="properties.Caption"
           ref="editableTextRef"
           @updateCaption="updateCaption"

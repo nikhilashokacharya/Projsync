@@ -143,26 +143,8 @@ export default class FdContainerVue extends FdControlVue {
   updateZIndexValue (id: string) {
     const userData = this.userformData[this.userFormId]
     const container = this.getContainerList(id)[0]
-    const containerControls = this.userformData[this.userFormId][container].controls
-    const controlType = userData[id].type
-    if (controlType === 'MultiPage' || controlType === 'Frame' || controlType === 'ListBox') {
-      this.updateExtraDatas(id, 'zIndex', userData[container].controls.length)
-    } else {
-      const tempControls = []
-      for (const index in containerControls) {
-        const cntrlData = this.userformData[this.userFormId][containerControls[index]]
-        if (cntrlData.type === 'MultiPage' || cntrlData.type === 'Frame' || cntrlData.type === 'ListBox') {
-          tempControls.push(containerControls[index])
-        }
-      }
-      const lastControlId = tempControls.length > 0 ? this.getLowestIndex(tempControls, userData[container].controls.length, true)
-        : this.userformData[this.userFormId][container].controls.length
-      this.updateExtraDatas(id, 'zIndex', lastControlId)
-      for (const index of tempControls) {
-        const cntrlZIndex = this.userformData[this.userFormId][index].extraDatas!.zIndex!
-        this.updateExtraDatas(index, 'zIndex', cntrlZIndex + 1)
-      }
-    }
+    const lastControlId = userData[container].controls.length
+    this.updateExtraDatas(id, 'zIndex', lastControlId)
   }
   updateTabIndexValue (id: string) {
     const userData = this.userformData[this.userFormId]

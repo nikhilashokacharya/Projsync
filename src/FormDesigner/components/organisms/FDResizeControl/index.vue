@@ -4,7 +4,7 @@
       class="resizeMainControlStyle"
       :style="resizeControlStyle"
       :ref="'draRef'.concat(controlId)"
-      @contextmenu.stop="displayContextMenu"
+      @contextmenu.stop="displayContextMenu($event, controlId)"
       @click="containerBorderClick"
       @mouseup="handleMouseUp"
     >
@@ -45,7 +45,7 @@
     </div>
     <div :style="componentStyle"
       @mousedown="controlDragResizeMoueDown"
-      @contextmenu.stop="displayContextMenu"
+      @contextmenu.stop="displayContextMenu($event, '')"
       @mouseup="handleMouseUp"
     >
       <component
@@ -60,7 +60,6 @@
         :isRunMode="isRunMode"
         :isEditMode="isEditMode"
         :containerId="containerId"
-        :getHighestZIndex="getControlZIndex"
         @setEditMode="setEditMode"
         @selectedItem="selectedItem"
         @deleteItem="deleteItem"
@@ -136,6 +135,7 @@ export default class ResizeControl extends FdSelectVue {
   previousSel: string[] = []
   isGroupActive: boolean = false
   actvControl: string = ''
+  delControl: boolean = false
 
   controlDragResizeMoueDown (event: MouseEvent) {
     if (this.isPropChanged) {
@@ -303,7 +303,7 @@ export default class ResizeControl extends FdSelectVue {
           ? 'none'
           : 'block',
         // cursor: !this.isRunMode ? 'move' : 'default',
-        zIndex: (highestZIndex !== -1) ? highestZIndex + 1 : extraData.zIndex! <= 0 ? '' : extraData.zIndex!
+        zIndex: extraData.zIndex!
       }
     }
   }
@@ -409,7 +409,6 @@ export default class ResizeControl extends FdSelectVue {
           ? 'none'
           : 'block',
       cursor: !this.isRunMode ? 'move' : 'default'
-      // zIndex: (highestZIndex !== -1) ? highestZIndex + 1 : extraData.zIndex! <= 0 ? '' : extraData.zIndex!
     }
   }
   get mainSelected () {
@@ -722,21 +721,29 @@ export default class ResizeControl extends FdSelectVue {
   updateSelectedControls () {
     const type = this.userformData[this.userFormId][this.selectedContainer[0]].type
     const controlType = this.userformData[this.userFormId][this.controlId].type
-    if ((type === 'Frame' || type === 'Page' || type === 'MultiPage') && this.selectedContainer.includes(this.controlId)) {
-      if (controlType === 'Frame' || controlType === 'MultiPage') {
-        this.isEditMode = true
+    if (this.delControl === false) {
+      if ((type === 'Frame' || type === 'Page' || type === 'MultiPage') && this.selectedContainer.includes(this.controlId)) {
+        if (controlType === 'Frame' || controlType === 'MultiPage') {
+          this.isEditMode = true
+        } else {
+          if (this.isMoving === false) {
+            this.isEditMode = false
+          } else {
+            this.isMoving = false
+          }
+        }
       } else {
-        if (this.isMoving === false) {
+        if (this.isMoving === false || (this.selMultipleCtrl)) {
           this.isEditMode = false
         } else {
           this.isMoving = false
         }
       }
     } else {
-      if (this.isMoving === false || (this.selMultipleCtrl)) {
-        this.isEditMode = false
-      } else {
-        this.isMoving = false
+      this.delControl = false
+      const controlType = this.userformData[this.userFormId][this.getSelectedControlsDatas![0]].type
+      if (controlType === 'Frame' || controlType === 'MultiPage' || controlType === 'Page') {
+        this.isEditMode = true
       }
     }
   }
@@ -752,7 +759,11 @@ export default class ResizeControl extends FdSelectVue {
       return null
     }
   }
+  updateDeleteControl (val : boolean) {
+    this.delControl = val
+  }
   created () {
+    EventBus.$on('deleteControl', this.updateDeleteControl)
     EventBus.$on('actMultipleCtrl', (val: boolean) => {
       this.selMultipleCtrl = val
       this.keyType = 'shiftKey'
@@ -856,9 +867,17 @@ export default class ResizeControl extends FdSelectVue {
       callBack(this.controlId, this.isEditMode)
     }
   }
-  displayContextMenu (event: MouseEvent) {
+  displayContextMenu (event: MouseEvent, control: string) {
     event.preventDefault()
     this.previousSel = [...this.selectedControls[this.userFormId].selected]
+    if (control !== '') {
+      if (this.isEditMode) {
+        this.selectControl({
+          userFormId: this.userFormId,
+          select: { container: this.getContainerList(this.controlId), selected: [this.controlId] }
+        })
+      }
+    }
     if (this.isGroupControlelected === '') {
       this.selectedItem(event)
     } else {
