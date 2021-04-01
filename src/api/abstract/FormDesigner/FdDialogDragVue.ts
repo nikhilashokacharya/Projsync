@@ -139,7 +139,11 @@ export default class FdDialogDragVue extends Vue {
        const currentIndex = this.currentIndex.sort((a, b) => { return (b - a) })
        let count = 0
        if (currentIndex[0] !== lastIndex) {
-         this.swapTabOrderListOnDown(currentIndex, currentIndex[currentIndex.length - 1] + 1)
+         if (!this.ctrlFlag) {
+           this.swapTabOrderListOnDown(currentIndex.sort(), currentIndex[currentIndex.length - 1] + 1)
+         } else {
+           this.swapTabOrderListOnDown(currentIndex, currentIndex[currentIndex.length - 1] + 1)
+         }
          for (let index of currentIndex) {
            count = count + 1
            if (count >= 2) {
